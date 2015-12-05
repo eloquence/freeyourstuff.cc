@@ -1,0 +1,15 @@
+[{
+  "name": "Yelp",
+  "plugin": "yelp",
+  "canonicalURL": "http://www.yelp.com",
+  "regex": "http(s)*://(www.)*yelp.com",
+  "supported": ["Reviews"],
+  "unsupported": ["Comments", "Photographs", "Messages", "Events"]
+}, {
+  "name": "IMDB",
+  "plugin": "imdb",
+  "canonicalURL": "http://www.imdb.com",
+  "regex": "http(s)*://(www.)*imdb.com",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Lists"]
+}]

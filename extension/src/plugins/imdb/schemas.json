@@ -1,0 +1,66 @@
+{
+  "reviews": {
+    "schemaVersion": 1,
+    "schemaDescription": {
+      "en": "IMDB reviews"
+    },
+    "head": {
+      "reviewerName": {
+        "type": "text",
+        "description": {
+          "en": "The publicly visible username of the reviewer"
+        }
+      },
+      "reviewerID": {
+        "type": "text",
+        "description": {
+          "en": "The unique ID assigned to the user"
+        }
+      }
+    },
+    "data": {
+      "subject": {
+        "type": "text",
+        "description": {
+          "en": "The movie/show/etc. that is being reviewed"
+        }
+      },
+      "subjectIMDBURL": {
+        "type": "weburl",
+        "description": {
+          "en": "The URL pointing to the movie/show/etc. that is being reviewed"
+        }
+      },
+      "date": {
+        "type": "date",
+        "description": {
+          "en": "The date the review was posted"
+        }
+      },
+      "title": {
+        "type": "html",
+        "description": {
+          "en": "The headline for the review"
+        }
+      },
+      "text": {
+        "type": "html",
+        "description": {
+          "en": "The full text of the review"
+        }
+      },
+      "starRating": {
+        "type": "number",
+        "description": {
+          "en": "The star rating of the review (1-10)"
+        }
+      },
+      "spoilers": {
+        "type": "boolean",
+        "description": {
+          "en": "Whether the author added a spoiler warning"
+        }
+      }
+    }
+  }
+}

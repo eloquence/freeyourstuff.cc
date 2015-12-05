@@ -1,0 +1,60 @@
+{
+  "reviews": {
+    "schemaVersion": 1,
+    "schemaDescription": {
+      "en": "Yelp reviews"
+    },
+    "head": {
+      "reviewerName": {
+        "type": "text",
+        "description": {
+          "en": "The publicly visible name of the reviewer"
+        }
+      },
+      "reviewerID": {
+        "type": "text",
+        "description": {
+          "en": "The unique ID assigned to the user"
+        }
+      }
+    },
+    "data": {
+      "subject": {
+        "type": "text",
+        "description": {
+          "en": "A business, place, or other subject of the review"
+        }
+      },
+      "subjectYelpURL": {
+        "type": "weburl",
+        "description": {
+          "en": "The URL pointing to all Yelp reviews for the business/place that is being reviewed"
+        }
+      },
+      "date": {
+        "type": "date",
+        "description": {
+          "en": "The date the review was posted"
+        }
+      },
+      "text": {
+        "type": "html",
+        "description": {
+          "en": "The full text of the review"
+        }
+      },
+      "starRating": {
+        "type": "number",
+        "description": {
+          "en": "The star rating of the review (1-5)"
+        }
+      },
+      "checkins": {
+        "type": "number",
+        "descrption": {
+          "en": "Number of times the reviewer has checked into the restaurant"
+        }
+      }
+    }
+  }
+}

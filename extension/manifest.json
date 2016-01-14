@@ -25,6 +25,7 @@
     "declarativeContent",
     "activeTab",
     "storage",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "http://*.yelp.com/"
   ]
 }

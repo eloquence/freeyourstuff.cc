@@ -8,6 +8,17 @@ if (!init) {
         });
         return false;
       }
+      if (window.location.protocol == 'https:') {
+        chrome.runtime.sendMessage({
+          progress: 'Moving to a non-HTTPS URL as Yelp does not yet support full HTTPS.'
+        });
+        chrome.runtime.sendMessage({
+          redirect: 'http://www.yelp.com/user_details',
+          autoRetrieve: true
+        });
+        init = false;
+        return false;
+      }
       let datasets = [];
       retrieveReviews(reviews => {
         datasets.push(new DataSet(reviews, request.schemas.reviews).set);
@@ -31,7 +42,7 @@ function retrieveReviews(callback) {
     head: {},
     data: []
   };
-  let firstURL = 'http://www.yelp.com/user_details_reviews_self';
+  let firstURL = '//www.yelp.com/user_details_reviews_self';
   $.get(firstURL).done(processPage);
 
   function processPage(html) {

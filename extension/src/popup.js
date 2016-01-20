@@ -9,7 +9,7 @@
   // special treatment due to their size.
   'use strict';
   var fileName = '';
-  var schemas = {};
+  var schema = {};
 
   init();
   setupListeners();
@@ -63,7 +63,7 @@
           // Tells listener in content.js to perform a download action
           chrome.tabs.sendMessage(tab.id, {
             action: "retrieve",
-            schemas
+            schema
           });
           // Avoid repeated clicks by disabling
           $('#retrieve').attr('disabled', true);
@@ -91,8 +91,8 @@
               });
 
               // Load schemas + initialize plugin
-              $.getJSON(`/src/plugins/${site.plugin}/schemas.json`).done(data => {
-                schemas = data;
+              $.getJSON(`/src/plugins/${site.plugin}/schema.json`).done(data => {
+                schema = data;
                 injectScript(`/src/plugins/${site.plugin}/index.js`)().then(() => {
                   $('#retrieve').attr('hidden', false);
                   $('#retrieve').attr('disabled', false);

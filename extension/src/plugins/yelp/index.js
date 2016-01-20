@@ -19,9 +19,12 @@ if (!init) {
         init = false;
         return false;
       }
-      let datasets = [];
+      let datasets = {};
+      datasets.schemaName = request.schema.schema.schemaName;
+      datasets.schemaVersion = request.schema.schema.schemaVersion;
       retrieveReviews(reviews => {
-        datasets.push(new DataSet(reviews, request.schemas.reviews).set);
+        datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
+        console.log(datasets);
         chrome.runtime.sendMessage({
           datasets
         });

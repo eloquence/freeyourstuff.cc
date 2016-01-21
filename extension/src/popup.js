@@ -1,4 +1,5 @@
 (function() {
+
   // This script needs to be loaded at the bottom of popup.html as it performs
   // changes to the DOM. It renders the little popup action and shows what
   // "stuff" is available for the current site. It then injects the general
@@ -8,6 +9,7 @@
   // We don't yet have the ability to handle media objects, which require
   // special treatment due to their size.
   'use strict';
+
   var fileName = '';
   var schema = {};
 
@@ -62,7 +64,7 @@
         $('#retrieve').click(() => {
           // Tells listener in content.js to perform a download action
           chrome.tabs.sendMessage(tab.id, {
-            action: "retrieve",
+            action: 'retrieve',
             schema
           });
           // Avoid repeated clicks by disabling
@@ -110,35 +112,35 @@
   function setupListeners() {
     // Process content or progress updates
     chrome.runtime.onMessage.addListener((request, sender) => {
-      if (request.datasets) {
+      if (request.action == 'dispatch' && request.data) {
         $('#progress').text('');
-        let json = JSON.stringify(request.datasets, null, 2);
+        let json = JSON.stringify(request.data, null, 2);
         // We need to URI-encode it so we can stash it into the href attribute
         let encodedJSON = encodeURIComponent(json);
         $('#download').attr('hidden', false);
         $('#download').attr('href', 'data:application/json;charset=utf-8,' + encodedJSON);
         $('#download').attr('download', (fileName || 'data.json'));
         $('#retrieve').attr('disabled', false);
-      } else if (request.progress) {
+      } else if (request.action == 'notice' && request.html) {
         // In case the popup has been closed in between progress updates,
         // we want to make sure the user doesn't trigger parallel download threads
         // by accident, so we re-disable again.
         $('#retrieve').attr('disabled', true);
 
         // Report progress
-        $('#progress').html(request.progress);
-      } else if (request.loggedOut) {
+        $('#progress').html(request.html);
+      } else if (request.action == 'notice-login') {
         let siteName = $('#siteName').text() || 'this website';
         $('#error').html(`Please log into ${siteName} first.`);
         $('#retrieve').attr('disabled', false);
-      } else if (request.error) {
-        $('#error').html(request.error);
+      } else if (request.action == 'error' && request.html) {
+        $('#error').html(request.html);
         $('#retrieve').attr('disabled', false);
-      } else if (request.redirect) {
+      } else if (request.action == 'redirect' && request.url) {
         var autoRetrieve = request.autoRetrieve;
         getTab().then((tab) => {
           chrome.tabs.update(tab.id, {
-            url: request.redirect
+            url: request.url
           }, () => {
             let listener = function() {
               if (tab.status === 'complete') {

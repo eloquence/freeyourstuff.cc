@@ -4,7 +4,7 @@ if (!init) {
     if (request.action == 'retrieve') {
       if (!loggedIn()) {
         chrome.runtime.sendMessage({
-          loggedOut: true
+          action: 'notice-login'
         });
         return false;
       }
@@ -13,7 +13,8 @@ if (!init) {
         baseURL = getBaseURL();
       } catch (e) {
         chrome.runtime.sendMessage({
-          error: e.message
+          action: 'error',
+          html: e.message
         });
         return false;
       }
@@ -23,7 +24,8 @@ if (!init) {
       retrieveReviews(baseURL, reviews => {
         datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
         chrome.runtime.sendMessage({
-          datasets
+          action: 'dispatch',
+          data: datasets
         });
       });
     }
@@ -118,7 +120,8 @@ function retrieveReviews(baseURL, callback) {
         totalPages = totalPageMatch[1];
       let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
       chrome.runtime.sendMessage({
-        progress: progress
+        action: 'notice',
+        html: progress
       });
       // Fetch next page
       $.get(nextURL).done(processPage);

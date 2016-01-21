@@ -4,16 +4,18 @@ if (!init) {
     if (request.action == 'retrieve') {
       if (!loggedIn()) {
         chrome.runtime.sendMessage({
-          loggedOut: true
+          action: 'notice-login'
         });
         return false;
       }
       if (window.location.protocol == 'https:') {
         chrome.runtime.sendMessage({
-          progress: 'Moving to a non-HTTPS URL as Yelp does not yet support full HTTPS.'
+          action: 'notice',
+          html: 'Moving to a non-HTTPS URL as Yelp does not yet support full HTTPS.'
         });
         chrome.runtime.sendMessage({
-          redirect: 'http://www.yelp.com/user_details',
+          action: 'redirect',
+          url: 'http://www.yelp.com/user_details',
           autoRetrieve: true
         });
         init = false;
@@ -24,9 +26,9 @@ if (!init) {
       datasets.schemaVersion = request.schema.schema.schemaVersion;
       retrieveReviews(reviews => {
         datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
-        console.log(datasets);
         chrome.runtime.sendMessage({
-          datasets
+          action: 'dispatch',
+          data: datasets
         });
       });
     }
@@ -97,7 +99,8 @@ function retrieveReviews(callback) {
         totalPages = totalPageMatch[1];
       let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
       chrome.runtime.sendMessage({
-        progress: progress
+        action: 'notice',
+        html: progress
       });
 
       // Fetch next page

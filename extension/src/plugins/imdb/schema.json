@@ -10,12 +10,18 @@
     "head": {
       "reviewerName": {
         "type": "text",
+        "label": {
+          "en": "Reviewer name"
+        },
         "description": {
           "en": "The publicly visible username of the reviewer"
         }
       },
       "reviewerID": {
         "type": "text",
+        "label": {
+          "en": "Reviewer ID"
+        },
         "description": {
           "en": "The unique ID assigned to the user"
         }
@@ -24,41 +30,62 @@
     "data": {
       "subject": {
         "type": "text",
+        "label": {
+          "en": "Subject"
+        },
         "description": {
           "en": "The movie/show/etc. that is being reviewed"
         }
       },
       "subjectIMDBURL": {
         "type": "weburl",
+        "label": {
+          "en": "IMDB URL"
+        },
         "description": {
           "en": "The URL pointing to the movie/show/etc. that is being reviewed"
         }
       },
       "date": {
         "type": "date",
+        "label": {
+          "en": "Date"
+        },
         "description": {
           "en": "The date the review was posted"
         }
       },
       "title": {
         "type": "html",
+        "label": {
+          "en": "Title"
+        },
         "description": {
           "en": "The headline for the review"
         }
       },
       "text": {
         "type": "html",
+        "label": {
+          "en": "Text"
+        },
         "description": {
           "en": "The full text of the review"
         }
       },
       "starRating": {
         "type": "number",
+        "label": {
+          "en": "Star rating"
+        },
         "description": {
           "en": "The star rating of the review (1-10)"
         }
       },
       "spoilers": {
+        "label": {
+          "en": "Spoilers?"
+        },
         "type": "boolean",
         "description": {
           "en": "Whether the author added a spoiler warning"

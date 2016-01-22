@@ -12,6 +12,11 @@
   we use jQuery's methods where jQuery is initialized and XMLHttpRequest
   otherwise.
 
+## Dependencies
+
+- We use the DataTables library for table display. Because image paths are
+  hardcoded in the CSS, we have to rebuild the library in case of a new release.
+
 ## Message passing
 
 Chrome extensions rely heavily on message passing. Therein lies the source of

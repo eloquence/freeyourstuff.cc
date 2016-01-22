@@ -10,12 +10,18 @@
     "head": {
       "reviewerName": {
         "type": "text",
+        "label": {
+          "en": "Reviewer name"
+        },
         "description": {
           "en": "The publicly visible name of the reviewer"
         }
       },
       "reviewerID": {
         "type": "text",
+        "label": {
+          "en": "Reviewer ID"
+        },
         "description": {
           "en": "The unique ID assigned to the user"
         }
@@ -24,36 +30,55 @@
     "data": {
       "subject": {
         "type": "text",
+        "label": {
+          "en": "Subject"
+        },
         "description": {
           "en": "A business, place, or other subject of the review"
         }
       },
       "subjectYelpURL": {
         "type": "weburl",
+        "label": {
+          "en": "Yelp URL"
+        },
         "description": {
           "en": "The URL pointing to all Yelp reviews for the business/place that is being reviewed"
-        }
+        },
+        "describes": "subject"
       },
       "date": {
         "type": "date",
+        "label": {
+          "en": "Date"
+        },
         "description": {
           "en": "The date the review was posted"
         }
       },
       "text": {
         "type": "html",
+        "label": {
+          "en": "Text"
+        },
         "description": {
           "en": "The full text of the review"
         }
       },
       "starRating": {
         "type": "number",
+        "label": {
+          "en": "Star rating"
+        },
         "description": {
           "en": "The star rating of the review (1-5)"
         }
       },
       "checkins": {
         "type": "number",
+        "label": {
+          "en": "Check-ins"
+        },
         "descrption": {
           "en": "Number of times the reviewer has checked into the restaurant"
         }

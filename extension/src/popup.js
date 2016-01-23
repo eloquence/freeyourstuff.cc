@@ -114,13 +114,6 @@
     chrome.runtime.onMessage.addListener((request, sender) => {
       if (request.action == 'dispatch' && request.data) {
         $('#progress').text('');
-        let json = JSON.stringify(request.data, null, 2);
-        // We need to URI-encode it so we can stash it into the href attribute
-        let encodedJSON = encodeURIComponent(json);
-        $('#download').attr('hidden', false);
-        $('#download').attr('href', 'data:application/json;charset=utf-8,' + encodedJSON);
-        $('#download').attr('download', (fileName || 'data.json'));
-        $('#retrieve').attr('disabled', false);
       } else if (request.action == 'notice' && request.html) {
         // In case the popup has been closed in between progress updates,
         // we want to make sure the user doesn't trigger parallel download threads

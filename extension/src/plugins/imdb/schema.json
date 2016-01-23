@@ -39,6 +39,7 @@
       },
       "subjectIMDBURL": {
         "type": "weburl",
+        "describes": "subject",
         "label": {
           "en": "IMDB URL"
         },

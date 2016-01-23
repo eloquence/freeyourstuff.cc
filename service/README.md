@@ -1,8 +1,13 @@
-Initial design notes:
-- Probably will use Node + Koa + Passport (for auth)
-- Publication will probably be geared towards web clients, therefore require
-  presence of login cookie from freeyourstuff.cc
-- Might want to support lightweight master/slave mode, to enable anyone to
-  set up a mirror trivially
-- No fancy search/navigation features planned right now, just raw dumps of
-  the contents
+This is a Node/Koa service. It's still pretty minimal, it currently implements:
+
+- a landing page
+- a signup/register flow with support for Twitter, Facebook, Google & local signup
+- a very very rough API to stash data in MongoDB
+
+Main TODOs right now:
+
+- generalize schema handling
+- clean up routes
+- vet various security bits
+- add library browse features, tech docs & mirror instructions
+- deploy/build/logging fundamentals

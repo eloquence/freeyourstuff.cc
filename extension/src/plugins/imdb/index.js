@@ -25,7 +25,8 @@ if (!init) {
         datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
         chrome.runtime.sendMessage({
           action: 'dispatch',
-          data: datasets
+          data: datasets,
+          schema: request.schema
         });
       });
     }

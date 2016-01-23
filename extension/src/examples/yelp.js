@@ -12,7 +12,7 @@ var exampleData = {
       "subjectYelpURL": "http://yelp.com/biz/great-harvest-bread-company-portland",
       "date": "11/10/2015",
       "text": "One visit so far. Staff was friendly but overwhelmed by orders. Bought some Dakota bread and a cappucino. The bread is fine -- not amazing either in freshness or texture, but perfectly decent. (Toast it to really bring out the flavor.) The cappucino order was screwed up; they literally gave me a cup of steamed milk after 7 minutes or so. I didn't go back to return it; I'm sure they'd have been super-apologetic. But, prepare for that kind of thing to happen.",
-      "starRating": 3      
+      "starRating": 3
     }, {
       "subject": "Ground Kontrol Classic Arcade",
       "subjectYelpURL": "http://yelp.com/biz/ground-kontrol-classic-arcade-portland-2",

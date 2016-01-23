@@ -1,7 +1,7 @@
 (function() {
   'use strict';
   chrome.runtime.onMessage.addListener((request, sender) => {
-    if (request.action == 'dispatch' && request.data) {
+    if (request.action == 'dispatch' && request.data && request.schema) {
       chrome.tabs.create({
         url: 'src/result.html',
         active: true
@@ -10,7 +10,8 @@
           if (newTab === tab.id && newTabObj.status === 'complete') {
             chrome.runtime.sendMessage({
               action: 'display',
-              data: request.data
+              data: request.data,
+              schema: request.schema
             });
             chrome.tabs.onUpdated.removeListener(listener);
           }

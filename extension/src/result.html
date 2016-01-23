@@ -1,23 +1,48 @@
 <!doctype html>
 <html>
+
 <head>
   <link rel="stylesheet" type="text/css" href="lib/jquery.dataTables.min.css">
   <title>freeyourstuff.cc results</title>
   <script src="lib/jquery-2.1.4.min.js"></script>
   <script src="lib/jquery.dataTables.min.js"></script>
   <style>
-  body {
-    margin-left: 1em;
-    margin-right: 1em;
-  }
-  tr {
-    vertical-align: text-top;
-  }
+    body {
+      margin-left: 1em;
+      margin-right: 1em;
+      font-family: sans-serif;
+    }
+
+    #preamble {
+      margin-left: 4em;
+      margin-right: 4em;
+      margin-bottom: 2em;
+      margin-top: 2em;
+    }
+
+
+    tr {
+      vertical-align: text-top;
+    }
   </style>
 </head>
+
 <body>
-<table id="result">
-</table>
-<script src="result.js"></script>
+
+  <div id="preamble">
+  This is your data retrieved with <a href="http://freeyourstuff.cc/">freeyourstuff.cc</a>.
+  You can inspect it below and <a href="#" id="download">download a copy</a>.
+  But most importantly, we encourage you to publish your data under Creative Commons
+  <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC-0</a>. This makes
+  it possible for anyone to build upon it, and will let the Internet community keep backups
+  of your data forever.
+  <p>
+
+  <button id="publish">Publish this data via freeyourstuff.cc</button>
+</div>
+  <table id="result" class="hover order-column">
+  </table>
+  <script src="result.js"></script>
 </body>
+
 </html>

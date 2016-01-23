@@ -3,8 +3,8 @@
 
   try {
     chrome.runtime.onMessage.addListener(request => {
-      if (request.action === 'display' && request.data) {
-        $('#result').html('<pre>' + JSON.stringify(request.data, null, 2) + '</pre>');
+      if (request.action === 'display' && request.data && request.schema) {
+        showData(request.data, request.schema);
       }
     });
   } catch (e) {
@@ -22,13 +22,37 @@
     document.body.appendChild(script);
   }
 
-  function showExampleData() {
+  function makeRenderFunction(rowName) {
+    return function(val, type, row) {
+      if (row[rowName])
+        return '<a href="' + row[rowName] + '">' + val + '</a>';
+      else
+        return val;
+    };
+  }
 
-    if (exampleData.schemaName !== exampleSchema.schema.schemaName) {
+  function showExampleData() {
+    showData(exampleData, exampleSchema);
+  }
+
+  function showData(data, schema) {
+
+    let json = JSON.stringify(data, null, 2);
+    // We need to URI-encode it so we can stash it into the href attribute
+    let encodedJSON = encodeURIComponent(json);
+    $('#download').attr('href', 'data:application/json;charset=utf-8,' + encodedJSON);
+    $('#download').attr('download', 'data.json');
+    $('#publish').click(function() {
+      $.post('http://freeyourstuff.cc/api/collection', data).done(function(res) {
+        console.log(res);
+      });
+    });
+
+    if (data.schemaName !== schema.schema.schemaName) {
       throw new Error('Schemas do not match. Cannot process data.');
     }
 
-    for (var setName in exampleData) {
+    for (var setName in data) {
       // Exclude metadata
       if (setName == 'schemaName' || setName == 'schemaVersion')
         continue;
@@ -37,32 +61,36 @@
       var fields = [];
 
       // Loop through each data object in the set
-      for (var dataObj of exampleData[setName].data) {
+      for (var dataObj of data[setName].data) {
         // Aggregate information from the schema as we go --
         // this way we only have metadata we have actual data for
         for (var prop in dataObj) {
           if (fields.indexOf(prop) == -1) {
-            if (!exampleSchema[setName].data[prop].describes) {
+            if (!schema[setName].data[prop].describes) {
               columns.push({
                 data: prop,
-                title: exampleSchema[setName].data[prop].label.en,
+                title: schema[setName].data[prop].label.en,
                 defaultContent: ''
               });
               fields.push(prop);
             } else {
-              // FIXME: This is all kinds of wrong. Maybe use render functions
-              // for this.
-              dataObj[exampleSchema[setName].data[prop].describes] =
-              '<a href="'+dataObj[prop]+'">' +
-              dataObj[exampleSchema[setName].data[prop].describes] +
-              '</a>';
+              // We're encountering data that "describes" other data, i.e. a URL
+              // for some text elsewhere. Let's locate the relevant column and
+              // add a render function if it doesn't already have one.
+              for (var col of columns) {
+                if (col.data == schema[setName].data[prop].describes) {
+                  if (!col.render)
+                    col.render = makeRenderFunction(prop);
+                  break;
+                }
+              }
             }
           }
         }
       }
 
       $('#result').dataTable({
-        "data": exampleData[setName].data,
+        "data": data[setName].data,
         "columns": columns
       });
     }

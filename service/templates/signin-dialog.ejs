@@ -1,0 +1,74 @@
+<!-- Sign in modal -->
+<% if (modal) { %>
+  <div aria-labelledby="signinModalLabel" class="modal fade" id="signinModal" role="dialog" tabindex="-1">
+  <% } else { %>
+  <div>
+    <% } %>
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Papers please:</h3>
+            </div>
+            <div class="panel-body">
+              <form accept-charset="UTF-8" action="/signin" method="post" role="form" id="localForm">
+                <fieldset>
+                  <div class="form-group has-feedback usernameGroup">
+                    <input class="form-control username" name="username" placeholder="Username" type="text">
+                    <span class="fa fa-exclamation-circle form-control-feedback formErrorIcon"></span>
+                  </div>
+                  <div class="form-group has-feedback passwordGroup">
+                    <input class="form-control password" name="password" placeholder="Password" type="password" value="">
+                    <span class="fa fa-exclamation-circle form-control-feedback formErrorIcon"></span>
+                  </div>
+                  <input class="btn btn-success btn-block" id="local" type="submit" value="Sign in">
+                  <!-- <a class="btn btn-default btn-block" href="">Password recovery &raquo;</a> -->
+                </fieldset>
+              </form>
+              <% if (modal) { %>
+              <br>
+              Don't have an account? <a id="registerLink" href="/register">Register</a>.
+              <% } %>
+              <% if (signinMessages.length) { %>
+                  <div class="dialogMessage" id="signinMessages">
+                    <% if (signinMessages.indexOf('authfail-user') !== -1) { %>
+                      <span class="fa fa-frown-o"></span> We don't know a user with this name.
+                    <% } else if (signinMessages.indexOf('authfail-pw') !== -1) { %>
+                      That password isn't right.
+                    <% } else if (signinMessages.indexOf('authfail-missing') !== -1) { %>
+                      We need both a username and a password.
+                    <% } else if (signinMessages.indexOf('facebook-denied') !== -1) { %>
+                      Facebook said no. Perhaps you didn't give us permission?
+                    <% } else if (signinMessages.indexOf('twitter-denied') !== -1) { %>
+                      Twitter said no. Perhaps you didn't give us permission?
+                    <% } else if (signinMessages.indexOf('google-denied') !== -1) { %>
+                      Google said no. Perhaps you didn't give us permission?
+                    <% } else { %>
+                      Something mysterious went wrong.
+                    <% } %>
+                  </div>
+            <% } %>
+            </div>
+
+            <div class="panel-heading">
+              <h3 class="panel-title">Or choose your deity:</h3>
+            </div>
+            <div class="modal-social-icons">
+              <a class="btn facebook" href='/auth/facebook' id="facebook">
+                <span class="fa fa-facebook modal-icons"></span>
+                Sign in with Facebook
+                <a class="btn twitter" href='/auth/twitter' id="twitter">
+                <span class="fa fa-twitter modal-icons"></span>
+                Sign in with Twitter
+                </a>
+                <a class="btn google" href='/auth/google' id="google">
+                <span class="fa fa-google modal-icons"></span>
+                Sign in with Google
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,65 @@
+<!-- Register modal -->
+<% if (modal) { %>
+  <div aria-labelledby="registerModalLabel" class="modal fade" id="registerModal" role="dialog" tabindex="-1">
+  <% } else { %>
+  <div>
+  <% } %>
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Pick a username and password:</h3>
+            </div>
+            <div class="panel-body">
+              <form accept-charset="UTF-8" action="/register" method="post" role="form" id="localRegisterForm">
+                <fieldset>
+                  <div class="form-group has-feedback usernameGroup">
+                    <input class="form-control username" name="username" placeholder="Username" type="text" id="registerUsername">
+                    <span class="fa fa-exclamation-circle form-control-feedback formErrorIcon"></span>
+                  </div>
+                  <div class="form-group has-feedback passwordGroup">
+                    <input class="form-control password" name="password" placeholder="Password" type="password" data-toggle="password" value="">
+                  </div>
+                  <input class="btn btn-success btn-block" id="localRegister" type="submit" value="Register">
+                </fieldset>
+              </form>
+              <% if (modal) { %>
+                <br>
+                Already have an account? <a id="signinLink" href="/signin">Sign in</a> instead.
+              <% } %>
+              <% if (registerMessages.length) { %>
+                <div class="dialogMessage" id="registerMessages">
+                <% if (registerMessages.indexOf('registerfail-missing') !== -1) { %>
+                  <span class="fa fa-frown-o"></span> We need both a username and a password.
+                <% } else if (registerMessages.indexOf('registerfail-length') !== -1) { %>
+                  Username way too long. Do not taunt happy fun ball.
+                <% } else if (registerMessages.indexOf('registerfail-unique') !== -1) { %>
+                  We already have a user with this name. Maybe it's you? Maaaybe?
+                <% } else { %>
+                  You pushed the button, and something broke. Sorry!
+                <% } %>
+                </div>
+            <% } %>
+            </div>
+            <div class="panel-heading">
+              <h3 class="panel-title">Or choose your deity:</h3>
+            </div>
+            <div class="modal-social-icons">
+              <a class="btn facebook" href='/auth/facebook' id="facebookRegister">
+                <span class="fa fa-facebook modal-icons"></span>
+                  Continue with Facebook
+                <a class="btn twitter" href='/auth/twitter' id="twitterRegister">
+                  <span class="fa fa-twitter modal-icons"></span>
+                  Continue with Twitter
+                </a>
+                <a class="btn google" href='/auth/google' id="googleRegister">
+                  <span class="fa fa-google modal-icons"></span>
+                  Continue with Google
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

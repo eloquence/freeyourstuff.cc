@@ -1,0 +1,6 @@
+<%- include('head', {siteSection: 'Sign in'}); -%>
+<div class="container top-margin">
+Welcome! Please provide your credentials below, or <a href="/register">register</a>.
+</div>
+<%- include('signin-dialog', { modal: false, signinMessages }); -%>
+<%- include('tail', { load: { nonmodalSigninScript: true, formValidation: true } } ); -%>

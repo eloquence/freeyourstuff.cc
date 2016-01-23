@@ -1,0 +1,129 @@
+<div class="container">
+<hr>
+<footer>
+  <p>freeyourstuff.cc is an
+    <a href="https://github.com/eloquence/freeyourstuff.cc">open community project</a>. It was made with
+    <span class="fa fa-heart" style="color:red;"></span>
+    by
+    <a href="https://twitter.com/xirzon">Erik Moeller</a>.</p>
+    <p>
+    <small>  Privacy: If you give us your email, we won't spam you or give it to others. We use cookies for logins, and we keep ordinary server logs. No tracking, no ads, and the code is open.
+    </small></p>
+</footer>
+</div>
+<!-- /container -->
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/bootstrap-show-password.min.js"></script>
+<script src="/static/js/jquery.cookie.min.js"></script>
+<% if (load.modalSigninScript || load.nonmodalSigninScript) { %>
+<script type="text/javascript">
+function showLoginHint(e) {
+
+  function showFor(selector) {
+    var popover = {content: '<span class="fa fa-info-circle"></span> This is how you logged in last time.', html: true, placement: 'left', animation: true};
+    // We don't want to repeatedly show, so we check visisbility via aria attr
+    if (!$('#local,#facebook,#google,#twitter').attr('aria-describedby')) {
+      $(selector).popover(popover);
+      $(selector).popover('show');
+    }
+  }
+  var method = $.cookie('fys-loginmethod');
+  showFor('#'+method);
+  if (method === 'local')
+    $('#localForm .username').focus();
+}
+</script>
+<% } %>
+<% if (load.modalSigninScript) { %>
+<script type="text/javascript">
+$(function() {
+  $('#signinModal').on('shown.bs.modal', showLoginHint);
+  function switchModals(e) {
+    $('#signinModal').modal('toggle');
+    $('#registerModal').modal('toggle');
+    e.preventDefault();
+  }
+  $('#registerLink').click(switchModals);
+  $('#signinLink').click(switchModals);
+  if($('#notifications').length) {
+    $('#notifications').fadeOut(8000);
+  }
+})
+</script>
+<% } %>
+<% if (load.nonmodalSigninScript) { %>
+<script type="text/javascript">
+  $(function() {
+    if($('#local').length)
+      showLoginHint();
+  })
+</script>
+<% } %>
+<% if (load.formValidation) { %>
+<script type="text/javascript">
+    function clearError(e) {
+      var ele = $(this);
+      if (ele.val()) {
+        var parent = ele.parent();
+        if (parent.hasClass('input-group'))
+          parent = parent.parent(); // FIXME: Ugly way to skip over input group for register form
+        parent.removeClass('has-error');
+        ele.next().hide();
+      }
+    }
+    function formValidation(e) {
+      var hasError = false;
+      var fieldset = $(this).parent();
+      function isEmpty(fieldClass) {
+        if (!fieldset.find(fieldClass).val()) {
+          fieldset.find(fieldClass + 'Group').addClass('has-error'); // container div
+          fieldset.find(fieldClass + 'Group' +' .formErrorIcon').show(); // span w/ icon
+          return true;
+        } else
+          return false;
+      }
+      hasError = isEmpty('.username');
+      hasError = isEmpty('.password') || hasError;
+      if (hasError) {
+        $('.dialogMessage').remove();
+        var errorMsg = 'Please fill in all required fields, beep boop.';
+        fieldset.append('<div class="dialogMessage">'+errorMsg+'</div>')
+        e.preventDefault();
+      }
+    }
+    $('.password').blur(clearError);
+    $('.username').blur(clearError);
+    $('#local').click(formValidation);
+    $('#localRegister').click(formValidation);
+</script>
+<% } %>
+<% if (load.checkNames) { %>
+<script type="text/javascript">
+function checkName(e) {
+  var ele = $(this);
+  e.preventDefault();
+  $.getJSON('http://localhost/api/name?name=' + $('#registerUsername').val(), function(data) {
+    if (data && data.userExists) {
+      $('#localRegister').attr('disabled', true);
+      if (!$('#usernameTakenMessage').length)
+        $('#registerUsername').parent().addClass('has-warning').append('<div class="dialogMessage" id="usernameTakenMessage">Username already taken</div>')
+    } else {
+      $('#localRegister').attr('disabled', false);
+      $('#usernameTakenMessage').remove();
+      $('#registerUsername').parent().removeClass('has-warning')
+      if(ele.attr('id') == 'localRegisterForm') {
+        ele.off();
+        ele.submit();
+      }
+    }
+  })
+}
+$('#registerUsername').change(checkName);
+$('#localRegisterForm').submit(checkName);
+</script>
+<% } %>
+</body>
+</html>

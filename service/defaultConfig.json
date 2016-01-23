@@ -1,0 +1,18 @@
+{
+  "port": 80,
+  "baseURL": "http://localhost/",
+  "siteName": "freeyourstuff.cc",
+  "dbHost": "localhost",
+  "dbPort": 27017,
+  "dbName": "freeyourstuff",
+  "sessionKeys": ["EighteenHeartlessBeggars", "ScrumptiousPelicansDelight"],
+  "facebookClientID": "0",
+  "facebookClientSecret": "0",
+  "facebookCallbackPath": "/auth/facebook/callback",
+  "twitterConsumerKey": "0",
+  "twitterConsumerSecret": "0",
+  "twitterCallbackPath": "/auth/twitter/callback",
+  "googleClientID": "0",
+  "googleClientSecret": "0",
+  "googleCallbackPath": "/auth/google/callback"
+}

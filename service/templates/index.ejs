@@ -1,0 +1,92 @@
+<%- include('head', {siteSection: 'Welcome'}); -%>
+<body>
+  <nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button aria-controls="navbar" aria-expanded="false" class="navbar-toggle collapsed" data-target="#navbar" data-toggle="collapse" type="button">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#"><%- conf.siteName -%></a>
+      </div>
+      <div class="navbar-collapse collapse" id="navbar">
+        <div class="navbar-right navbar-form">
+          <% if (notifications.length) { %>
+            <span id="notifications" class="notifications">
+            <% if (notifications.indexOf('welcome-newuser') !== -1) { %>
+              Registration successful. Welcome!
+            <% } else if (notifications.indexOf('welcome-back') !== -1) { %>
+              Welcome back!
+            <% } %>
+            </span>
+          <% } %>
+          <% if (signedIn) { %>
+            <span id="userNameNav"><span class="fa fa-user"></span> <%- userName -%>
+            <% if (method != 'local') { %>
+            <span class="fa fa-<%- method -%> <%-method -%>-small social-small"></span>
+            <% } %>
+            </span>
+            <form action="/signout" method="post" id="signoutForm">
+            <input class="btn btn-default" id="signoutButton" type="submit" value="Sign out">
+            </form>
+          <% } else { %>
+            <a class="btn btn-primary" data-remote="false" data-target="#signinModal" data-toggle="modal" href="/signin" id="signinButton">Sign in</a>
+            <a class="btn btn-default" data-remote="false" data-toggle="modal" data-target="#registerModal" href="/register" id="registerButton" role="button">Register</a>
+          <% } %>
+        </p>
+      </div>
+    </div>
+    <!--/.navbar-collapse -->
+  </div>
+</nav>
+<%- include('signin-dialog', {modal: true, signinMessages: []}); %>
+<%- include('register-dialog', {modal: true, registerMessages: []}); %>
+<div class="jumbotron">
+  <div class="container">
+    <h1>Change the rules.</h1>
+    <p>
+      <img src="/static/icon128.png" style="float:right;">
+      We all contribute to websites that ask us for our reviews, our opinions, our creative work. They profit from our work while nobody else can use it. Open, community-driven alternatives don't stand a chance against tech giants.
+    </p>
+    <p>
+      We think the web deserves better.
+
+    </p>
+    <p>
+      <b>We are asking you to join us, and "free your stuff".</b>
+      By sharing your work freely, you help build an open, community-driven web. Thanks to lots of copies, your work will live as long as the web itself. All you need is our browser extension, and this website.
+    </p>
+    <p>
+      <a class="btn btn-primary btn-lg" href="#" role="button">Download Chrome extension &raquo;</a>
+    </p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h2>Browse collections</h2>
+      <p>Take a look at content that has been liberated so far.</p>
+      <p>
+        <a class="btn btn-default" href="#" role="button">Browse &raquo;</a>
+      </p>
+    </div>
+    <div class="col-md-4">
+      <h2>Write a plugin</h2>
+      <p>Contributing a plugin for your favorite website is not hard, as long as you know JavaScript.</p>
+      <p>
+        <a class="btn btn-default" href="#" role="button">Learn more &raquo;</a>
+      </p>
+    </div>
+    <div class="col-md-4">
+      <h2>Run a mirror</h2>
+      <p>We need as many people as possible to maintain public copies of content that has been liberated, so it remains online forever.</p>
+      <p>
+        <a class="btn btn-default" href="#" role="button">Learn more &raquo;</a>
+      </p>
+    </div>
+  </div>
+</div>
+<%- include('tail', { load: { modalSigninScript: true, formValidation: true, checkNames: true } } ); -%>

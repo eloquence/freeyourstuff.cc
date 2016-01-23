@@ -1,0 +1,35 @@
+{
+  "name": "freeyourstuff.cc",
+  "version": "0.1.0",
+  "description": "A web service for publishing liberated content under a CC-0 license",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eloquence/freeyourstuff.cc/tree/master/service"
+  },
+  "author": "Erik Moeller",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "chokidar": "^1.4.1",
+    "ejs": "^2.3.4",
+    "generator-bind": "^1.0.1",
+    "jsonfile": "^2.2.3",
+    "koa": "^1.1.2",
+    "koa-bodyparser": "^2.0.1",
+    "koa-connect-flash": "^0.1.2",
+    "koa-generic-session": "^1.10.1",
+    "koa-gzip": "^0.1.0",
+    "koa-passport": "^1.2.0",
+    "koa-route": "^2.4.2",
+    "koa-send": "^3.1.0",
+    "mongoose": "^4.3.1",
+    "passport-facebook": "^2.0.0",
+    "passport-google-oauth": "^0.2.0",
+    "passport-local": "^1.0.0",
+    "passport-twitter": "^1.0.3"
+  }
+}

@@ -113,7 +113,7 @@ var exampleSchema = {
     "schemaVersion": 1
   },
   "reviews": {
-    "description": {
+    "label": {
       "en": "Yelp reviews"
     },
     "head": {

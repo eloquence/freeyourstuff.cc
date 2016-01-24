@@ -50,7 +50,7 @@
   // redirected from another page
   function init(newTab, autoRetrieve) {
     // Ensure we have jQuery available before loading anything else
-    injectScript('src/lib/jquery-2.1.4.min.js')()
+    injectScript('src/lib/js/jquery-2.1.4.min.js')()
       .then(injectScript('src/dataset.js'));
 
     getTab()

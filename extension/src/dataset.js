@@ -43,7 +43,7 @@ function DataSet(dataObj, schemaObj) {
           coerce(dataObj[section][key], schemaObj[section][key].type);
     }
     else {
-      throw new Error(`Parse error against schema "${schemaObj.schemaDescription.en}".
+      throw new Error(`Parse error against schema "${schemaObj.label.en}".
 Attempted data import with unknown key in section "${section}": "${key}"`);
     }
   }

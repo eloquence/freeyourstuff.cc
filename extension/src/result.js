@@ -17,15 +17,15 @@
   function loadExample(scriptName) {
     var script = document.createElement('script');
     script.type = 'text/javascript';
-    script.src = 'examples/' + scriptName + '.js';
+    script.src = `examples/${scriptName}.js`;
     script.onload = showExampleData;
     document.body.appendChild(script);
   }
 
   function makeRenderFunction(rowName) {
-    return function(val, type, row) {
+    return (val, type, row) => {
       if (row[rowName])
-        return '<a href="' + row[rowName] + '">' + val + '</a>';
+        return `<a href="${row[rowName]}">${val}</a>`;
       else
         return val;
     };
@@ -40,10 +40,10 @@
     let json = JSON.stringify(data, null, 2);
     // We need to URI-encode it so we can stash it into the href attribute
     let encodedJSON = encodeURIComponent(json);
-    $('#download').attr('href', 'data:application/json;charset=utf-8,' + encodedJSON);
+    $('#download').attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
     $('#download').attr('download', 'data.json');
-    $('#publish').click(function() {
-      $.post('http://freeyourstuff.cc/api/collection', data).done(function(res) {
+    $('#publish').click(() => {
+      $.post('http://freeyourstuff.cc/api/collection', data).done(res => {
         console.log(res);
       });
     });
@@ -89,7 +89,9 @@
         }
       }
 
-      $('#result').dataTable({
+      $('#results').append(`<h3>${schema[setName].label.en}</h3>`);
+      $('#results').append(`<table id="result_${setName}" class="table table-hover table-responsive">`);
+      $(`#result_${setName}`).dataTable({
         "data": data[setName].data,
         "columns": columns
       });

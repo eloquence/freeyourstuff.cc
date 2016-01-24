@@ -14,8 +14,8 @@
 
 ## Dependencies
 
-- We use the DataTables library for table display. Because image paths are
-  hardcoded in the CSS, we have to rebuild the library in case of a new release.
+- We use jQuery for, well, everything.
+- We use the DataTables library for table display, and Bootstrap for theming.
 
 ## Message passing
 

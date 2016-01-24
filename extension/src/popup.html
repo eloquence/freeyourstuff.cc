@@ -8,46 +8,25 @@
 
 <head>
   <title>Your stuff for this website</title>
+  <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/bootstrap-theme.min.css">
   <style>
     body {
-      margin: 1em;
-      font-family: sans-serif;
-      font-size: 100%;
+      margin-left: 2em;
+      margin-right: 2em;
+      margin-top: 1em;
+      margin-bottom: 1em;
       width: 400px;
+    }
+
+    ul {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+      font-weight: bold;
     }
 
     #footer {
       font-size: small;
-    }
-
-    #retrieve {
-      position: relative;
-      overflow: hidden;
-      color: #fff;
-      text-align: center;
-      cursor: pointer;
-      display: inline-block;
-      vertical-align: middle;
-      user-select: none;
-      height: 32px;
-      border: 1px solid;
-      border-radius: 4px;
-      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.19);
-      border-color: #0F80AE #0F80AE #11698D #0F80AE;
-      background: linear-gradient(#169BD0, #0D7FAE);
-    }
-
-    #retrieve:disabled {
-      color: #ddd;
-      box-shadow: inset 0 2px 3px 0 rgba(0, 0, 0, 0.12), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.11);
-      background: linear-gradient(#25A6DA, #209BCE);
-    }
-
-    #retrieve:enabled:hover {
-      border-color: #0F79A3 #0F79A3 #0F6383 #0F79A3;
-      text-decoration: none;
-      background: linear-gradient(#1DA5DB, #0F87BA);
-      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.24), 0 1px 2px 0 rgba(0, 0, 0, 0.11);
     }
 
     #progress {
@@ -58,23 +37,21 @@
       color: red;
     }
   </style>
-  <script src="lib/jquery-2.1.4.min.js"></script>
+  <script src="lib/js/jquery-2.1.4.min.js"></script>
 </head>
 
 <body>
-  Available content contributions to
-  <span id="siteName">this site</span>:
+  Hooray! freeyourstuff.cc lets you download or publish the following content contributions you have made to <span id="siteName">this site</span>:
   <ul id="availableContent"></ul>
-
-  <button id="retrieve" hidden>Retrieve</button>
+  <button id="retrieve" class="btn btn-primary">Retrieve my contributions</button>
   <span id="progress"></span>
   <span id="error"></span>
-  <a href="#" id="download" hidden>Download</a>
-  <P>
-    Content currently not supported:
+  <br><br>
+  The download will be done by your browser. Nothing will be published unless you say so in the next step.
+  <br><br>
+  We don't know yet how to download the following contribution types:
     <ul id="unsupportedContent"></ul>
     </div>
-
     <div id="footer">
       <a href="https://github.com/eloquence/freeyourstuff.cc" target="_blank">Contribute a plugin</a> &middot; <a href="https://github.com/eloquence/freeyourstuff.cc/issues/new" target="_blank">Report a bug</a>
     </div>

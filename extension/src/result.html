@@ -2,27 +2,34 @@
 <html>
 
 <head>
-  <link rel="stylesheet" type="text/css" href="lib/jquery.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/dataTables.bootstrap.min.css">
   <title>freeyourstuff.cc results</title>
-  <script src="lib/jquery-2.1.4.min.js"></script>
-  <script src="lib/jquery.dataTables.min.js"></script>
+  <script src="lib/js/jquery-2.1.4.min.js"></script>
+  <script src="lib/js/jquery.dataTables.min.js"></script>
+  <script src="lib/js/dataTables.bootstrap.min.js"></script>
   <style>
     body {
-      margin-left: 1em;
-      margin-right: 1em;
-      font-family: sans-serif;
+      margin-left: 10%;
+      margin-right: 10%;
     }
 
     #preamble {
-      margin-left: 4em;
-      margin-right: 4em;
+      margin-left: 5%;
+      margin-right: 5%;
       margin-bottom: 2em;
       margin-top: 2em;
     }
 
-
     tr {
       vertical-align: text-top;
+    }
+
+    #icon {
+      float:left;
+      margin-right:1em;
     }
   </style>
 </head>
@@ -30,18 +37,16 @@
 <body>
 
   <div id="preamble">
-  This is your data retrieved with <a href="http://freeyourstuff.cc/">freeyourstuff.cc</a>.
-  You can inspect it below and <a href="#" id="download">download a copy</a>.
-  But most importantly, we encourage you to publish your data under Creative Commons
-  <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC-0</a>. This makes
-  it possible for anyone to build upon it, and will let the Internet community keep backups
-  of your data forever.
-  <p>
+    <img src="../assets/icon64.png" id="icon">
+    This is your data retrieved with <a href="http://freeyourstuff.cc/">freeyourstuff.cc</a>. You can inspect it below and <a href="#" id="download">download a copy</a>. But most importantly, we encourage you to publish your data under Creative Commons
+    <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC-0</a>. This puts your data in the public domain and makes it possible for anyone to build upon it and use it for any purpose. It will also let the Internet community keep backups of your
+    data forever.
+    <br clear="all"><br>
 
-  <button id="publish">Publish this data via freeyourstuff.cc</button>
-</div>
-  <table id="result" class="hover order-column">
-  </table>
+    <button class="btn btn-primary" id="publish">Publish data under Creative Commons CC-0</button>
+  </div>
+  <div id="results">
+  </div>
   <script src="result.js"></script>
 </body>
 

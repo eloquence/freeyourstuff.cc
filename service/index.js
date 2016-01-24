@@ -67,6 +67,7 @@ app.use(routes.authTwitterCallback);
 app.use(routes.authGoogle);
 app.use(routes.authGoogleCallback);
 app.use(routes.apiNameCheck);
+app.use(routes.apiLoginStatus);
 app.use(routes.apiCollection_POST);
 app.use(gzip());
 /* ----- End middleware section ------ */

@@ -86,10 +86,10 @@
               $('#availableContent').html('');
               $('#unsupportedContent').html('');
               site.supported.forEach((supportedContentType) => {
-                $('#availableContent').append('<li>' + supportedContentType + '</li>');
+                $('#availableContent').append(`<li>${supportedContentType}</li>`);
               });
               site.unsupported.forEach((unsupportedContentType) => {
-                $('#unsupportedContent').append('<li>' + unsupportedContentType + '</li>');
+                $('#unsupportedContent').append(`<li>${unsupportedContentType}</li>`);
               });
 
               // Load schemas + initialize plugin

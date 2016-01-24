@@ -280,6 +280,19 @@ module.exports = {
     return yield next;
   }),
 
+  apiLoginStatus: router.get('/api/loginstatus', function* get(next) {
+    if (!this.isAuthenticated()) {
+      this.body = { loggedIn: false };
+    } else {
+      this.body = {
+        loggedIn: true,
+        displayName: this.session.passport.user[this.session.method].displayName,
+        method: this.session.method
+      };
+    }
+    return yield next;
+  }),
+
   apiCollection_POST: router.post('/api/collection', function* post(next) {
     if (!apiSignedIn(this))
       return yield next;

@@ -31,6 +31,14 @@
       float:left;
       margin-right:1em;
     }
+
+    #publish, #signedout {
+      display: none;
+    }
+
+    #signedout {
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -44,6 +52,7 @@
     <br clear="all"><br>
 
     <button class="btn btn-primary" id="publish">Publish data under Creative Commons CC-0</button>
+    <div id="signedout">You need to <a href="http://freeyourstuff.cc/signin" target="_blank" id="signin">sign in</a> or <a href="http://freeyourstuff.cc/signin" target="_blank" id="register">register</a> before you can publish your data (links will open in a new window). <a href="#" id="retry">Try again</a> once you have done so.</div>
   </div>
   <div id="results">
   </div>

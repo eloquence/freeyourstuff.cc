@@ -1,18 +1,20 @@
 (function() {
   'use strict';
 
-  try {
-    chrome.runtime.onMessage.addListener(request => {
-      if (request.action === 'display' && request.data && request.schema) {
-        showData(request.data, request.schema);
-      }
-    });
-  } catch (e) {
-    console.log('Chrome API not found. Loading outside of extension context with example data.');
+  if (window.location.hash !== '#debug') {
+    try {
+      chrome.runtime.onMessage.addListener(request => {
+        if (request.action === 'display' && request.data && request.schema) {
+          showData(request.data, request.schema);
+        }
+      });
+    } catch (e) {
+      console.log('Chrome API not found. Loading outside of extension context with example data.');
+      loadExample('yelp');
+    }
+  } else {
     loadExample('yelp');
   }
-
-  /** Loading / processing of example data **/
 
   function loadExample(scriptName) {
     var script = document.createElement('script');
@@ -35,6 +37,22 @@
     showData(exampleData, exampleSchema);
   }
 
+  function checkLoginStatus() {
+    $.get('http://freeyourstuff.cc/api/loginstatus').done(res => {
+      if (typeof res == 'object' && res.loggedIn) {
+        $('#publish').show();
+        $('#signedout').hide();
+      } else {
+        if ($('#signedout').is(':visible')) {
+          $('#signedout').fadeOut();
+          $('#signedout').fadeIn();
+        } else {
+          $('#signedout').show();
+        }
+        $('#publish').hide();
+      }
+    });
+  }
   function showData(data, schema) {
 
     let json = JSON.stringify(data, null, 2);
@@ -42,11 +60,17 @@
     let encodedJSON = encodeURIComponent(json);
     $('#download').attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
     $('#download').attr('download', 'data.json');
+
+    // FIXME use .ajax with content type
     $('#publish').click(() => {
       $.post('http://freeyourstuff.cc/api/collection', data).done(res => {
         console.log(res);
       });
     });
+    $('#retry').click(() => {
+      checkLoginStatus();
+    });
+    checkLoginStatus();
 
     if (data.schemaName !== schema.schema.schemaName) {
       throw new Error('Schemas do not match. Cannot process data.');

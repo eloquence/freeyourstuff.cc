@@ -53,3 +53,9 @@
   .formErrorIcon {
     display: none;
   }
+  /* These fall outside the viewport on mobile screens, so let's hide them */
+  @media all and (max-width:800px) {
+    .popover {
+      display: none !important;
+    }
+  }

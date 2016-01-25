@@ -17,7 +17,7 @@
   }
 
   function loadExample(scriptName) {
-    var script = document.createElement('script');
+    let script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = `examples/${scriptName}.js`;
     script.onload = showExampleData;
@@ -95,19 +95,19 @@
       throw new Error('Schemas do not match. Cannot process data.');
     }
 
-    for (var setName in data) {
+    for (let setName in data) {
       // Exclude metadata
       if (setName == 'schemaName' || setName == 'schemaVersion')
         continue;
 
-      var columns = [];
-      var fields = [];
+      let columns = [];
+      let fields = [];
 
       // Loop through each data object in the set
-      for (var dataObj of data[setName].data) {
+      for (let dataObj of data[setName].data) {
         // Aggregate information from the schema as we go --
         // this way we only have metadata we have actual data for
-        for (var prop in dataObj) {
+        for (let prop in dataObj) {
           if (fields.indexOf(prop) == -1) {
             if (!schema[setName].data[prop].describes) {
               columns.push({
@@ -120,7 +120,7 @@
               // We're encountering data that "describes" other data, i.e. a URL
               // for some text elsewhere. Let's locate the relevant column and
               // add a render function if it doesn't already have one.
-              for (var col of columns) {
+              for (let col of columns) {
                 if (col.data == schema[setName].data[prop].describes) {
                   if (!col.render)
                     col.render = makeRenderFunction(prop);

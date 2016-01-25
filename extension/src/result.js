@@ -42,17 +42,33 @@
       if (typeof res == 'object' && res.loggedIn) {
         $('#publish').show();
         $('#signedout').hide();
+        clearInterval(window.interval);
       } else {
-        if ($('#signedout').is(':visible')) {
-          $('#signedout').fadeOut();
-          $('#signedout').fadeIn();
-        } else {
-          $('#signedout').show();
-        }
+        $('#signedout').show();
         $('#publish').hide();
       }
     });
   }
+
+  function getLinkOpener(url) {
+    return function() {
+      $(this).prop('disabled', true);
+      window.open(url);
+      startPinging();
+    };
+  }
+
+  function startPinging() {
+    $('#pinging').show();
+    window.interval = setInterval(checkLoginStatus, 1000);
+  }
+
+  function stopPinging() {
+    $('#facebook,#google,#twitter,#local').prop('disabled', false);
+    clearInterval(window.interval);
+    $('#pinging').fadeOut();
+  }
+
   function showData(data, schema) {
 
     let json = JSON.stringify(data, null, 2);
@@ -67,9 +83,12 @@
         console.log(res);
       });
     });
-    $('#retry').click(() => {
-      checkLoginStatus();
-    });
+    $('#facebook').click(getLinkOpener('http://freeyourstuff.cc/auth/facebook'));
+    $('#twitter').click(getLinkOpener('http://freeyourstuff.cc/auth/twitter'));
+    $('#google').click(getLinkOpener('http://freeyourstuff.cc/auth/google'));
+    $('#local').click(getLinkOpener('http://freeyourstuff.cc/signin'));
+    $('#stop').click(stopPinging);
+
     checkLoginStatus();
 
     if (data.schemaName !== schema.schema.schemaName) {

@@ -6,7 +6,9 @@
   <link rel="stylesheet" type="text/css" href="lib/css/bootstrap-theme.min.css">
   <link rel="stylesheet" type="text/css" href="lib/css/dataTables.bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="lib/css/dataTables.bootstrap.min.css">
-  <title>freeyourstuff.cc results</title>
+  <link rel="stylesheet" type="text/css" href="lib/css/font-awesome.min.css">
+
+  <title>Your freeyourstuff.cc results</title>
   <script src="lib/js/jquery-2.1.4.min.js"></script>
   <script src="lib/js/jquery.dataTables.min.js"></script>
   <script src="lib/js/dataTables.bootstrap.min.js"></script>
@@ -28,16 +30,54 @@
     }
 
     #icon {
-      float:left;
-      margin-right:1em;
+      float: left;
+      margin-right: 1em;
     }
 
-    #publish, #signedout {
+    #publish,
+    #signedout {
       display: none;
     }
 
     #signedout {
       font-weight: bold;
+    }
+
+    .google,
+    .google:hover,
+    .google:visited {
+      background-color: #dd4b39;
+      color: #fff !important;
+    }
+
+    .twitter,
+    .twitter:hover,
+    .twitter:visited {
+      background-color: #00aced;
+      color: #fff !important;
+    }
+
+    .facebook,
+    .facebook:hover,
+    .facebook:visited {
+      background-color: #3b5999;
+      color: #fff !important;
+    }
+
+    .facebook:active,
+    .twitter:active,
+    .google:active {
+      color: #ddd !important;
+    }
+
+    .fa-facebook,
+    .fa-twitter,
+    .fa-google {
+      margin-right: 1em;
+    }
+
+    #pinging {
+      display: none;
     }
   </style>
 </head>
@@ -45,14 +85,29 @@
 <body>
 
   <div id="preamble">
-    <img src="../assets/icon64.png" id="icon">
-    This is your data retrieved with <a href="http://freeyourstuff.cc/">freeyourstuff.cc</a>. You can inspect it below and <a href="#" id="download">download a copy</a>. But most importantly, we encourage you to publish your data under Creative Commons
+    <img src="../assets/icon64.png" id="icon"> This is your data retrieved with <a href="http://freeyourstuff.cc/">freeyourstuff.cc</a>. You can inspect it below and <a href="#" id="download">download a copy</a>. But most importantly, we encourage you to publish your data under Creative Commons
     <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC-0</a>. This puts your data in the public domain and makes it possible for anyone to build upon it and use it for any purpose. It will also let the Internet community keep backups of your
     data forever.
-    <br clear="all"><br>
-
+    <br clear="all">
+    <br>
+    <div id="signedout">
+      You need to be logged into freeyourstuff.cc to publish your content:
+      <br>
+      <br>
+      <button class="btn modal-social-icons facebook" id="facebook">
+        <span class="fa fa-facebook"></span>Continue with Facebook</button>
+      <button class="btn modal-social-icons twitter" id="twitter">
+        <span class="fa fa-twitter"></span>Continue with Twitter</button>
+      <button class="btn modal-social-icons google" id="google">
+        <span class="fa fa-google"></span>Continue with Google</button>
+      <button class="btn btn-default" id="local">Continue with local account</button>
+      <br>
+      <br>
+      <div id="pinging">
+        <span class="fa fa-spinner fa-spin"></span> Waiting for successful login ... <a id="stop" href="#">click to cancel</a>.
+      </div>
+    </div>
     <button class="btn btn-primary" id="publish">Publish data under Creative Commons CC-0</button>
-    <div id="signedout">You need to <a href="http://freeyourstuff.cc/signin" target="_blank" id="signin">sign in</a> or <a href="http://freeyourstuff.cc/signin" target="_blank" id="register">register</a> before you can publish your data (links will open in a new window). <a href="#" id="retry">Try again</a> once you have done so.</div>
   </div>
   <div id="results">
   </div>

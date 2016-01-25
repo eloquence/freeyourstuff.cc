@@ -14,7 +14,7 @@ let path = require('path');
 // Internal dependencies
 let loadTemplate = require('./templates');
 let passport = require('./auth'); // exports koa-passport
-let routes = require('./routes');
+let routes = require('./routes/index.js');
 app.config = require('./loadconfig');
 
 mongoose.connect(app.config.dbHost, app.config.dbName, app.config.dbPort);
@@ -52,23 +52,23 @@ app.use(bodyParser({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(routes.static);
-app.use(routes.root);
-app.use(routes.signin);
-app.use(routes.signin_POST);
-app.use(routes.signout_POST);
-app.use(routes.register);
-app.use(routes.register_POST);
-app.use(routes.signup); // just a redirect
-app.use(routes.authFacebook);
-app.use(routes.authFacebookCallback);
-app.use(routes.authTwitter);
-app.use(routes.authTwitterCallback);
-app.use(routes.authGoogle);
-app.use(routes.authGoogleCallback);
-app.use(routes.apiNameCheck);
-app.use(routes.apiLoginStatus);
-app.use(routes.apiCollection_POST);
+app.use(routes.content.static);
+app.use(routes.content.root);
+app.use(routes.user.signin);
+app.use(routes.user.signin_POST);
+app.use(routes.user.signout_POST);
+app.use(routes.user.register);
+app.use(routes.user.register_POST);
+app.use(routes.user.signup); // just a redirect
+app.use(routes.user.authFacebook);
+app.use(routes.user.authFacebookCallback);
+app.use(routes.user.authTwitter);
+app.use(routes.user.authTwitterCallback);
+app.use(routes.user.authGoogle);
+app.use(routes.user.authGoogleCallback);
+app.use(routes.api.nameCheck);
+app.use(routes.api.loginStatus);
+app.use(routes.api.collection_POST);
 app.use(gzip());
 /* ----- End middleware section ------ */
 

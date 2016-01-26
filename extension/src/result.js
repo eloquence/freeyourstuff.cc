@@ -37,8 +37,26 @@
     showData(exampleData, exampleSchema);
   }
 
-  function checkLoginStatus() {
+  // Message object properties:
+  // text: 'text'
+  // type: 'warning' | 'success' | 'error' (will be added as CSS class name)
+  // retry: Whether we're showing the same message again (triggers animation)
+  function showMessage(msg) {
+    if (!msg.retry) {
+      $('#messages').empty();
+      $('#messages').append(`<div class="${msg.type} message">${msg.text}</div>`);
+      $('#messages').show();
+    }
+    else {
+      $('#messages').fadeOut().fadeIn();
+    }
+  }
+
+  // retry: Whether this was user-triggered.
+  function checkLoginStatus(retry) {
     $.get('http://freeyourstuff.cc/api/loginstatus').done(res => {
+      // Hide previous warning messages
+      $('#messages').hide();
       if (typeof res == 'object' && res.loggedIn) {
         $('#publish').show();
         $('#signedout').hide();
@@ -47,6 +65,18 @@
         $('#signedout').show();
         $('#publish').hide();
       }
+    }).fail(err => {
+      showMessage({
+        text: `We can't reach freeyourstuff.cc right now, so you can't publish your data. Sorry! You can still download it or` +
+          ` <a id="retry" href="#">retry connecting.</a>`,
+        type: 'warning',
+        retry
+      }, true);
+      $('#retry').off();
+      $('#retry').click((e) => {
+        e.preventDefault();
+        checkLoginStatus(true);
+      });
     });
   }
 
@@ -69,6 +99,39 @@
     $('#pinging').fadeOut();
   }
 
+  function getPublishClickHandler(json) {
+    return function(e) {
+      $('#publish').prop('disabled', true); // Prevent repeat submission
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: 'http://freeyourstuff.cc/api/collection',
+        data: json,
+        dataType: 'json'
+      }).done(res => {
+        $('#publish').hide();
+        showMessage({
+          text: 'Your data was successfully published! Thank you for contributing to the commons. :-)',
+          type: 'success'
+        });
+      }).fail(err => {
+        $('#publish').prop('disabled', false);
+
+        let text = 'There was a problem publishing your data. Sorry! :-(';
+        if (err.responseJSON.error) {
+          text += ' We got the following error message:' +
+            `<br><br><code>${err.responseJSON.error}</code>`;
+        }
+        text += '<br><br>You can help us out by ' +
+        '<a target="_blank" href="https://github.com/eloquence/freeyourstuff.cc/issues/new">filing a bug</a>.';
+        showMessage({
+          text,
+          type: 'error'
+        });
+      });
+    };
+  }
+
   function showData(data, schema) {
 
     let json = JSON.stringify(data, null, 2);
@@ -77,12 +140,7 @@
     $('#download').attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
     $('#download').attr('download', 'data.json');
 
-    // FIXME use .ajax with content type
-    $('#publish').click(() => {
-      $.post('http://freeyourstuff.cc/api/collection', data).done(res => {
-        console.log(res);
-      });
-    });
+    $('#publish').click(getPublishClickHandler(json));
     $('#facebook').click(getLinkOpener('http://freeyourstuff.cc/auth/facebook'));
     $('#twitter').click(getLinkOpener('http://freeyourstuff.cc/auth/twitter'));
     $('#google').click(getLinkOpener('http://freeyourstuff.cc/auth/google'));

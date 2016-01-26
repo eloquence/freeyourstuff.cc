@@ -79,6 +79,26 @@
     #pinging {
       display: none;
     }
+
+    .message {
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #eee;
+      border-left-width: 5px;
+      border-radius: 3px;
+    }
+
+    .warning {
+      border-left-color: #f0ad4e;
+    }
+
+    .success {
+      border-left-color: green;
+    }
+
+    .error {
+      border-left-color: red;
+    }
   </style>
 </head>
 
@@ -107,11 +127,12 @@
         <span class="fa fa-spinner fa-spin"></span> Waiting for successful login ... <a id="stop" href="#">click to cancel</a>.
       </div>
     </div>
+    <div id="messages">
+    </div>
     <button class="btn btn-primary" id="publish">Publish data under Creative Commons CC-0</button>
   </div>
   <div id="results">
   </div>
   <script src="result.js"></script>
 </body>
-
 </html>

@@ -74,6 +74,7 @@ module.exports = {
     this.body = {
       error: 'Unknown schema: ' + c.schemaName
     };
+    this.status = 400;
     return yield next;
 
   })

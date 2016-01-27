@@ -54,6 +54,9 @@ module.exports = {
 
     if (Collection.hasOwnProperty(c.schemaName)) {
       let collection = new Collection[c.schemaName]();
+      collection.uploadDate = new Date();
+      collection.uploader = this.session.passport.user._id;
+
       // Loop through datasets in this collection, add them to our DB collection.
       // Abort if we encounter invalid data.
       for (let d in c) {
@@ -63,6 +66,7 @@ module.exports = {
           return yield next;
         collection[d] = c[d];
       }
+
       // Attempt to save the data to MongoDB
       try {
         yield collection.save();

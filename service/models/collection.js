@@ -8,6 +8,7 @@ let mongoose = require('mongoose');
 let fs = require('fs');
 let path = require('path');
 let jsonfile = require('jsonfile');
+let ObjectId = mongoose.Schema.Types.ObjectId;
 
 // Setup
 let pluginDir = '../extension/src/plugins';
@@ -31,6 +32,8 @@ for (let dir of dirs) {
 for (let schema in schemas) {
   console.log(`Importing schema "${schemas[schema].schema.schemaName}"...`);
   let modelObj = {};
+  modelObj.uploader = ObjectId;
+  modelObj.uploadDate = Date;
 
   let s = schemas[schema]; // shortcut to current schema
 

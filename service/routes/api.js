@@ -3,7 +3,7 @@
 let router = require('koa-route');
 
 // Internal dependnecies
-let collectionModels = require('../models/collections');
+let Collection = require('../models/collection');
 let User = require('../models/user');
 
 module.exports = {
@@ -52,31 +52,33 @@ module.exports = {
     if (!apiValidateCollection(this, c))
       return yield next;
 
-    for (var i = 0; i < collectionModels.length; i++) {
-      if (c.schemaName === collectionModels[i].modelName) {
-        if (c.reviews) {
-          if (!apiValidateDataset(this, c.reviews))
-            return yield next;
-          let collection = new collectionModels[i]();
-          collection.reviews = c.reviews;
-          try {
-            yield collection.save();
-          } catch (e) {
-            apiDBError(this, e);
-            return yield next;
-          }
-          apiReportSuccess(this);
+    if (Collection.hasOwnProperty(c.schemaName)) {
+      let collection = new Collection[c.schemaName]();
+      // Loop through datasets in this collection, add them to our DB collection.
+      // Abort if we encounter invalid data.
+      for (let d in c) {
+        if (d == 'schemaName' || d == 'schemaVersion')
+          continue;
+        if (!apiValidateDataset(this, c[d]))
           return yield next;
-        }
+        collection[d] = c[d];
       }
+      // Attempt to save the data to MongoDB
+      try {
+        yield collection.save();
+      } catch (e) {
+        apiDBError(this, e);
+        return yield next;
+      }
+      apiReportSuccess(this);
+      return yield next;
+    } else {
+      this.body = {
+        error: 'Unknown schema: ' + c.schemaName
+      };
+      this.status = 400;
+      return yield next;
     }
-
-    this.body = {
-      error: 'Unknown schema: ' + c.schemaName
-    };
-    this.status = 400;
-    return yield next;
-
   })
 
 };

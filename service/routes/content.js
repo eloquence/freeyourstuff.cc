@@ -18,21 +18,37 @@ var main = {
     return yield next;
   }),
   root: router.get('/', function*(next) {
-    let signedIn = this.isAuthenticated();
-    let userName;
-    if (signedIn && this.session.method &&
-      this.session.passport.user[this.session.method])
-      userName = this.session.passport.user[this.session.method].displayName;
-    let notifications = this.flash('once-notifications');
-    this.body = this.app.templates['index.ejs']({
-      conf: this.app.config.expose(),
-      signedIn,
-      method: this.session.method,
-      notifications,
-      userName
-    });
+    render.call(this, 'index.ejs');
     return yield next;
   }),
+  browse: router.get('/browse', function*(next) {
+    render.call(this, 'browse.ejs');
+    return yield next;
+  })
 };
+
+function render(template, extraVars) {
+  let vars = getStandardVars.call(this);
+  if (extraVars)
+    Object.assign(vars, extraVars);
+  this.body = this.app.templates[template](vars);
+}
+
+function getStandardVars() {
+  let signedIn = this.isAuthenticated();
+  let userName;
+  if (signedIn && this.session.method &&
+    this.session.passport.user[this.session.method])
+    userName = this.session.passport.user[this.session.method].displayName;
+  let notifications = this.flash('once-notifications');
+  let stv = {
+    conf: this.app.config.expose(),
+    signedIn,
+    method: this.session.method,
+    notifications,
+    userName
+  };
+  return stv;
+}
 
 module.exports = main;

@@ -1,6 +1,7 @@
-<%- include('head', {siteSection: 'Welcome'}); -%>
+<%- include('head', {siteSection: 'Welcome', load: { dataTables: true } }); -%>
 <%- include('nav'); %>
 <div class="container">
-Recent uploads:
+<div id="collections">
 </div>
-<%- include('tail', { load: { modalSigninScript: true, formValidation: true, checkNames: true } } ); -%>
+</div>
+<%- include('tail', { load: { modalSigninScript: true, formValidation: true, checkNames: true, dataTables: true, recentCollections: true} } ); -%>

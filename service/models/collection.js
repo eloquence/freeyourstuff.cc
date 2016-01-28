@@ -54,12 +54,15 @@ for (let schema in schemas) {
       dataObj[d] = getType(s[setName].data[d].type);
     }
     modelObj[setName].data.push(dataObj);
-    let mSchema = mongoose.Schema(
-      modelObj,
-      { collection: schema } // collection name is plugin directory name, see above
-    );
-    models[s.schema.schemaName] = mongoose.model(s.schema.schemaName, mSchema);
   }
+  let mSchema = mongoose.Schema(
+    modelObj,
+    { collection: schema } // collection name is plugin directory name, see above
+  );
+  models[s.schema.schemaName] = mongoose.model(s.schema.schemaName, mSchema);
+  // We stash the original (non-Mongoose) schema in the model; it contains useful
+  // metadata such as field names that we need for rendering the data.
+  models[s.schema.schemaName].collectionSchema = s;
 }
 
 module.exports = models;

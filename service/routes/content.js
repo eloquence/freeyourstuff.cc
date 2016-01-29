@@ -6,6 +6,7 @@ let send = require('koa-send');
 
 // Internal dependencies
 let Collection = require('../models/collection.js');
+let User = require('../models/user.js');
 
 // Naming convention for routes: Anything that is not a GET method
 // is suffixed with method name, e.g. _POST.
@@ -27,7 +28,7 @@ var main = {
   browse: router.get('/browse', function*(next) {
     let recentCollections = [];
     for (var c in Collection) {
-      let rv = yield Collection[c].find({}).limit(25).sort({uploadDate: -1}).lean();
+      let rv = yield Collection[c].find({}).limit(25).sort({uploadDate: -1}).populate('uploader').lean();
       rv.forEach(coll => {
         coll.collectionSchema = Collection[c].collectionSchema;
       });

@@ -41,7 +41,7 @@
           }
         }
         $('#collections').append(`<h3>${collection.collectionSchema[setName].label.en}</h3>`);
-        $('#collections').append(`<h4>Upload by ${collection.uploader} on ${collection.uploadDate}</h4>`);
+        $('#collections').append(`<h4>Upload by ${getName(collection.uploader)} on ${collection.uploadDate}</h4>`);
         $('#collections').append(`<table id="collection_${index}" class="table table-hover table-responsive">`);
         $(`#collection_${index}`).dataTable({
           "data": collection[setName].data,
@@ -51,6 +51,20 @@
 
       }
     }
+  }
+
+  function getName(user) {
+    let rv;
+    if (user.local)
+      return user.local.displayName;
+    else if (user.facebook)
+      return user.facebook.displayName;
+    else if (user.twitter)
+      return user.twitter.displayName;
+    else if (user.google)
+      return user.google.displayName;
+    else
+      return undefined;
   }
 
 

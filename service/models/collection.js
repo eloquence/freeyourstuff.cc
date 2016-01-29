@@ -24,7 +24,7 @@ let models = {};
 for (let dir of dirs) {
   try {
     schemas[dir] = jsonfile.readFileSync(`${pluginDir}/${dir}/schema.json`);
-  } catch(e) {
+  } catch (e) {
     console.log(`Problem reading schema.json for plugin "${dir}". Skipping.`);
   }
 }
@@ -32,7 +32,10 @@ for (let dir of dirs) {
 for (let schema in schemas) {
   console.log(`Importing schema "${schemas[schema].schema.schemaName}"...`);
   let modelObj = {};
-  modelObj.uploader = ObjectId;
+  modelObj.uploader = {
+    type: ObjectId,
+    ref: 'User'
+  };
   modelObj.uploadDate = Date;
 
   let s = schemas[schema]; // shortcut to current schema
@@ -56,8 +59,9 @@ for (let schema in schemas) {
     modelObj[setName].data.push(dataObj);
   }
   let mSchema = mongoose.Schema(
-    modelObj,
-    { collection: schema } // collection name is plugin directory name, see above
+    modelObj, {
+      collection: schema
+    } // collection name is plugin directory name, see above
   );
   models[s.schema.schemaName] = mongoose.model(s.schema.schemaName, mSchema);
   // We stash the original (non-Mongoose) schema in the model; it contains useful
@@ -81,7 +85,7 @@ function getType(schemaType) {
     case 'boolean':
       return Boolean;
     default:
-      throw new Error('Unknown type:'+schemaType);
+      throw new Error('Unknown type:' + schemaType);
   }
 }
 

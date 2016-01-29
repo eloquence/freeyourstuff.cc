@@ -28,9 +28,9 @@ var main = {
     let recentCollections = [];
     for (var c in Collection) {
       let rv = yield Collection[c].find({}).limit(25).sort({uploadDate: -1}).lean();
-      for (let rvi in rv) {
-        rv[rvi].collectionSchema = Collection[c].collectionSchema;
-      }
+      rv.forEach(coll => {
+        coll.collectionSchema = Collection[c].collectionSchema;
+      });
       recentCollections.push(rv);
     }
     render.call(this, 'browse.ejs', { recentCollections } );

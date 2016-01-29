@@ -3,6 +3,7 @@
   let index = 0;
   for (let collectionGroup of recentCollections) {
     for (let collection of collectionGroup) {
+      $('#collections').append(`<h2>${collection.collectionSchema.schema.schemaName}</h2>`);
       for (let setName of Object.keys(collection.collectionSchema)) {
         if (setName == 'schema')
           continue;

@@ -28,7 +28,7 @@ var main = {
   browse: router.get('/browse', function*(next) {
     let recentCollections = [];
     for (var c in Collection) {
-      let rv = yield Collection[c].find({}).limit(25).sort({uploadDate: -1}).populate('uploader').lean();
+      let rv = yield Collection[c].find({}).limit(1).sort({uploadDate: -1}).populate('uploader').lean();
       rv.forEach(coll => {
         coll.collectionSchema = Collection[c].collectionSchema;
       });

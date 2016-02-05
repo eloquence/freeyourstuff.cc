@@ -69,6 +69,24 @@ for (let schema in schemas) {
   models[s.schema.schemaName].collectionSchema = s;
 }
 
+
+
+function findAllByUploaderID(uid) {
+  let resultObj = {};
+  for (let c of Object.keys(this)) {
+    resultObj[c] = this[c].find({
+      uploader: uid
+    }).lean();
+  }
+  return resultObj;
+}
+
+// We want the set of collections to be enumerable without the function
+Object.defineProperty(models, 'findAllByUploaderID', {
+  value: findAllByUploaderID,
+  enumerable: false
+});
+
 module.exports = models;
 
 // Translate types supported in datasets to appropriate MongoDB/Mongoose types

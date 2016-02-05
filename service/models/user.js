@@ -61,5 +61,27 @@ userSchema.methods.validPassword = function(password) {
   return bcrypt.compareSync(password, this.local.password);
 };
 
+userSchema.statics.findByName = function(name) {
+  return this.findOne({'local.username': name.toUpperCase()});
+};
+
+userSchema.methods.getDisplayName = function() {
+  return this.local.displayName || this.twitter.displayName ||
+    this.facebook.displayName || this.google.displayName || null;
+};
+
+userSchema.methods.getMethod = function() {
+  if (this.local)
+    return 'local';
+  else if (this.twitter)
+    return 'twitter';
+  else if (this.facebook)
+    return 'facebook';
+  else if (this.google)
+    return 'google';
+  else
+    return null;
+};
+
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);

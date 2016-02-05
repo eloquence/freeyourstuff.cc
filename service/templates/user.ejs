@@ -1,0 +1,17 @@
+<%- include('head', {siteSection: 'Welcome', load: { dataTables: true } }); -%>
+<%- include('nav'); %>
+<div class="container">
+<br>
+<% if (collectionUser) { %>
+Collections for <%- collectionUser.getDisplayName() -%>:
+
+<pre>
+<%- JSON.stringify(collections) -%>
+</pre>
+
+<% } else { %>
+We don't know a user with this name.
+<% } %>
+
+</div>
+<%- include('tail', { load: { modalSigninScript: true, formValidation: true, checkNames: true, dataTables: true} } ); -%>

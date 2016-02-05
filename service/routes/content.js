@@ -7,6 +7,7 @@ let send = require('koa-send');
 // Internal dependencies
 let Collection = require('../models/collection.js');
 let User = require('../models/user.js');
+let render = require('../routes/render.js');
 
 // Naming convention for routes: Anything that is not a GET method
 // is suffixed with method name, e.g. _POST.
@@ -38,29 +39,5 @@ var main = {
     return yield next;
   })
 };
-
-function render(template, extraVars) {
-  let vars = getStandardVars.call(this);
-  if (extraVars)
-    Object.assign(vars, extraVars);
-  this.body = this.app.templates[template](vars);
-}
-
-function getStandardVars() {
-  let signedIn = this.isAuthenticated();
-  let userName;
-  if (signedIn && this.session.method &&
-    this.session.passport.user[this.session.method])
-    userName = this.session.passport.user[this.session.method].displayName;
-  let notifications = this.flash('once-notifications');
-  let stv = {
-    conf: this.app.config.expose(),
-    signedIn,
-    method: this.session.method,
-    notifications,
-    userName
-  };
-  return stv;
-}
 
 module.exports = main;

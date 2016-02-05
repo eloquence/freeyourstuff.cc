@@ -6,8 +6,39 @@ let router = require('koa-route');
 
 // Internal dependencies
 let User = require('../models/user');
+let Collection = require('../models/collection');
+let render = require('../routes/render');
 
 module.exports = {
+  user: router.get('/user/(.*)', function*(uid, next) {
+    if (!uid) {
+      return yield next;
+    } else {
+      let u;
+      if (!this.query.method || this.query.method == 'local') {
+        u = yield User.findByName(uid);
+      } else {
+        try {
+          u = yield User.findOne({
+            _id: uid
+          });
+        } catch (e) { // In case of invalid query
+          u = null;
+        }
+      }
+      let resultObj, count = 0;
+      if (u && u._id) {
+        resultObj = yield Collection.findAllByUploaderID(u._id);
+        for (let c in resultObj)
+          count += resultObj[c].length;
+      }
+      render.call(this, 'user.ejs', {
+        collections: resultObj,
+        collectionCount: count,
+        collectionUser: u
+      });
+    }
+  }),
   signin: router.get('/signin', function*(next) {
     let signinMessages = this.flash('signinMessages');
     let conf = this.app.config.expose();

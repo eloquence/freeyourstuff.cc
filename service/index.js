@@ -55,6 +55,7 @@ app.use(passport.session());
 app.use(routes.content.static);
 app.use(routes.content.root);
 app.use(routes.content.browse);
+app.use(routes.user.user);
 app.use(routes.user.signin);
 app.use(routes.user.signin_POST);
 app.use(routes.user.signout_POST);

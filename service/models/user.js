@@ -3,6 +3,9 @@
 let mongoose = require('mongoose');
 let bcrypt = require('bcrypt-nodejs');
 
+// Internal dependencies
+let config = require('../loadconfig');
+
 // Schema definition
 let userSchema = mongoose.Schema({
 
@@ -13,7 +16,13 @@ let userSchema = mongoose.Schema({
       uppercase: true,
       maxlength: 256,
       unique: true,
-      sparse: true
+      sparse: true,
+      validate: {
+        validator: function(v) {
+          return !(/[<>'"]/.test(v));
+        },
+        message: 'registerfail-char'
+      }
     },
     displayName: {
       type: String,
@@ -68,6 +77,11 @@ userSchema.statics.findByName = function(name) {
 userSchema.methods.getDisplayName = function() {
   return this.local.displayName || this.twitter.displayName ||
     this.facebook.displayName || this.google.displayName || null;
+};
+
+userSchema.methods.getLink = function() {
+  let url = config.baseURL + 'user/' + this._id + '?method=' + this.getMethod();
+  return `<a href="${url}">${this.getDisplayName()}</a>`;
 };
 
 userSchema.methods.getMethod = function() {

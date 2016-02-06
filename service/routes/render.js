@@ -1,18 +1,14 @@
 'use strict';
 
 function getStandardVars() {
-  let signedIn = this.isAuthenticated();
-  let userName;
-  if (signedIn && this.session.method &&
-    this.session.passport.user[this.session.method])
-    userName = this.session.passport.user[this.session.method].displayName;
+  let user = this.isAuthenticated() && this.session.passport.user ?
+    this.session.passport.user : null;
   let notifications = this.flash('once-notifications');
   let stv = {
     conf: this.app.config.expose(),
-    signedIn,
+    user,
     method: this.session.method,
     notifications,
-    userName
   };
   return stv;
 }

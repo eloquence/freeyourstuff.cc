@@ -15,7 +15,7 @@ module.exports = {
       return yield next;
     } else {
       let u;
-      if (!this.query.method || this.query.method == 'local') {
+      if (!this.query.method) {
         u = yield User.findByName(uid);
       } else {
         try {
@@ -119,11 +119,15 @@ module.exports = {
       yield newUser.save();
       saved = true;
     } catch (e) {
+//      console.log(e);
       if (e.errors && e.errors['local.username'] &&
         e.errors['local.username'].kind === 'maxlength')
         this.flash('registerMessages', 'registerfail-length');
       else if (e.code === 11000)
         this.flash('registerMessages', 'registerfail-unique');
+      else if (e.errors && e.errors['local.username'] &&
+        e.errors['local.username'].message === 'registerfail-char')
+        this.flash('registerMessages', 'registerfail-char');
       else
         this.flash('registerMessages', 'registerfail-unknown');
 

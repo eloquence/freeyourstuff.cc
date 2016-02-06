@@ -21,8 +21,8 @@
             <% } %>
             </span>
           <% } %>
-          <% if (signedIn) { %>
-            <span id="userNameNav"><span class="fa fa-user"></span> <%- userName -%>
+          <% if (user) { %>
+            <span id="userNameNav"><span class="fa fa-user"></span> <%- user.getLink() -%>
             <% if (method != 'local') { %>
             <span class="fa fa-<%- method -%> <%-method -%>-small social-small"></span>
             <% } %>

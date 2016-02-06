@@ -36,6 +36,8 @@
                   Username way too long. Do not taunt happy fun ball.
                 <% } else if (registerMessages.indexOf('registerfail-unique') !== -1) { %>
                   We already have a user with this name. Maybe it's you? Maaaybe?
+                <% } else if (registerMessages.indexOf('registerfail-char') !== -1) { %>
+                  The following characters are prohibited: <code>&lt; &gt; ' "</code>
                 <% } else { %>
                   You pushed the button, and something broke. Sorry!
                 <% } %>

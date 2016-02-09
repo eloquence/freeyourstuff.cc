@@ -91,7 +91,7 @@ function retrieveReviews(callback) {
       reviews.data.push(reviewObj);
     });
 
-    let nextURL = $(dom).find('.prev-next.next').attr('href');
+    let nextURL = $(dom).find('.pagination-links .next').attr('href');
     if (nextURL) {
       page++;
       // Obtain and relay progress info

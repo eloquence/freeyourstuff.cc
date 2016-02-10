@@ -85,13 +85,13 @@ userSchema.methods.getLink = function() {
 };
 
 userSchema.methods.getMethod = function() {
-  if (this.local)
+  if (this.local && this.local.displayName)
     return 'local';
-  else if (this.twitter)
+  else if (this.twitter && this.twitter.displayName)
     return 'twitter';
-  else if (this.facebook)
+  else if (this.facebook && this.facebook.displayName)
     return 'facebook';
-  else if (this.google)
+  else if (this.google && this.google.displayName)
     return 'google';
   else
     return null;

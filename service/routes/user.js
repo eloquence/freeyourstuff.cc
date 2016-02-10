@@ -33,6 +33,7 @@ module.exports = {
           count += resultObj[c].length;
       }
       render.call(this, 'user.ejs', {
+        SiteSet,
         siteSets: resultObj,
         siteSetCount: count,
         siteSetUser: u

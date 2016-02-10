@@ -2,12 +2,39 @@
 <%- include('nav'); %>
 <div class="container">
 <br>
-<% if (siteSetUser) { %>
-Data for <%- siteSetUser.getLink() -%>:
 
-<pre>
-<%- JSON.stringify(siteSets) -%>
-</pre>
+<% if (siteSetUser) { %>
+  <% if (!user || !user._id.equals(siteSetUser._id)) { %>
+
+  <h2>Published datasets by <%- siteSetUser.getLink() -%>:</h2>
+
+  <% } else { %>
+
+  <h2>Your data:</h2>
+
+  <% } %>
+
+  <% if (!siteSetCount) { %>
+    <% if (!user || !user._id.equals(siteSetUser._id)) { %>
+      This user has not published any data using
+      freeyourstuff.cc yet. <span class="fa fa-frown-o"></span>
+    <% } else { %>
+      It looks like you have not published any data using <%- conf.siteName -%> yet.
+      <a href="<%- conf.baseURL -%>">Download the browser extension</a> to get
+      started.
+    <% } %>
+  <% } else { %>
+    <% for (var siteSetFamily in siteSets) { %>
+      <% if (!siteSetFamily.length) break; %>
+      <h3><%- SiteSet[siteSetFamily].siteSetSchema.schema.label.en -%></h3>
+        <ul>
+        <% for (var siteSet of siteSets[siteSetFamily]) { %>
+          <li> <a href="<%- conf.baseURL + 'view/' + siteSetFamily + '/' + siteSet._id -%>">
+            Upload from <%- siteSet.uploadDate.toLocaleString() -%></a>
+        <% } %>
+      </ul>
+    <% } %>
+  <% } %>
 
 <% } else { %>
 We don't know a user with this name.

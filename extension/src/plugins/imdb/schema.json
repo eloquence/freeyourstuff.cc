@@ -1,7 +1,10 @@
 {
   "schema": {
-    "schemaName": "IMDB",
-    "schemaVersion": 1
+    "key": "imdb",
+    "label": {
+      "en": "IMDB"
+    },
+    "version": 1
   },
   "reviews": {
     "label": {

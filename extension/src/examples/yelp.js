@@ -1,6 +1,6 @@
 'use strict';
 var exampleData = {
-  "schemaName": "Yelp",
+  "schemaKey": "yelp",
   "schemaVersion": 1,
   "reviews": {
     "head": {
@@ -109,8 +109,11 @@ var exampleData = {
 
 var exampleSchema = {
   "schema": {
-    "schemaName": "Yelp",
-    "schemaVersion": 1
+    "key": "yelp",
+    "version": 1,
+    "label": {
+      "en": "Yelp"
+    }
   },
   "reviews": {
     "label": {

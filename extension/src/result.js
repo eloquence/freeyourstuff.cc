@@ -149,13 +149,13 @@
 
     checkLoginStatus();
 
-    if (data.schemaName !== schema.schema.schemaName) {
+    if (data.schemaKey !== schema.schema.key) {
       throw new Error('Schemas do not match. Cannot process data.');
     }
 
     for (let setName in data) {
       // Exclude metadata
-      if (setName == 'schemaName' || setName == 'schemaVersion')
+      if (setName == 'schemaKey' || setName == 'schemaVersion')
         continue;
 
       let columns = [];

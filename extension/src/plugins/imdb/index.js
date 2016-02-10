@@ -19,8 +19,8 @@ if (!init) {
         return false;
       }
       let datasets = {};
-      datasets.schemaName = request.schema.schema.schemaName;
-      datasets.schemaVersion = request.schema.schema.schemaVersion;
+      datasets.schemaKey = request.schema.schema.key;
+      datasets.schemaVersion = request.schema.schema.version;
       retrieveReviews(baseURL, reviews => {
         datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
         chrome.runtime.sendMessage({

@@ -13,24 +13,19 @@ let ObjectId = mongoose.Schema.Types.ObjectId;
 // Setup
 let pluginDir = '../extension/src/plugins';
 let dirs = getDirectories(pluginDir);
-let schemas = {};
+let schemas = [];
 let models = {};
 
-// Note that we use the directory name as the collection name (because we are
-// enforcing a naming convention consistent with MongoDB collection practices
-// on it), so we temporarily carry it forward as a key.
-//
-// The actual models are keyed using the schemaName for lookup.
 for (let dir of dirs) {
   try {
-    schemas[dir] = jsonfile.readFileSync(`${pluginDir}/${dir}/schema.json`);
+    schemas.push(jsonfile.readFileSync(`${pluginDir}/${dir}/schema.json`));
   } catch (e) {
     console.log(`Problem reading schema.json for plugin "${dir}". Skipping.`);
   }
 }
 
-for (let schema in schemas) {
-  console.log(`Importing schema "${schemas[schema].schema.schemaName}"...`);
+for (let schemaObj of schemas) {
+  console.log(`Importing schema "${schemaObj.schema.key}"...`);
   let modelObj = {};
   modelObj.uploader = {
     type: ObjectId,
@@ -38,9 +33,7 @@ for (let schema in schemas) {
   };
   modelObj.uploadDate = Date;
 
-  let s = schemas[schema]; // shortcut to current schema
-
-  for (let setName in s) {
+  for (let setName in schemaObj) {
     if (setName == 'schema')
       continue;
 
@@ -48,35 +41,35 @@ for (let schema in schemas) {
     modelObj[setName].head = {};
     modelObj[setName].data = [];
 
-    for (let h in s[setName].head) {
-      modelObj[setName].head[h] = getType(s[setName].head[h].type);
+    for (let h in schemaObj[setName].head) {
+      modelObj[setName].head[h] = getType(schemaObj[setName].head[h].type);
     }
 
     let dataObj = {};
-    for (let d in s[setName].data) {
-      dataObj[d] = getType(s[setName].data[d].type);
+    for (let d in schemaObj[setName].data) {
+      dataObj[d] = getType(schemaObj[setName].data[d].type);
     }
     modelObj[setName].data.push(dataObj);
   }
   let mSchema = mongoose.Schema(
     modelObj, {
-      collection: schema
-    } // collection name is plugin directory name, see above
+      collection: schemaObj.schema.key
+    }
   );
-  models[s.schema.schemaName] = mongoose.model(s.schema.schemaName, mSchema);
+  models[schemaObj.schema.key] = mongoose.model(schemaObj.schema.key, mSchema);
   // We stash the original (non-Mongoose) schema in the model; it contains useful
-  // metadata such as field names that we need for rendering the data.
-  models[s.schema.schemaName].siteSetSchema = s;
+  // metadata such as labels that we need for rendering the data.
+  models[schemaObj.schema.key].siteSetSchema = schemaObj;
 }
 
 
-
+// This will only return the collection IDs and upload dates
 function findAllByUploaderID(uid) {
   let resultObj = {};
   for (let c of Object.keys(this)) {
     resultObj[c] = this[c].find({
       uploader: uid
-    }).lean();
+    }, { uploadDate: 1 } ).lean();
   }
   return resultObj;
 }

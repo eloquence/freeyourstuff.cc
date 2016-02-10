@@ -1,7 +1,10 @@
 {
   "schema": {
-    "schemaName": "Yelp",
-    "schemaVersion": 1
+    "key": "yelp",
+    "label": {
+      "en": "Yelp"
+    },
+    "version": 1
   },
   "reviews": {
     "label": {

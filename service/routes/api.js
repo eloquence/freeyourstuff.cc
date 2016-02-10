@@ -52,15 +52,15 @@ module.exports = {
     if (!apiValidateSiteSet(this, c))
       return yield next;
 
-    if (SiteSet.hasOwnProperty(c.schemaName)) {
-      let siteSet = new SiteSet[c.schemaName]();
+    if (SiteSet.hasOwnProperty(c.schemaKey)) {
+      let siteSet = new SiteSet[c.schemaKey]();
       siteSet.uploadDate = new Date();
       siteSet.uploader = this.session.passport.user._id;
 
       // Loop through datasets in this siteset, add them to our DB collection.
       // Abort if we encounter invalid data.
       for (let d in c) {
-        if (d == 'schemaName' || d == 'schemaVersion')
+        if (d == 'schemaKey' || d == 'schemaVersion')
           continue;
         if (!apiValidateDataset(this, c[d]))
           return yield next;
@@ -78,7 +78,7 @@ module.exports = {
       return yield next;
     } else {
       this.body = {
-        error: 'Unknown schema: ' + c.schemaName
+        error: 'Unknown schema: ' + c.schemaKey
       };
       this.status = 400;
       return yield next;
@@ -113,9 +113,9 @@ function apiDBError(ctx, error) {
 }
 
 function apiValidateSiteSet(ctx, siteSet) {
-  if (!siteSet.schemaVersion || !siteSet.schemaName) {
+  if (!siteSet.schemaVersion || !siteSet.schemaKey) {
     ctx.body = {
-      error: 'Not a valid schema, must have a schemaVersion and schemaName.'
+      error: 'Not a valid schema, must have a schemaVersion and schemaKey.'
     };
     ctx.status = 400;
     return false;

@@ -3,7 +3,7 @@
 let router = require('koa-route');
 
 // Internal dependnecies
-let Collection = require('../models/collection');
+let SiteSet = require('../models/siteset');
 let User = require('../models/user');
 
 module.exports = {
@@ -43,33 +43,33 @@ module.exports = {
     return yield next;
   }),
 
-  collection_POST: router.post('/api/collection', function* post(next) {
+  siteSet_POST: router.post('/api/siteset', function* post(next) {
     if (!apiSignedIn(this))
       return yield next;
 
     let c = this.request.body;
 
-    if (!apiValidateCollection(this, c))
+    if (!apiValidateSiteSet(this, c))
       return yield next;
 
-    if (Collection.hasOwnProperty(c.schemaName)) {
-      let collection = new Collection[c.schemaName]();
-      collection.uploadDate = new Date();
-      collection.uploader = this.session.passport.user._id;
+    if (SiteSet.hasOwnProperty(c.schemaName)) {
+      let siteSet = new SiteSet[c.schemaName]();
+      siteSet.uploadDate = new Date();
+      siteSet.uploader = this.session.passport.user._id;
 
-      // Loop through datasets in this collection, add them to our DB collection.
+      // Loop through datasets in this siteset, add them to our DB collection.
       // Abort if we encounter invalid data.
       for (let d in c) {
         if (d == 'schemaName' || d == 'schemaVersion')
           continue;
         if (!apiValidateDataset(this, c[d]))
           return yield next;
-        collection[d] = c[d];
+        siteSet[d] = c[d];
       }
 
       // Attempt to save the data to MongoDB
       try {
-        yield collection.save();
+        yield siteSet.save();
       } catch (e) {
         apiDBError(this, e);
         return yield next;
@@ -112,8 +112,8 @@ function apiDBError(ctx, error) {
   }
 }
 
-function apiValidateCollection(ctx, collection) {
-  if (!collection.schemaVersion || !collection.schemaName) {
+function apiValidateSiteSet(ctx, siteSet) {
+  if (!siteSet.schemaVersion || !siteSet.schemaName) {
     ctx.body = {
       error: 'Not a valid schema, must have a schemaVersion and schemaName.'
     };

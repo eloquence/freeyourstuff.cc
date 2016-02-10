@@ -22,11 +22,11 @@
 <script src="/static/js/jquery.dataTables.min.js"></script>
 <script src="/static/js/dataTables.bootstrap.min.js"></script>
 <% } %>
-<% if (load.recentCollections) { %>
+<% if (load.recentSiteSets) { %>
 <script type="text/javascript">
-var recentCollections = <%- JSON.stringify(recentCollections, null, 2); -%>;
+var recentSiteSets = <%- JSON.stringify(recentSiteSets, null, 2); -%>;
 </script>
-<script src="/static/js/recentCollections.js"></script>
+<script src="/static/js/recentSiteSets.js"></script>
 <% } %>
 <% if (load.modalSigninScript || load.nonmodalSigninScript) { %>
 <script type="text/javascript">

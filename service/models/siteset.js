@@ -66,7 +66,7 @@ for (let schema in schemas) {
   models[s.schema.schemaName] = mongoose.model(s.schema.schemaName, mSchema);
   // We stash the original (non-Mongoose) schema in the model; it contains useful
   // metadata such as field names that we need for rendering the data.
-  models[s.schema.schemaName].collectionSchema = s;
+  models[s.schema.schemaName].siteSetSchema = s;
 }
 
 
@@ -81,7 +81,7 @@ function findAllByUploaderID(uid) {
   return resultObj;
 }
 
-// We want the set of collections to be enumerable without the function
+// We want the set of SiteSets to be enumerable without the function
 Object.defineProperty(models, 'findAllByUploaderID', {
   value: findAllByUploaderID,
   enumerable: false

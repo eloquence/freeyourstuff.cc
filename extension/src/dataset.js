@@ -3,7 +3,11 @@
 // complex for our needs. DataSet gives us a simple way to manage tabular data
 // with headers, descriptive information and strong types, easy to serialize
 // into multiple forms.
-
+//
+// We group DataSets into what we call SiteSets, since any site can have multiple
+// DataSets associated with it. Schemas exist at the level of SiteSets, so we do
+// not end up with too many separate schema versions for a single site.
+//
 // - dataObj: Object of the form { head: { header object }, data: { data object } }
 // - schemaObj: Object that describes and types fields in header and data objects
 function DataSet(dataObj, schemaObj) {

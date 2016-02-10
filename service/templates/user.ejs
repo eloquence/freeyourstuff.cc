@@ -2,11 +2,11 @@
 <%- include('nav'); %>
 <div class="container">
 <br>
-<% if (collectionUser) { %>
-Collections for <%- collectionUser.getLink() -%>:
+<% if (siteSetUser) { %>
+Data for <%- siteSetUser.getLink() -%>:
 
 <pre>
-<%- JSON.stringify(collections) -%>
+<%- JSON.stringify(siteSets) -%>
 </pre>
 
 <% } else { %>

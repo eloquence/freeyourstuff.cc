@@ -5,7 +5,7 @@ let router = require('koa-route');
 let send = require('koa-send');
 
 // Internal dependencies
-let Collection = require('../models/collection.js');
+let SiteSet = require('../models/siteset.js');
 let User = require('../models/user.js');
 let render = require('../routes/render.js');
 
@@ -27,15 +27,15 @@ var main = {
     return yield next;
   }),
   browse: router.get('/browse', function*(next) {
-    let recentCollections = [];
-    for (var c in Collection) {
-      let rv = yield Collection[c].find({}).limit(1).sort({uploadDate: -1}).populate('uploader').lean();
-      rv.forEach(coll => {
-        coll.collectionSchema = Collection[c].collectionSchema;
+    let recentSiteSets = [];
+    for (var c in SiteSet) {
+      let rv = yield SiteSet[c].find({}).limit(1).sort({uploadDate: -1}).populate('uploader').lean();
+      rv.forEach(siteSet => {
+        siteSet.siteSetSchema = SiteSet[c].siteSetSchema;
       });
-      recentCollections.push(rv);
+      recentSiteSets.push(rv);
     }
-    render.call(this, 'browse.ejs', { recentCollections } );
+    render.call(this, 'browse.ejs', { recentSiteSets } );
     return yield next;
   })
 };

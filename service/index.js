@@ -70,7 +70,7 @@ app.use(routes.user.authGoogle);
 app.use(routes.user.authGoogleCallback);
 app.use(routes.api.nameCheck);
 app.use(routes.api.loginStatus);
-app.use(routes.api.collection_POST);
+app.use(routes.api.siteSet_POST);
 app.use(gzip());
 /* ----- End middleware section ------ */
 

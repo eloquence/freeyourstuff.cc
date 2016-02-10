@@ -6,7 +6,7 @@ let router = require('koa-route');
 
 // Internal dependencies
 let User = require('../models/user');
-let Collection = require('../models/collection');
+let SiteSet = require('../models/siteset');
 let render = require('../routes/render');
 
 module.exports = {
@@ -28,14 +28,14 @@ module.exports = {
       }
       let resultObj, count = 0;
       if (u && u._id) {
-        resultObj = yield Collection.findAllByUploaderID(u._id);
+        resultObj = yield SiteSet.findAllByUploaderID(u._id);
         for (let c in resultObj)
           count += resultObj[c].length;
       }
       render.call(this, 'user.ejs', {
-        collections: resultObj,
-        collectionCount: count,
-        collectionUser: u
+        siteSets: resultObj,
+        siteSetCount: count,
+        siteSetUser: u
       });
     }
   }),

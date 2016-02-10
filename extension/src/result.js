@@ -105,7 +105,7 @@
       $.ajax({
         type: 'POST',
         contentType: 'application/json',
-        url: 'http://freeyourstuff.cc/api/collection',
+        url: 'http://freeyourstuff.cc/api/siteset',
         data: json,
         dataType: 'json'
       }).done(res => {

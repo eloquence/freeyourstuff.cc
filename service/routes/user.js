@@ -10,21 +10,17 @@ let SiteSet = require('../models/siteset');
 let render = require('../routes/render');
 
 module.exports = {
-  user: router.get('/user/(.*)', function*(uid, next) {
-    if (!uid) {
+  user: router.get('/user/(.*)/(.*)', function*(method, uid, next) {
+    if (!method || !uid) {
       return yield next;
     } else {
       let u;
-      if (!this.query.method) {
-        u = yield User.findByName(uid);
-      } else {
-        try {
-          u = yield User.findOne({
-            _id: uid
-          });
-        } catch (e) { // In case of invalid query
-          u = null;
-        }
+      try {
+        u = yield User.findOne({
+          _id: uid
+        });
+      } catch (e) { // In case of invalid query
+        u = null;
       }
       let resultObj, count = 0;
       if (u && u._id) {
@@ -120,7 +116,6 @@ module.exports = {
       yield newUser.save();
       saved = true;
     } catch (e) {
-//      console.log(e);
       if (e.errors && e.errors['local.username'] &&
         e.errors['local.username'].kind === 'maxlength')
         this.flash('registerMessages', 'registerfail-length');

@@ -24,21 +24,13 @@
   // Expose config variables
   window.config = <%- JSON.stringify(conf) -%>;
 </script>
-<% if (load.dataTables) { %>
+<% if (load.viewSiteSets) { %>
   <script src="/static/lib/js/jquery.dataTables.min.js"></script>
   <script src="/static/lib/js/dataTables.bootstrap.min.js"></script>
-<% } %>
-<% if (load.recentSiteSets) { %>
   <script type="text/javascript">
-    window.recentSiteSets = <%- JSON.stringify(recentSiteSets, null, 2); -%>;
+  window.siteSets = <%- JSON.stringify(siteSets) -%>;
   </script>
-  <script src="/static/recentSiteSets.js"></script>
-<% } %>
-<% if (load.view) { %>
-  <script type="text/javascript">
-  window.siteSet = <%- JSON.stringify(siteSet) -%>;
-  </script>
-  <script src="/static/view.js"></script>
+  <script src="/static/viewSiteSets.js"></script>
 <% } %>
 <% if (load.signin) { %>
   <script src="/static/signin.js"></script>

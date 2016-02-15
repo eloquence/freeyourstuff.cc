@@ -30,34 +30,35 @@ var main = {
     if (!schemaKey || !id)
       return yield next;
 
-    let siteSet = null;
+    let siteSets = [];
     if (SiteSet[schemaKey]) {
       try {
-        siteSet = yield SiteSet[schemaKey].findOne({
+        let siteSet = yield SiteSet[schemaKey].findOne({
           _id: id
         }).populate('uploader').lean();
+        siteSet.siteSetSchema = SiteSet[schemaKey].siteSetSchema;
+        siteSets.push(siteSet);
       } catch(e) {
       }
     }
-    siteSet.siteSetSchema = SiteSet[schemaKey].siteSetSchema;
     render.call(this, 'view.ejs', {
-      siteSet
+      siteSets
     });
     return yield next;
   }),
   browse: router.get('/browse', function*(next) {
-    let recentSiteSets = [];
+    let siteSets = [];
     for (var c in SiteSet) {
       let rv = yield SiteSet[c].find({}).limit(1).sort({
         uploadDate: -1
       }).populate('uploader').lean();
-      rv.forEach(siteSet => {
-        siteSet.siteSetSchema = SiteSet[c].siteSetSchema;
-      });
-      recentSiteSets.push(rv);
+      if (rv !== null) {
+        rv[0].siteSetSchema = SiteSet[c].siteSetSchema;
+        siteSets.push(rv[0]);
+      }
     }
     render.call(this, 'browse.ejs', {
-      recentSiteSets
+      siteSets
     });
     return yield next;
   })

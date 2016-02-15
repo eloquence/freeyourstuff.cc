@@ -1,6 +1,6 @@
-<%- include('head', {siteSection: 'Welcome', load: { dataTables: true } }); -%>
+<%- include('head', {siteSection: 'Welcome', load: { viewSiteSets: true } }); -%>
 <%- include('nav'); %>
 <div class="container">
-  <div id="siteSet"></div>
+  <div id="siteSets"></div>
 </div>
-<%- include('tail', { load: { signin: true, dataTables: true, view: true } } ); -%>
+<%- include('tail', { load: { signin: true, dataTables: true, viewSiteSets: true } } ); -%>

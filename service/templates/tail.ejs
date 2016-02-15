@@ -34,6 +34,12 @@
   </script>
   <script src="/static/recentSiteSets.js"></script>
 <% } %>
+<% if (load.view) { %>
+  <script type="text/javascript">
+  window.siteSet = <%- JSON.stringify(siteSet) -%>;
+  </script>
+  <script src="/static/view.js"></script>
+<% } %>
 <% if (load.signin) { %>
   <script src="/static/signin.js"></script>
 <% } %>

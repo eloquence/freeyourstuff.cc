@@ -26,16 +26,39 @@ var main = {
     render.call(this, 'index.ejs');
     return yield next;
   }),
+  view: router.get('/view/(.*)/(.*)', function*(schemaKey, id, next) {
+    if (!schemaKey || !id)
+      return yield next;
+
+    let siteSet = null;
+    if (SiteSet[schemaKey]) {
+      try {
+        siteSet = yield SiteSet[schemaKey].findOne({
+          _id: id
+        }).populate('uploader').lean();
+      } catch(e) {
+      }
+    }
+    siteSet.siteSetSchema = SiteSet[schemaKey].siteSetSchema;
+    render.call(this, 'view.ejs', {
+      siteSet
+    });
+    return yield next;
+  }),
   browse: router.get('/browse', function*(next) {
     let recentSiteSets = [];
     for (var c in SiteSet) {
-      let rv = yield SiteSet[c].find({}).limit(1).sort({uploadDate: -1}).populate('uploader').lean();
+      let rv = yield SiteSet[c].find({}).limit(1).sort({
+        uploadDate: -1
+      }).populate('uploader').lean();
       rv.forEach(siteSet => {
         siteSet.siteSetSchema = SiteSet[c].siteSetSchema;
       });
       recentSiteSets.push(rv);
     }
-    render.call(this, 'browse.ejs', { recentSiteSets } );
+    render.call(this, 'browse.ejs', {
+      recentSiteSets
+    });
     return yield next;
   })
 };

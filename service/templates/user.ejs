@@ -1,4 +1,4 @@
-<%- include('head', {siteSection: 'Welcome', load: { dataTables: true } }); -%>
+<%- include('head', {siteSection: 'Welcome', load: {} }); -%>
 <%- include('nav'); %>
 <div class="container">
 <br>
@@ -17,7 +17,7 @@
   <% if (!siteSetCount) { %>
     <% if (!user || !user._id.equals(siteSetUser._id)) { %>
       This user has not published any data using
-      freeyourstuff.cc yet. <span class="fa fa-frown-o"></span>
+      <%- conf.siteName -%> yet. <span class="fa fa-frown-o"></span>
     <% } else { %>
       It looks like you have not published any data using <%- conf.siteName -%> yet.
       <a href="<%- conf.baseURL -%>">Download the browser extension</a> to get
@@ -41,4 +41,4 @@ We don't know a user with this ID.
 <% } %>
 
 </div>
-<%- include('tail', { load: { modalSigninScript: true, formValidation: true, checkNames: true, dataTables: true} } ); -%>
+<%- include('tail', { load: { modalSigninScript: true, formValidation: true, checkNames: true } } ); -%>

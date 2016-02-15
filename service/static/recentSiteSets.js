@@ -1,7 +1,7 @@
 (function() {
   'use strict';
   let index = 0;
-  for (let siteSetFamily of recentSiteSets) {
+  for (let siteSetFamily of window.recentSiteSets) {
     for (let siteSet of siteSetFamily) {
       $('#siteSets').append(`<h2>${siteSet.siteSetSchema.schema.label.en}</h2>`);
       for (let setName of Object.keys(siteSet.siteSetSchema)) {

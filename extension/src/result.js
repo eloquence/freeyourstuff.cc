@@ -3,17 +3,20 @@
 
   if (window.location.hash !== '#debug') {
     try {
-      chrome.runtime.onMessage.addListener(request => {
-        if (request.action === 'display' && request.data && request.schema) {
-          showData(request.data, request.schema);
-        }
-      });
+      chrome.runtime.onMessage.addListener(displayHandler);
     } catch (e) {
       console.log('Chrome API not found. Loading outside of extension context with example data.');
       loadExample('yelp');
     }
   } else {
     loadExample('yelp');
+  }
+
+  function displayHandler(request) {
+    if (request.action === 'display' && request.data && request.schema) {
+      showData(request.data, request.schema);
+      chrome.runtime.onMessage.removeListener(displayHandler);
+    }
   }
 
   function loadExample(scriptName) {

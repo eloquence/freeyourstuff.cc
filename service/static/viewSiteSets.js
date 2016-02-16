@@ -41,7 +41,7 @@
         }
       }
       $('#siteSets').append(`<h3>${siteSet.siteSetSchema[setName].label.en}</h3>`);
-      $('#siteSets').append(`<h4>Upload by ${getName(siteSet.uploader)} on ${siteSet.uploadDate}</h4>`);
+      $('#siteSets').append(`<h4>Upload by ${getLink(siteSet.uploader)} on ${siteSet.uploadDate}</h4>`);
       $('#siteSets').append(`<table id="siteSet_table_${tableIndex}" class="table table-hover table-responsive">`);
       $(`#siteSet_table_${tableIndex}`).dataTable({
         "data": siteSet[setName].data,
@@ -52,18 +52,21 @@
     }
   }
 
-  function getName(user) {
-    let rv;
+  function getLink(user) {
+    let method;
     if (user.local)
-      return user.local.displayName;
+      method = 'local';
     else if (user.facebook)
-      return user.facebook.displayName;
+      method = 'facebook';
     else if (user.twitter)
-      return user.twitter.displayName;
+      method = 'twitter';
     else if (user.google)
-      return user.google.displayName;
+      method = 'google';
     else
-      return undefined;
+      return 'unknown user';
+
+    let url = window.config.baseURL + 'user/' + method + '/' + user._id;
+    return '<a href="' + url + '">'+ user[method].displayName  + '</a>';
   }
 
 

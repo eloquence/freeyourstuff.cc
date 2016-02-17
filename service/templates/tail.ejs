@@ -23,6 +23,9 @@
 <script type="text/javascript">
   // Expose config variables
   window.config = <%- JSON.stringify(conf) -%>;
+
+  // Expose user ID
+  window.userID = <%- user ? JSON.stringify(user._id) : 'null' -%>;
 </script>
 <% if (load.viewSiteSets) { %>
   <script src="/static/lib/js/jquery.dataTables.min.js"></script>

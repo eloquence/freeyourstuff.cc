@@ -59,3 +59,7 @@
       display: none !important;
     }
   }
+  .technicalNotice {
+    font-size: small;
+    color: #666;
+  }

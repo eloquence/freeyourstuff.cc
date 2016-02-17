@@ -10,6 +10,7 @@
 
       let columns = [];
       let fields = [];
+      let htmlWarning = false;
       // Loop through each data object in the set
       for (let dataObj of siteSet[setName].data) {
 
@@ -20,11 +21,18 @@
             continue;
           if (fields.indexOf(prop) == -1) {
             if (!siteSet.siteSetSchema[setName].data[prop].describes) {
-              columns.push({
+              let colDef = {
                 data: prop,
                 title: siteSet.siteSetSchema[setName].data[prop].label.en,
                 defaultContent: ''
-              });
+              };
+              if (siteSet.uploader._id != window.userID) {
+                if (siteSet.siteSetSchema[setName].data[prop].type == 'html') {
+                  colDef.render = escapeHTML;
+                  htmlWarning = true;
+                }
+              }
+              columns.push(colDef);
               fields.push(prop);
             } else {
               // We're encountering data that "describes" other data, i.e. a URL
@@ -42,6 +50,9 @@
         }
       }
       $('#siteSets').append(`<h4>${siteSet.siteSetSchema[setName].label.en}</h4>`);
+      if (htmlWarning) {
+        $('#siteSets').append('<div class="technicalNotice">Since this may not be your own dataset, HTML characters have been escaped for security reasons.<br><br></div>');
+      }
       $('#siteSets').append(`<table id="siteSet_table_${tableIndex}" class="table table-hover table-responsive">`);
       $(`#siteSet_table_${tableIndex}`).dataTable({
         "data": siteSet[setName].data,
@@ -86,6 +97,16 @@
       else
         return val;
     };
+  }
+
+  // Escape HTML control characters
+  function escapeHTML(text) {
+    return text.replace(/[\"&'\/<>]/g, function (a) {
+        return {
+            '"': '&quot;', '&': '&amp;', "'": '&#39;',
+            '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
+        }[a];
+    });
   }
 
 })();

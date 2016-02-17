@@ -3,6 +3,7 @@
   let tableIndex = 0; // each siteSet can produce multiple tables
   for (let siteSet of window.siteSets) {
     $('#siteSets').append(`<h2>${siteSet.siteSetSchema.schema.label.en}</h2>`);
+    $('#siteSets').append(`<B>Upload by ${getUploaderLink(siteSet.uploader)} on ${getSiteSetLink(siteSet)}</b>`);
     for (let setName of Object.keys(siteSet.siteSetSchema)) {
       if (setName == 'schema')
         continue;
@@ -40,8 +41,7 @@
           }
         }
       }
-      $('#siteSets').append(`<h3>${siteSet.siteSetSchema[setName].label.en}</h3>`);
-      $('#siteSets').append(`<h4>Upload by ${getLink(siteSet.uploader)} on ${siteSet.uploadDate}</h4>`);
+      $('#siteSets').append(`<h4>${siteSet.siteSetSchema[setName].label.en}</h4>`);
       $('#siteSets').append(`<table id="siteSet_table_${tableIndex}" class="table table-hover table-responsive">`);
       $(`#siteSet_table_${tableIndex}`).dataTable({
         "data": siteSet[setName].data,
@@ -52,7 +52,16 @@
     }
   }
 
-  function getLink(user) {
+  function getSiteSetLink(siteSet) {
+    if (window.siteSets.length > 1) {
+      let url = window.config.baseURL + 'view/' + siteSet.siteSetSchema.schema.key + '/' + siteSet._id;
+      return '<a href="' + url + '">' + siteSet.uploadDate + '</a>';
+    } else {
+      return siteSet.uploadDate;
+    }
+  }
+
+  function getUploaderLink(user) {
     let method;
     if (user.local)
       method = 'local';

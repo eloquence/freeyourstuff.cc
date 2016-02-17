@@ -25,7 +25,7 @@
     <% } %>
   <% } else { %>
     <% for (var siteSetFamily in siteSets) { %>
-      <% if (!siteSetFamily.length) break; %>
+      <% if (!siteSets[siteSetFamily].length) continue; %>
       <h3><%- SiteSet[siteSetFamily].siteSetSchema.schema.label.en -%></h3>
         <ul>
         <% for (var siteSet of siteSets[siteSetFamily]) { %>

@@ -32,6 +32,7 @@ for (let schemaObj of schemas) {
     ref: 'User'
   };
   modelObj.uploadDate = Date;
+  modelObj.schemaVersion = Number;
 
   for (let setName in schemaObj) {
     if (setName == 'schema')

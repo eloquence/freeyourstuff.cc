@@ -57,6 +57,11 @@ module.exports = {
       siteSet.uploadDate = new Date();
       siteSet.uploader = this.session.passport.user._id;
 
+      // We store the version, but not the key of the schema.
+      // The key is already implicitly stored through the MongoDB collection name.
+      if (c.schemaVersion !== undefined)
+        siteSet.schemaVersion = c.schemaVersion;
+
       // Loop through datasets in this siteset, add them to our DB collection.
       // Abort if we encounter invalid data.
       for (let d in c) {

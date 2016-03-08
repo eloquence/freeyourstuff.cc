@@ -8,19 +8,6 @@ if (!init) {
         });
         return false;
       }
-      if (window.location.protocol == 'https:') {
-        chrome.runtime.sendMessage({
-          action: 'notice',
-          html: 'Moving to a non-HTTPS URL as Yelp does not yet support full HTTPS.'
-        });
-        chrome.runtime.sendMessage({
-          action: 'redirect',
-          url: 'http://www.yelp.com/user_details',
-          autoRetrieve: true
-        });
-        init = false;
-        return false;
-      }
       let datasets = {};
       datasets.schemaKey = request.schema.schema.key;
       datasets.schemaVersion = request.schema.schema.version;

@@ -52,7 +52,7 @@ var main = {
       let rv = yield SiteSet[c].find({}).limit(1).sort({
         uploadDate: -1
       }).populate('uploader').lean();
-      if (rv !== null) {
+      if (rv !== null && rv.length) {
         rv[0].siteSetSchema = SiteSet[c].siteSetSchema;
         siteSets.push(rv[0]);
       }

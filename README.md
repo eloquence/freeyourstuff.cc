@@ -1,6 +1,6 @@
 # freeyourstuff.cc
 
-Liberate the content you've contributed to sites like IMDB, Yelp, and others!
+Liberate the content you've contributed to sites like IMDB, Yelp, Amazon.com, and others!
 
 There are two components:
 

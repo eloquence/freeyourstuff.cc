@@ -1,0 +1,91 @@
+{
+  "schema": {
+    "key": "amazon",
+    "label": {
+      "en": "Amazon.com"
+    },
+    "version": 1
+  },
+  "reviews": {
+    "label": {
+      "en": "Amazon.com reviews"
+    },
+    "head": {
+      "reviewerName": {
+        "type": "text",
+        "label": {
+          "en": "Reviewer name"
+        },
+        "description": {
+          "en": "The publicly visible name of the reviewer"
+        }
+      },
+      "reviewerURL": {
+        "type": "weburl",
+        "label": {
+          "en": "Reviewer URL"
+        },
+        "description": {
+          "en": "The public profile URL for the user"
+        }
+      }
+    },
+    "data": {
+      "product": {
+        "type": "text",
+        "label": {
+          "en": "Product"
+        },
+        "description": {
+          "en": "A product that is the subject of the review"
+        }
+      },
+      "productURL": {
+        "type": "weburl",
+        "label": {
+          "en": "Link to product page"
+        },
+        "description": {
+          "en": "The Amazon.com page for this product"
+        },
+        "describes": "product"
+      },
+      "date": {
+        "type": "date",
+        "label": {
+          "en": "Date"
+        },
+        "description": {
+          "en": "The date the review was posted"
+        }
+      },
+      "headline": {
+        "type": "text",
+        "label": {
+          "en": "Headline"
+        },
+        "description": {
+          "en": "The headline of the review"
+        }
+      },
+      "text": {
+        "type": "html",
+        "label": {
+          "en": "Text"
+        },
+        "description": {
+          "en": "The full text of the review"
+        }
+      },
+      "starRating": {
+        "type": "number",
+        "label": {
+          "en": "Star rating"
+        },
+        "description": {
+          "en": "The star rating of the review (1-5)"
+        }
+      }
+    }
+  }
+}

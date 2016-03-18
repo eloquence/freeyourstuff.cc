@@ -12,4 +12,12 @@
   "regex": "http(s)*://(www.)*imdb.com",
   "supported": ["Reviews"],
   "unsupported": ["Ratings", "Comments", "Lists"]
+},
+{
+  "name": "Amazon.com",
+  "plugin": "amazon",
+  "canonicalURL": "http://www.amazon.com",
+  "regex": "http(s)*://(www.)*amazon.com",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
 }]

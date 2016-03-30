@@ -15,7 +15,7 @@ let path = require('path');
 let loadTemplate = require('./templates');
 let passport = require('./auth'); // exports koa-passport
 let routes = require('./routes/index.js');
-app.config = require('./loadconfig');
+app.config = require('./load-config');
 
 mongoose.connect(app.config.dbHost, app.config.dbName, app.config.dbPort);
 

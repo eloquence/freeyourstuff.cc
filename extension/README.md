@@ -69,7 +69,7 @@ interventions.
 - We do use assignments in conditions, but wrap them in () to avoid linting
   issues and signal that they're intentional
 - `camelCase` for names inside JS, capitalized when describing a constructor.
-  `lower_case` with underscores for filenames to avoid ambiguity on some
+  `lower-case` with hyphens for filenames to avoid ambiguity on some
   filesystems.
 
 # License

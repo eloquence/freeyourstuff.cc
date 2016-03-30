@@ -7,7 +7,7 @@ let GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 let url = require('url');
 
 // Internal dependencies
-let config = require('./loadconfig');
+let config = require('./load-config');
 let User = require('./models/user');
 
 // Save to the session

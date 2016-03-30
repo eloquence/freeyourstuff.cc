@@ -4,7 +4,7 @@ let mongoose = require('mongoose');
 let bcrypt = require('bcrypt-nodejs');
 
 // Internal dependencies
-let config = require('../loadconfig');
+let config = require('../load-config');
 
 // Schema definition
 let userSchema = mongoose.Schema({

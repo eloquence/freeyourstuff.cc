@@ -67,7 +67,10 @@ interventions.
 - We don't wrap single line statements in blocks when we don't need to.
 - Single quotes for strings except for strings containing single quotes
 - We do use assignments in conditions, but wrap them in () to avoid linting
-- issues and signal that they're intentional
+  issues and signal that they're intentional
+- `camelCase` for names inside JS, capitalized when describing a constructor.
+  `lower_case` with underscores for filenames to avoid ambiguity on some
+  filesystems.
 
 # License
 - We use CC-0, because we take the position that a world without copyright

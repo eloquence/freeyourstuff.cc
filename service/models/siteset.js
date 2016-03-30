@@ -5,24 +5,11 @@
 
 // External dependencies
 let mongoose = require('mongoose');
-let fs = require('fs');
-let path = require('path');
-let jsonfile = require('jsonfile');
 let ObjectId = mongoose.Schema.Types.ObjectId;
 
-// Setup
-let pluginDir = '../extension/src/plugins';
-let dirs = getDirectories(pluginDir);
-let schemas = [];
+// Internal dependencies
+let schemas = require('../load-schemas.js');
 let models = {};
-
-for (let dir of dirs) {
-  try {
-    schemas.push(jsonfile.readFileSync(`${pluginDir}/${dir}/schema.json`));
-  } catch (e) {
-    console.log(`Problem reading schema.json for plugin "${dir}". Skipping.`);
-  }
-}
 
 for (let schemaObj of schemas) {
   console.log(`Importing schema "${schemaObj.schema.key}"...`);
@@ -99,10 +86,4 @@ function getType(schemaType) {
     default:
       throw new Error('Unknown type:' + schemaType);
   }
-}
-
-function getDirectories(srcpath) {
-  return fs.readdirSync(srcpath).filter(function(file) {
-    return fs.statSync(path.join(srcpath, file)).isDirectory();
-  });
 }

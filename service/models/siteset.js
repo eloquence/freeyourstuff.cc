@@ -9,10 +9,11 @@ let ObjectId = mongoose.Schema.Types.ObjectId;
 
 // Internal dependencies
 let schemas = require('../load-schemas.js');
+
 let models = {};
 
-for (let schemaObj of schemas) {
-  console.log(`Importing schema "${schemaObj.schema.key}"...`);
+for (let schemaKey in schemas) {
+  console.log(`Importing schema "${schemaKey}"...`);
   let modelObj = {};
   modelObj.uploader = {
     type: ObjectId,
@@ -21,7 +22,7 @@ for (let schemaObj of schemas) {
   modelObj.uploadDate = Date;
   modelObj.schemaVersion = Number;
 
-  for (let setName in schemaObj) {
+  for (let setName in schemas[schemaKey]) {
     if (setName == 'schema')
       continue;
 
@@ -29,25 +30,25 @@ for (let schemaObj of schemas) {
     modelObj[setName].head = {};
     modelObj[setName].data = [];
 
-    for (let h in schemaObj[setName].head) {
-      modelObj[setName].head[h] = getType(schemaObj[setName].head[h].type);
+    for (let h in schemas[schemaKey][setName].head) {
+      modelObj[setName].head[h] = getType(schemas[schemaKey][setName].head[h].type);
     }
 
     let dataObj = {};
-    for (let d in schemaObj[setName].data) {
-      dataObj[d] = getType(schemaObj[setName].data[d].type);
+    for (let d in schemas[schemaKey][setName].data) {
+      dataObj[d] = getType(schemas[schemaKey][setName].data[d].type);
     }
     modelObj[setName].data.push(dataObj);
   }
   let mSchema = mongoose.Schema(
     modelObj, {
-      collection: schemaObj.schema.key
+      collection: schemas[schemaKey].schema.key
     }
   );
-  models[schemaObj.schema.key] = mongoose.model(schemaObj.schema.key, mSchema);
+  models[schemaKey] = mongoose.model(schemaKey, mSchema);
   // We stash the original (non-Mongoose) schema in the model; it contains useful
   // metadata such as labels that we need for rendering the data.
-  models[schemaObj.schema.key].siteSetSchema = schemaObj;
+  models[schemaKey].siteSetSchema = schemas[schemaKey];
 }
 
 

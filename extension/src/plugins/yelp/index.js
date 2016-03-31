@@ -1,5 +1,20 @@
 'use strict';
-if (!init) {
+if (typeof init === 'undefined')
+  var init = false;
+
+// For execution in browser
+if (typeof chrome !== 'undefined' && !init)
+  setupExtensionEvents();
+
+// For execution in Node
+if (typeof module !== 'undefined') {
+  let tests = {
+    reviews: retrieveReviews
+  };
+  module.exports = tests;
+}
+
+function setupExtensionEvents() {
   chrome.runtime.onMessage.addListener(request => {
     if (request.action == 'retrieve') {
       if (!loggedIn()) {
@@ -22,7 +37,7 @@ if (!init) {
     }
   });
   // Prevent repeated initialization
-  var init = true;
+  init = true;
 }
 
 function loggedIn() {
@@ -35,7 +50,7 @@ function retrieveReviews(callback) {
     head: {},
     data: []
   };
-  let firstURL = '//www.yelp.com/user_details_reviews_self';
+  let firstURL = 'https://www.yelp.com/user_details_reviews_self';
   $.get(firstURL).done(processPage);
 
   function processPage(html) {
@@ -85,16 +100,24 @@ function retrieveReviews(callback) {
       let totalPageMatch, totalPages;
       if ((totalPageMatch = $(dom).find('.page-of-pages').text().match(/\d+.*?(\d+)/)))
         totalPages = totalPageMatch[1];
-      let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
-      chrome.runtime.sendMessage({
-        action: 'notice',
-        html: progress
-      });
-
+      report(`Fetching page ${page} of ${totalPages} &hellip;`);
       // Fetch next page
       $.get(nextURL).done(processPage);
     } else {
       callback(reviews);
     }
+  }
+}
+
+// FIXME: We'll want to move this into a separate file, but will need to do so
+// in a manner that works both client & server-side.
+function report(html) {
+  if (typeof chrome !== 'undefined') {
+    chrome.runtime.sendMessage({
+      action: 'notice',
+      html
+    });
+  } else {
+    console.log('Progress update: ' + html);
   }
 }

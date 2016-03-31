@@ -1,5 +1,20 @@
 'use strict';
-if (!init) {
+if (typeof init === 'undefined')
+  var init = false;
+
+// For execution in browser
+if (typeof chrome !== 'undefined' && !init)
+  setupExtensionEvents();
+
+// For execution in Node
+if (typeof module !== 'undefined') {
+  let tests = {
+    reviews: retrieveReviews
+  };
+  module.exports = tests;
+}
+
+function setupExtensionEvents() {
   chrome.runtime.onMessage.addListener(request => {
     if (request.action == 'retrieve') {
       if (!loggedIn()) {
@@ -35,7 +50,7 @@ if (!init) {
     }
   });
   // Prevent repeated initialization
-  var init = true;
+  init = true;
 }
 
 function loggedIn() {
@@ -48,13 +63,13 @@ function retrieveReviews(callback) {
     data: []
   };
   let pages = [ 1 ];
-  let profileURL = '//www.amazon.com/gp/profile/';
+  let profileURL = 'https://www.amazon.com/gp/profile/';
 
   // We use XMLHttpRequest here because jQuery does not expose responseURL,
   // due to limited support for it; see https://bugs.jquery.com/ticket/15173
   let req = new XMLHttpRequest();
   req.addEventListener("load", processProfile);
-  req.open("GET", "https:///www.amazon.com/gp/profile/");
+  req.open("GET", "https://www.amazon.com/gp/profile/");
   req.send();
 
   function processProfile() {
@@ -63,7 +78,7 @@ function retrieveReviews(callback) {
 
     // The requests redirects to the full profile URL
     reviews.head.reviewerURL = this.responseURL;
-    let firstURL = '//www.amazon.com/gp/cdp/member-reviews/';
+    let firstURL = 'https://www.amazon.com/gp/cdp/member-reviews/';
     $.get(firstURL).done(processPage);
   }
 
@@ -105,12 +120,9 @@ function retrieveReviews(callback) {
 
     if (pages.indexOf(nextPage) == -1) {
       let progress = `Fetching page ${nextPage} &hellip;`;
-      chrome.runtime.sendMessage({
-        action: 'notice',
-        html: progress
-      });
+      report(progress);
       pages.push(nextPage);
-      $.get(nextPageLink.attr('href')).done(processPage);
+      $.get('https://www.amazon.com' + nextPageLink.attr('href')).done(processPage);
     } else {
       callback(reviews);
     }
@@ -124,4 +136,15 @@ function retrieveReviews(callback) {
     }
   }
 
+}
+
+function report(html) {
+  if (typeof chrome !== 'undefined') {
+    chrome.runtime.sendMessage({
+      action: 'notice',
+      html
+    });
+  } else {
+    console.log('Progress update: ' + html);
+  }
 }

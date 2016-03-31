@@ -1,5 +1,20 @@
 'use strict';
-if (!init) {
+if (typeof init === 'undefined')
+  var init = false;
+
+// For execution in browser
+if (typeof chrome !== 'undefined' && !init)
+  setupExtensionEvents();
+
+// For execution in Node
+if (typeof module !== 'undefined') {
+  let tests = {
+    reviews: retrieveReviews
+  };
+  module.exports = tests;
+}
+
+function setupExtensionEvents() {
   chrome.runtime.onMessage.addListener(request => {
     if (request.action == 'retrieve') {
       if (!loggedIn()) {
@@ -21,18 +36,18 @@ if (!init) {
       let datasets = {};
       datasets.schemaKey = request.schema.schema.key;
       datasets.schemaVersion = request.schema.schema.version;
-      retrieveReviews(baseURL, reviews => {
+      retrieveReviews(reviews => {
         datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
         chrome.runtime.sendMessage({
           action: 'dispatch',
           data: datasets,
           schema: request.schema
         });
-      });
+      }, baseURL);
     }
   });
   // Prevent repeated initialization
-  var init = true;
+  init = true;
 }
 
 function loggedIn() {
@@ -48,7 +63,7 @@ function getBaseURL() {
     throw new Error('Could not obtain base URL.');
 }
 
-function retrieveReviews(baseURL, callback) {
+function retrieveReviews(callback, baseURL) {
 
   // Standard testing URL; note that the pages for logged-in and logged-out
   // users differ slightly; we try to successfully parse both
@@ -64,7 +79,6 @@ function retrieveReviews(baseURL, callback) {
   let firstURL = baseURL + 'comments-expanded';
   doneURLs.push(firstURL);
   $.get(firstURL).done(processPage);
-
   function processPage(html) {
     let dom = $.parseHTML(html);
     if (page === 1) {
@@ -120,14 +134,22 @@ function retrieveReviews(baseURL, callback) {
       if ((totalPageMatch = $(dom).find('table td font').first().text().match(/\d+.*?(\d+)/)))
         totalPages = totalPageMatch[1];
       let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
-      chrome.runtime.sendMessage({
-        action: 'notice',
-        html: progress
-      });
+      report(progress);
       // Fetch next page
       $.get(nextURL).done(processPage);
     } else {
       callback(reviews);
     }
+  }
+}
+
+function report(html) {
+  if (typeof chrome !== 'undefined') {
+    chrome.runtime.sendMessage({
+      action: 'notice',
+      html
+    });
+  } else {
+    console.log('Progress update: ' + html);
   }
 }

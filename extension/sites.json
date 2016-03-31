@@ -1,7 +1,7 @@
 [{
   "name": "Yelp",
   "plugin": "yelp",
-  "canonicalURL": "http://www.yelp.com",
+  "canonicalURL": "https://www.yelp.com/",
   "regex": "http(s)*://(www.)*yelp.com",
   "supported": ["Reviews"],
   "unsupported": ["Comments", "Photographs", "Messages", "Events"]

@@ -1,4 +1,10 @@
 'use strict';
+// This function can be used as a Node module for testing purposes.
+// let DataSet = require('dataset.js')
+if (typeof module !== 'undefined') {
+  module.exports = DataSet;
+}
+
 // JSON schema is both too simplistic (primitives without validation) and too
 // complex for our needs. DataSet gives us a simple way to manage tabular data
 // with headers, descriptive information and strong types, easy to serialize

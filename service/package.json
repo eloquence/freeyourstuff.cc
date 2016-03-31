@@ -31,5 +31,10 @@
     "passport-google-oauth": "^0.2.0",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.3"
+  },
+  "devDependencies": {
+    "jsdom": "^8.1.0",
+    "chrome-cookies-secure": "^1.1.4",
+    "tough-cookie": "^2.2.2"
   }
 }

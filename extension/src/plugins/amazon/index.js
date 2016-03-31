@@ -68,10 +68,9 @@ function retrieveReviews(callback) {
   // We use XMLHttpRequest here because jQuery does not expose responseURL,
   // due to limited support for it; see https://bugs.jquery.com/ticket/15173
   let req = new XMLHttpRequest();
-  req.addEventListener("load", processProfile);
-  req.open("GET", "https://www.amazon.com/gp/profile/");
+  req.addEventListener('load', processProfile);
+  req.open('GET', 'https://www.amazon.com/gp/profile/');
   req.send();
-
   function processProfile() {
     let dom = $.parseHTML(this.responseText);
     reviews.head.reviewerName = $(dom).find('.public-name-text').text();

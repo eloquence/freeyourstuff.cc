@@ -27,34 +27,66 @@ let cookieJar = new CookieJar();
 let DataSet = require('../../extension/src/dataset.js');
 let schemas = require('../load-schemas');
 let pluginDir = '../../extension/src/plugins';
+let colors = require('colors/safe');
 
-for (let schemaKey in schemas) {
-  chromeCookies.getCookies(schemas[schemaKey].schema.site.canonicalURL, 'set-cookie', (err, cookies) => {
-//    console.log(cookies);
-    for (let cookie of cookies) {
-      cookieJar.setCookieSync(cookie, schemas[schemaKey].schema.site.canonicalURL);
-    }
-    let userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
-    let url = 'https://www.yelp.com/user_details_reviews_self';
-    let jsdom = require('jsdom');
-    global.document = jsdom.jsdom(undefined, {
-      userAgent, cookieJar
-    });
-    global.window = global.document.defaultView;
-    global.XMLHttpRequest = global.window.XMLHttpRequest;
-    jsdom.jQueryify(global.window, 'https://code.jquery.com/jquery-1.12.2.min.js', () => {
-      global.$ = global.window.$;
-      let tests = require(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`);
-      for (let testName in tests) {
-        tests[testName](result => {
-          let dataSet = new DataSet(result, schemas[schemaKey][testName]);
-          reportResult(dataSet.set);
-        });
-      }
-    });
+let schemaKeys = Object.keys(schemas);
+if (process.argv.length > 2) {
+  let myTests = process.argv;
+  myTests.splice(0, 2);
+  schemaKeys = schemaKeys.filter(key => {
+    return (myTests.indexOf(key) !== -1);
   });
+  if (!schemaKeys.length) {
+    console.log(colors.red('None of the specified plugin(s) could be found: ' + myTests.join(', ')));
+    process.exit(1);
+  } else
+    console.log(colors.gray('The following specified plugin(s) have been found in sites.json and will be tested: ' + schemaKeys.join(', ')));
+} else {
+  console.log(colors.gray('All plugins registered in sites.json will be tested: ' + schemaKeys.join(', ')));
+  console.log(colors.gray('To test only some plugins, specify them as command line arguments, separated with spaces.'));
+}
+
+runTests();
+
+function runTests() {
+  if (schemaKeys.length) {
+    let schemaKey = schemaKeys.shift();
+    console.log(`Testing plugin "${schemaKey}"...`);
+    chromeCookies.getCookies(schemas[schemaKey].schema.site.canonicalURL, 'set-cookie', (err, cookies) => {
+      for (let cookie of cookies) {
+        cookieJar.setCookieSync(cookie, schemas[schemaKey].schema.site.canonicalURL);
+      }
+      let userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
+      let url = 'https://www.yelp.com/user_details_reviews_self';
+      let jsdom = require('jsdom');
+      global.document = jsdom.jsdom(undefined, {
+        userAgent,
+        cookieJar
+      });
+      global.window = global.document.defaultView;
+      global.XMLHttpRequest = global.window.XMLHttpRequest;
+      jsdom.jQueryify(global.window, 'https://code.jquery.com/jquery-1.12.2.min.js', () => {
+        global.$ = global.window.$;
+        let tests = require(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`);
+        for (let testName in tests) {
+          console.log(`Running test "${testName}"...`);
+          // This will not catch errors during asynchronous execution
+          try {
+            tests[testName](result => {
+              let dataSet = new DataSet(result, schemas[schemaKey][testName]);
+              reportResult(dataSet.set);
+              // Continue until all tests are run
+              runTests();
+            });
+          } catch(e) {
+            console.log(colors.red('Test failed. Error was: '+e.stack));
+          }
+        }
+      });
+    });
+  }
 }
 
 function reportResult(result) {
-  console.log(result);
+  console.log(colors.gray(JSON.stringify(result, undefined, 2)));
 }

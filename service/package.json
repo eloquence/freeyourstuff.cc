@@ -33,8 +33,9 @@
     "passport-twitter": "^1.0.3"
   },
   "devDependencies": {
-    "jsdom": "^8.1.0",
     "chrome-cookies-secure": "^1.1.4",
+    "colors": "^1.1.2",
+    "jsdom": "^8.1.0",
     "tough-cookie": "^2.2.2"
   }
 }

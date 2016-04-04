@@ -80,6 +80,7 @@ function runTests() {
             });
           } catch(e) {
             console.log(colors.red('Test failed. Error was: '+e.stack));
+            runTests();
           }
         }
       });

@@ -23,16 +23,6 @@ function setupExtensionEvents() {
         });
         return false;
       }
-      let baseURL;
-      try {
-        baseURL = getBaseURL();
-      } catch (e) {
-        chrome.runtime.sendMessage({
-          action: 'error',
-          html: e.message
-        });
-        return false;
-      }
       let datasets = {};
       datasets.schemaKey = request.schema.schema.key;
       datasets.schemaVersion = request.schema.schema.version;
@@ -43,7 +33,7 @@ function setupExtensionEvents() {
           data: datasets,
           schema: request.schema
         });
-      }, baseURL);
+      });
     }
   });
   // Prevent repeated initialization
@@ -54,93 +44,120 @@ function loggedIn() {
   return !($('#nblogin').text());
 }
 
-function getBaseURL() {
-  // Strips off query string
-  let menuMatch = $('#nb_personal a').first().attr('href').match(/(.*)\?/);
-  if (menuMatch[1])
-    return menuMatch[1];
-  else
-    throw new Error('Could not obtain base URL.');
+// When running in an extension context, we can usually just look at the page
+// we're on to find the profile URL. When running in Node, we need to get at
+// least one IMDB page first to extract it. This is also a nice fallback for
+// pages which don't have the profile link on them (e.g., error pages).
+function getBaseURL(callback) {
+  let baseURL = extractBaseURL();
+  if (baseURL) {
+    callback(baseURL);
+  } else {
+    $.get('http://www.imdb.com/').done(function(html) {
+      let doc = $.parseHTML(html);
+      baseURL = extractBaseURL(doc);
+      if (baseURL)
+        callback(baseURL);
+      else
+        throw new Error('Could not obtain IMDB base URL.');
+    });
+  }
 }
 
-function retrieveReviews(callback, baseURL) {
+// Factored out so we can call it on current page or another; expects DOM element
+// or array of them ($.parseHTML produces the latter).
+function extractBaseURL(pageDocument) {
+  if (!pageDocument)
+    pageDocument = document;
 
-  // Standard testing URL; note that the pages for logged-in and logged-out
-  // users differ slightly; we try to successfully parse both
-  if (!baseURL)
-    baseURL = 'http://www.imdb.com/user/ur3274830/';
+  let mainPart = 'http://www.imdb.com';
+  // Strips off query string
+  let menuLink = $(pageDocument).find('#nb_personal a').first().attr('href');
+  let menuMatch = menuLink !== undefined ? menuLink.match(/(.*)\?/) : [];
+  if (menuMatch[1])
+    return mainPart + menuMatch[1];
+  else
+    return null;
+}
 
+
+function retrieveReviews(callback) {
+  let baseURL;
   let page = 1;
   let reviews = {
     head: {},
     data: []
   };
   let doneURLs = [];
-  let firstURL = baseURL + 'comments-expanded';
-  doneURLs.push(firstURL);
-  $.get(firstURL).done(processPage);
-  function processPage(html) {
-    let dom = $.parseHTML(html);
-    if (page === 1) {
-      reviews.head.reviewerName = $(dom).find('#consumer_user_nav a').first().text().trim();
-      reviews.head.reviewerID = baseURL.match(/ur[0-9]*/)[0];
-    }
-    while ($(dom).find('table#outerbody div').length) {
-      let subject = $(dom).find('table#outerbody div a').first().text();
-      let subjectIMDBURL = 'http://www.imdb.com' + $(dom).find('table div a').first().attr('href');
-      let reviewScope = $(dom).find('table div').first().nextUntil('div,hr');
-      let title = reviewScope.closest('b').first().text();
-      // "<small>x of y people found the following review useful:</small>" is only present where y > 0
-      let date = reviewScope.closest('small').length == 1 ? $(reviewScope.closest('small')[0]).text() :
-        $(reviewScope.closest('small')[1]).text();
 
-      let spoilers = reviewScope.find('b').length ? true : false;
-      // We don't want spoiler warnings in the actual text.
-      reviewScope = reviewScope.not('p:has(b)');
+  getBaseURL(baseURL => {
+    let firstURL = baseURL + 'comments-expanded';
+    doneURLs.push(firstURL);
+    $.get(firstURL).done(processPage);
 
-      let text = '';
-      reviewScope.closest('p').each((i, e) => {
-        if (e.innerHTML)
-          text += `<p>${e.innerHTML}</p>`;
-      });
+    function processPage(html) {
+      let dom = $.parseHTML(html);
+      if (page === 1) {
+        reviews.head.reviewerName = $(dom).find('#consumer_user_nav a').first().text().trim();
+        reviews.head.reviewerID = baseURL.match(/ur[0-9]*/)[0];
+      }
+      while ($(dom).find('table#outerbody div').length) {
+        let subject = $(dom).find('table#outerbody div a').first().text();
+        let subjectIMDBURL = 'http://www.imdb.com' + $(dom).find('table div a').first().attr('href');
+        let reviewScope = $(dom).find('table div').first().nextUntil('div,hr');
+        let title = reviewScope.closest('b').first().text();
+        // "<small>x of y people found the following review useful:</small>" is only present where y > 0
+        let date = reviewScope.closest('small').length == 1 ? $(reviewScope.closest('small')[0]).text() :
+          $(reviewScope.closest('small')[1]).text();
 
-      let starRating, starRatingMatch;
-      if (reviewScope.closest('img').attr('alt') &&
-        (starRatingMatch = reviewScope.closest('img').attr('alt').match(/(\d+)\//)))
-        starRating = starRatingMatch[1];
-      // Remove processed bits so the while loop can continue
-      $(dom).find('table#outerbody div').first().nextUntil('div').remove();
-      $(dom).find('table#outerbody div').first().remove();
-      let reviewObj = {
-        subject,
-        subjectIMDBURL,
-        title,
-        date,
-        text,
-        starRating,
-        spoilers
-      };
-      reviews.data.push(reviewObj);
+        let spoilers = reviewScope.find('b').length ? true : false;
+        // We don't want spoiler warnings in the actual text.
+        reviewScope = reviewScope.not('p:has(b)');
+
+        let text = '';
+        reviewScope.closest('p').each((i, e) => {
+          if (e.innerHTML)
+            text += `<p>${e.innerHTML}</p>`;
+        });
+
+        let starRating, starRatingMatch;
+        if (reviewScope.closest('img').attr('alt') &&
+          (starRatingMatch = reviewScope.closest('img').attr('alt').match(/(\d+)\//)))
+          starRating = starRatingMatch[1];
+        // Remove processed bits so the while loop can continue
+        $(dom).find('table#outerbody div').first().nextUntil('div').remove();
+        $(dom).find('table#outerbody div').first().remove();
+        let reviewObj = {
+          subject,
+          subjectIMDBURL,
+          title,
+          date,
+          text,
+          starRating,
+          spoilers
+        };
+        reviews.data.push(reviewObj);
+      }
+      let nextURL = $(dom).find('table table td a img').last().parent().attr('href');
+      //nextURL = 'http://www.imdb.com/user/ur3274830/' + nextURL;
+      if (nextURL)
+        nextURL = baseURL + nextURL;
+      if (nextURL && doneURLs.indexOf(nextURL) === -1) {
+        doneURLs.push(nextURL);
+        page++;
+        // Obtain and relay progress info
+        let totalPageMatch, totalPages;
+        if ((totalPageMatch = $(dom).find('table td font').first().text().match(/\d+.*?(\d+)/)))
+          totalPages = totalPageMatch[1];
+        let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
+        report(progress);
+        // Fetch next page
+        $.get(nextURL).done(processPage);
+      } else {
+        callback(reviews);
+      }
     }
-    let nextURL = $(dom).find('table table td a img').last().parent().attr('href');
-    //nextURL = 'http://www.imdb.com/user/ur3274830/' + nextURL;
-    if (nextURL)
-      nextURL = baseURL + nextURL;
-    if (nextURL && doneURLs.indexOf(nextURL) === -1) {
-      doneURLs.push(nextURL);
-      page++;
-      // Obtain and relay progress info
-      let totalPageMatch, totalPages;
-      if ((totalPageMatch = $(dom).find('table td font').first().text().match(/\d+.*?(\d+)/)))
-        totalPages = totalPageMatch[1];
-      let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
-      report(progress);
-      // Fetch next page
-      $.get(nextURL).done(processPage);
-    } else {
-      callback(reviews);
-    }
-  }
+  });
 }
 
 function report(html) {

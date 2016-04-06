@@ -25,7 +25,7 @@
   window.config = <%- JSON.stringify(conf) -%>;
 
   // Expose user ID
-  window.userID = <%- user ? JSON.stringify(user._id) : 'null' -%>;
+  window.userID = <%- typeof user !== 'undefined' && user ? JSON.stringify(user._id) : 'null' -%>;
 </script>
 <% if (load.viewSiteSets) { %>
   <script src="/static/lib/js/jquery.dataTables.min.js"></script>

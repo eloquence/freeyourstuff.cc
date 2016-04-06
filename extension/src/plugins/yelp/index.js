@@ -1,4 +1,10 @@
 'use strict';
+
+// Result comparison tests to be run by NodeJS/JSDOM test runner
+var jsonTests = {
+  reviews: retrieveReviews
+};
+
 if (typeof init === 'undefined')
   var init = false;
 
@@ -6,15 +12,7 @@ if (typeof init === 'undefined')
 if (typeof chrome !== 'undefined' && !init)
   setupExtensionEvents();
 
-// For execution in Node
-if (typeof module !== 'undefined') {
-  let tests = {
-    reviews: retrieveReviews
-  };
-  module.exports = tests;
-}
-
-function setupExtensionEvents() {
+  function setupExtensionEvents() {
   chrome.runtime.onMessage.addListener(request => {
     if (request.action == 'retrieve') {
       if (!loggedIn()) {
@@ -63,7 +61,6 @@ function retrieveReviews(callback) {
       if ((idMatch = idLink.attr('href').match(/userid=(.*)/)))
         reviews.head.reviewerID = idMatch[1];
     }
-
     // Parse contents
     $(dom).find('div.review').each((i, e) => {
       let text = $(e).find('.review-content p').first().html();

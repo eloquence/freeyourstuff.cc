@@ -1,18 +1,15 @@
 'use strict';
+// Result comparison tests to be run by NodeJS/JSDOM test runner
+var jsonTests = {
+  reviews: retrieveReviews
+};
+
 if (typeof init === 'undefined')
   var init = false;
 
 // For execution in browser
 if (typeof chrome !== 'undefined' && !init)
   setupExtensionEvents();
-
-// For execution in Node
-if (typeof module !== 'undefined') {
-  let tests = {
-    reviews: retrieveReviews
-  };
-  module.exports = tests;
-}
 
 function setupExtensionEvents() {
   chrome.runtime.onMessage.addListener(request => {

@@ -133,6 +133,6 @@ function validateResult(testName, newResult) {
     console.log(`Additions are green, removals are red.`);
     console.log(str);
   } else {
-    console.log('No differences with previous run.');
+    console.log('No differences with first run.');
   }
 }

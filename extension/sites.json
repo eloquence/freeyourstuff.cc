@@ -16,7 +16,7 @@
 {
   "name": "Amazon.com",
   "plugin": "amazon",
-  "canonicalURL": "http://www.amazon.com",
+  "canonicalURL": "https://www.amazon.com",
   "regex": "http(s)*://(www.)*amazon.com",
   "supported": ["Reviews"],
   "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]

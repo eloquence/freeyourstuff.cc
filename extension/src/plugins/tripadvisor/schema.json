@@ -40,7 +40,7 @@
           "en": "A hotel, restaurant, attraction, or other subject of the review"
         }
       },
-      "subjectURL": {
+      "subjectTripAdvisorURL": {
         "type": "weburl",
         "label": {
           "en": "TripAdvisor URL"

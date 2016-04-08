@@ -76,7 +76,11 @@ function retrieveReviews(callback) {
     let directoryDOM = $.parseHTML(directoryHTML);
     reviews.head.reviewerName = $(directoryDOM).find('.name .nameText').text();
     let reviewList = $(directoryDOM).find('li.cs-review').toArray();
-    if (!reviewList.length) {
+    let reviewURLs = [];
+    reviewURLs = reviewList.map(ele => {
+      return base + $(ele).find('a.cs-review-title').attr('href');
+    });
+    if (!reviewURLs.length) {
       reportError('No reviews found.');
       return false;
     }
@@ -85,30 +89,37 @@ function retrieveReviews(callback) {
     processReviewList();
 
     function processReviewList() {
-      let listItem = reviewList.shift();
-      let listItemURL = base + $(listItem).find('a.cs-review-title').attr('href');
-      $.get(listItemURL).done(processReview);
+      count++;
+      let url = reviewURLs.shift();
+      if (url) {
+        report(`Fetching review ${count} of ${total} &hellip;`);
+        $.get(url).done(processReview);
+      }
 
       function processReview(html) {
-        count++;
-        report(`Fetching review ${count} of ${total} &hellip;`);
         let dom = $.parseHTML(html);
+        let subject = $(dom).find('.altHeadInline a').first().text();
+        let subjectTripAdvisorURL = base + $(dom).find('.altHeadInline a').first().attr('href');
         let $review = $(dom).find('.reviewSelector').first();
         let text = $review.find('[property="reviewBody"]').html().trim();
         let date = $review.find('.ratingDate').attr('content');
         let overallRating = $review.find('.rating img').attr('class').match(/s([0-9])/)[1];
 
         let reviewObj = {
+          subject,
+          subjectTripAdvisorURL,
           text,
           date,
           overallRating
         };
 
         let subRatingLabels = ['Value', 'Service', 'Sleep Quality', 'Location',
-          'Food', 'Atmospere', 'Cleanliness', 'Rooms'];
+          'Food', 'Atmospere', 'Cleanliness', 'Rooms'
+        ];
         let subRatingKeys = ['valueRating', 'serviceRating', 'sleepQualityRating',
           'locationRating', 'foodRating', 'atmosphereRating', 'cleanlinessRating',
-          'roomsRating'];
+          'roomsRating'
+        ];
 
         $review.find('li.recommend-answer').each(function() {
           let ratingType = $(this).find('.recommend-description').text().trim();
@@ -120,24 +131,42 @@ function retrieveReviews(callback) {
         });
 
         reviews.data.push(reviewObj);
-        if (reviewList.length)
+        if (reviewURLs.length)
           processReviewList();
-        else {
-          if (total > 50) {
-            report('Attempting to get more data &hellip;');
-            let id = directoryHTML.match(/\{"memberId":"(.*?)"\}/)[1];
-            let token = $(directoryDOM).find('input[name="token"]').val();
-            var data = {
-            	token,
-            	version: 5,
-            	authenticator: 'DEFAULT',
-            	actions:JSON.stringify([{"name":"FETCH","resource":"modules.membercenter.model.ContentStreamComposite","params":	{"offset":50,"limit":50,"page":"PROFILE","memberId":"zP1qGhYGcXZiyNWNrBcHOQ=="},"id":"clientaction576"}])
-            };
-            $.post('https://www.tripadvisor.com/ModuleAjax?', data, null, 'json').done(function(response){
-              // FIXME finish AJAX integration
-              console.log(response.store['modules.unimplemented.entity.AnnotatedItem']);
-            });
-          }
+        else if (total - count > 0) {
+          report('Attempting to get more data &hellip;');
+          let id = directoryHTML.match(/\{"memberId":"(.*?)"\}/)[1];
+          let token = $(directoryDOM).find('input[name="token"]').val();
+          var data = {
+            token,
+            version: 5,
+            authenticator: 'DEFAULT',
+            actions: JSON.stringify([{
+              "name": "FETCH",
+              "resource": "modules.membercenter.model.ContentStreamComposite",
+              "params": {
+                "offset": count,
+                "limit": 50,
+                "page": "PROFILE",
+                "memberId": id
+              },
+              "id": "clientaction576"
+            }])
+          };
+          $.post('https://www.tripadvisor.com/ModuleAjax?', data, null, 'json').done(function(response) {
+            let dir = response.store['modules.unimplemented.entity.AnnotatedItem'];
+            for (let itemKey in dir) {
+              if (dir[itemKey].url)
+                reviewURLs.push(base + dir[itemKey].url);
+            }
+            if (reviewURLs.length)
+              processReviewList();
+            else {
+              reportError('No additional reviews received!');
+              callback(reviews);
+            }
+          });
+        } else {
           callback(reviews);
         }
       }

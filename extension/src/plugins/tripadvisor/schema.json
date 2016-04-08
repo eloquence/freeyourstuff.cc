@@ -1,0 +1,154 @@
+{
+  "schema": {
+    "key": "tripadvisor",
+    "label": {
+      "en": "TripAdvisor"
+    },
+    "version": 1
+  },
+  "reviews": {
+    "label": {
+      "en": "TripAdvisor reviews"
+    },
+    "head": {
+      "reviewerName": {
+        "type": "text",
+        "label": {
+          "en": "Reviewer name"
+        },
+        "description": {
+          "en": "The publicly visible name of the reviewer"
+        }
+      },
+      "reviewerID": {
+        "type": "text",
+        "label": {
+          "en": "Reviewer ID"
+        },
+        "description": {
+          "en": "The unique ID assigned to the user"
+        }
+      }
+    },
+    "data": {
+      "subject": {
+        "type": "text",
+        "label": {
+          "en": "Subject"
+        },
+        "description": {
+          "en": "A hotel, restaurant, attraction, or other subject of the review"
+        }
+      },
+      "subjectURL": {
+        "type": "weburl",
+        "label": {
+          "en": "TripAdvisor URL"
+        },
+        "description": {
+          "en": "The URL pointing to all TripAdvisor reviews for the entity that is being reviewed"
+        },
+        "describes": "subject"
+      },
+      "date": {
+        "type": "date",
+        "label": {
+          "en": "Date"
+        },
+        "description": {
+          "en": "The date the review was posted"
+        }
+      },
+      "text": {
+        "type": "html",
+        "label": {
+          "en": "Text"
+        },
+        "description": {
+          "en": "The full text of the review"
+        }
+      },
+      "overallRating": {
+        "type": "number",
+        "label": {
+          "en": "Overall rating"
+        },
+        "description": {
+          "en": "The overall rating of the review (1-5)"
+        }
+      },
+      "serviceRating": {
+        "type": "number",
+        "label": {
+          "en": "Service rating"
+        },
+        "description": {
+          "en": "The service rating of the review (1-5)"
+        }
+      },
+      "foodRating": {
+        "type": "number",
+        "label": {
+          "en": "Food rating"
+        },
+        "description": {
+          "en": "The food rating of the review (1-5)"
+        }
+      },
+      "sleepQualityRating": {
+        "type": "number",
+        "label": {
+          "en": "Sleep quality rating"
+        },
+        "description": {
+          "en": "For hotels, the sleep quality rating of the review (1-5)"
+        }
+      },
+      "valueRating": {
+        "type": "number",
+        "label": {
+          "en": "Value rating"
+        },
+        "description": {
+          "en": "The value for money rating of the review (1-5)"
+        }
+      },
+      "atmosphereRating": {
+        "type": "number",
+        "label": {
+          "en": "Atmosphere rating"
+        },
+        "description": {
+          "en": "The atmoshere rating of the review (1-5)"
+        }
+      },
+      "cleanlinessRating": {
+        "type": "number",
+        "label": {
+          "en": "Cleanliness rating"
+        },
+        "description": {
+          "en": "The cleanliness rating of the review (1-5)"
+        }
+      },
+      "locationRating": {
+        "type": "number",
+        "label": {
+          "en": "Location rating"
+        },
+        "description": {
+          "en": "The location rating of the review (1-5)"
+        }
+      },
+      "roomsRating": {
+        "type": "number",
+        "label": {
+          "en": "Rooms rating"
+        },
+        "description": {
+          "en": "The rooms rating of the review (1-5)"
+        }
+      }
+    }
+  }
+}

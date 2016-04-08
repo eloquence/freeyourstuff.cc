@@ -14,6 +14,14 @@
   "unsupported": ["Ratings", "Comments", "Lists"]
 },
 {
+  "name": "TripAdvisor",
+  "plugin": "tripadvisor",
+  "canonicalURL": "https://www.tripadvisor.com",
+  "regex": "http(s)*://(www.)*tripadvisor.com",
+  "supported": ["Reviews"],
+  "unsupported": ["Maps", "Comments", "Questions", "Photographs", "Lists"]
+},
+{
   "name": "Amazon.com",
   "plugin": "amazon",
   "canonicalURL": "https://www.amazon.com",

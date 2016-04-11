@@ -116,7 +116,7 @@ function retrieveReviews(callback) {
 
     if (pages.indexOf(nextPage) == -1) {
       let progress = `Fetching page ${nextPage} &hellip;`;
-      report(progress);
+      plugin.report(progress);
       pages.push(nextPage);
       $.get('https://www.amazon.com' + nextPageLink.attr('href')).done(processPage);
     } else {
@@ -132,15 +132,4 @@ function retrieveReviews(callback) {
     }
   }
 
-}
-
-function report(html) {
-  if (typeof chrome !== 'undefined') {
-    chrome.runtime.sendMessage({
-      action: 'notice',
-      html
-    });
-  } else {
-    console.log('Progress update: ' + html);
-  }
 }

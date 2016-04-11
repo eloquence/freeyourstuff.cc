@@ -27,6 +27,7 @@ const JSDiff = require('diff');
 
 // Internal dependencies
 const DataSet = require('../../extension/src/dataset.js');
+const plugin = require('../../extension/src/plugin.js');
 const schemas = require('../load-schemas');
 const pluginDir = '../../extension/src/plugins';
 const resultsDir = 'tests/results';
@@ -75,6 +76,7 @@ function runTests() {
       });
       let window = document.defaultView;
       jsdom.jQueryify(window, 'https://code.jquery.com/jquery-1.12.2.min.js', () => {
+        window.plugin = plugin;
         let $ = window.$;
         let pluginJS = fs.readFileSync(require.resolve(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`));
         const scriptEl = document.createElement('script');

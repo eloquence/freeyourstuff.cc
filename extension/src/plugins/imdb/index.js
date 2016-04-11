@@ -147,7 +147,7 @@ function retrieveReviews(callback) {
         if ((totalPageMatch = $(dom).find('table td font').first().text().match(/\d+.*?(\d+)/)))
           totalPages = totalPageMatch[1];
         let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
-        report(progress);
+        plugin.report(progress);
         // Fetch next page
         $.get(nextURL).done(processPage);
       } else {
@@ -155,15 +155,4 @@ function retrieveReviews(callback) {
       }
     }
   });
-}
-
-function report(html) {
-  if (typeof chrome !== 'undefined') {
-    chrome.runtime.sendMessage({
-      action: 'notice',
-      html
-    });
-  } else {
-    console.log('Progress update: ' + html);
-  }
 }

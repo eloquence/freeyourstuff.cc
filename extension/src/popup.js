@@ -95,7 +95,9 @@
               // Load schemas + initialize plugin
               $.getJSON(`/src/plugins/${site.plugin}/schema.json`).done(data => {
                 schema = data;
-                injectScript(`/src/plugins/${site.plugin}/index.js`)().then(() => {
+                injectScript('/src/plugin.js')()
+                .then(injectScript(`/src/plugins/${site.plugin}/index.js`))
+                .then(() => {
                   $('#retrieve').attr('hidden', false);
                   $('#retrieve').attr('disabled', false);
                   if(autoRetrieve)

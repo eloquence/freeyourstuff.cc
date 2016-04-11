@@ -66,7 +66,7 @@ function retrieveReviews(callback) {
         directoryURL = base + path;
         $.get(directoryURL).done(processDirectory);
       } else {
-        reportError('Could not find your user profile.');
+        plugin.reportError('Could not find your user profile.');
         return false;
       }
     });
@@ -81,7 +81,7 @@ function retrieveReviews(callback) {
       return base + $(ele).find('a.cs-review-title').attr('href');
     });
     if (!reviewURLs.length) {
-      reportError('No reviews found.');
+      plugin.reportError('No reviews found.');
       return false;
     }
     let count = 0;
@@ -92,7 +92,7 @@ function retrieveReviews(callback) {
       count++;
       let url = reviewURLs.shift();
       if (url) {
-        report(`Fetching review ${count} of ${total} &hellip;`);
+        plugin.report(`Fetching review ${count} of ${total} &hellip;`);
         $.get(url).done(processReview);
       }
 
@@ -134,7 +134,7 @@ function retrieveReviews(callback) {
         if (reviewURLs.length)
           processReviewList();
         else if (total - count > 0) {
-          report('Attempting to get more data &hellip;');
+          plugin.report('Attempting to get more data &hellip;');
           let id = directoryHTML.match(/\{"memberId":"(.*?)"\}/)[1];
           let token = $(directoryDOM).find('input[name="token"]').val();
           var data = {
@@ -162,7 +162,7 @@ function retrieveReviews(callback) {
             if (reviewURLs.length)
               processReviewList();
             else {
-              reportError('No additional reviews received!');
+              plugin.reportError('No additional reviews received!');
               callback(reviews);
             }
           });
@@ -172,25 +172,4 @@ function retrieveReviews(callback) {
       }
     }
   }
-}
-
-// FIXME: We'll want to move this into a separate file, but will need to do so
-// in a manner that works both client & server-side.
-function report(html, error) {
-  if (typeof chrome !== 'undefined') {
-    chrome.runtime.sendMessage({
-      action: error ? 'error' : 'notice',
-      html
-    });
-  } else {
-    if (error)
-      console.error('Error: ' + html);
-    else
-      console.log('Progress update: ' + html);
-  }
-}
-
-// Convenience function
-function reportError(html) {
-  report(html, true);
 }

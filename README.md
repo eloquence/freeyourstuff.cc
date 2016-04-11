@@ -14,3 +14,9 @@ The extension shows a little icon in the address bar on supported sites, and let
 The web service allows you publication of your contributions under the [CC-0](https://creativecommons.org/publicdomain/zero/1.0/) license, to enable easy re-use by anyone. This is a good idea, to mitigate the [network effect](https://en.wikipedia.org/wiki/Network_effect) which enables first movers to lock in a given market. This effect makes it harder for open source, non-profit, community-driven alternatives to emerge, which is the principal motivation for this project.
 
 In other words: Free your stuff! :-)
+
+# Contributor notice
+
+The extension, plugins and web service are licensed under the CC-0 License (see LICENSE file),
+equivalent to the public domain. By submitting a pull request, you agree to license it
+under the same terms.

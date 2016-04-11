@@ -12,7 +12,7 @@ if (typeof init === 'undefined')
 if (typeof chrome !== 'undefined' && !init)
   setupExtensionEvents();
 
-  function setupExtensionEvents() {
+function setupExtensionEvents() {
   chrome.runtime.onMessage.addListener(request => {
     if (request.action == 'retrieve') {
       if (!loggedIn()) {

@@ -1,5 +1,6 @@
 'use strict';
 
+// Variables that are exposed to all EJS templates, including flash notifications
 function getStandardVars() {
   let user = this.isAuthenticated() && this.session.passport.user ?
     this.session.passport.user : null;
@@ -13,6 +14,7 @@ function getStandardVars() {
   return stv;
 }
 
+// Render a given template, optionally with additional exposed variables
 function render(template, extraVars) {
   let vars = getStandardVars.call(this);
   if (extraVars)

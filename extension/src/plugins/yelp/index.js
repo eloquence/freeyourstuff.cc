@@ -52,59 +52,63 @@ function retrieveReviews(callback) {
   $.get(firstURL).done(processPage);
 
   function processPage(html) {
-    let dom = $.parseHTML(html);
-    if (page === 1) {
-      let idLink = $(dom).find('.user-display-name');
-      reviews.head.reviewerName = idLink.text();
+    try {
+      let dom = $.parseHTML(html);
+      if (page === 1) {
+        let idLink = $(dom).find('.user-display-name');
+        reviews.head.reviewerName = idLink.text();
 
-      let idMatch;
-      if ((idMatch = idLink.attr('href').match(/userid=(.*)/)))
-        reviews.head.reviewerID = idMatch[1];
-    }
-    // Parse contents
-    $(dom).find('div.review').each((i, e) => {
-      let text = $(e).find('.review-content p').first().html();
-      let subject = $(e).find('.biz-name').text();
-      let subjectYelpURL;
-      let base = 'https://yelp.com';
-      let path = $(e).find('.biz-name').attr('href');
-      if (path)
-        subjectYelpURL = base + path;
-      let date = $(e).find('.rating-qualifier').text().trim(); // TODO: other qualifiers
+        let idMatch;
+        if ((idMatch = idLink.attr('href').match(/userid=(.*)/)))
+          reviews.head.reviewerID = idMatch[1];
+      }
+      // Parse contents
+      $(dom).find('div.review').each((i, e) => {
+        let text = $(e).find('.review-content p').first().html();
+        let subject = $(e).find('.biz-name').text();
+        let subjectYelpURL;
+        let base = 'https://yelp.com';
+        let path = $(e).find('.biz-name').attr('href');
+        if (path)
+          subjectYelpURL = base + path;
+        let date = $(e).find('.rating-qualifier').text().trim(); // TODO: other qualifiers
 
-      let starRatingMatch, starRating;
-      let starRatingClass = $(e).find("[class^='star-img stars_']").attr('class');
-      if (starRatingClass && (starRatingMatch = starRatingClass.match(/[0-9]/)))
-        starRating = starRatingMatch[0];
+        let starRatingMatch, starRating;
+        let starRatingClass = $(e).find("[class^='star-img stars_']").attr('class');
+        if (starRatingClass && (starRatingMatch = starRatingClass.match(/[0-9]/)))
+          starRating = starRatingMatch[0];
 
-      let checkins = $(e).find("[class$='checkin_c-common_sprite-wrap review-tag']")
-        .text().match(/\d+/);
+        let checkins = $(e).find("[class$='checkin_c-common_sprite-wrap review-tag']")
+          .text().match(/\d+/);
 
-      let reviewObj = {
-        subject,
-        subjectYelpURL,
-        date,
-        text,
-        starRating
-      };
-      if (checkins)
-        reviewObj.checkins = checkins;
+        let reviewObj = {
+          subject,
+          subjectYelpURL,
+          date,
+          text,
+          starRating
+        };
+        if (checkins)
+          reviewObj.checkins = checkins;
 
-      reviews.data.push(reviewObj);
-    });
+        reviews.data.push(reviewObj);
+      });
 
-    let nextURL = $(dom).find('.pagination-links .next').attr('href');
-    if (nextURL) {
-      page++;
-      // Obtain and relay progress info
-      let totalPageMatch, totalPages;
-      if ((totalPageMatch = $(dom).find('.page-of-pages').text().match(/\d+.*?(\d+)/)))
-        totalPages = totalPageMatch[1];
-      plugin.report(`Fetching page ${page} of ${totalPages} &hellip;`);
-      // Fetch next page
-      $.get(nextURL).done(processPage);
-    } else {
-      callback(reviews);
+      let nextURL = $(dom).find('.pagination-links .next').attr('href');
+      if (nextURL) {
+        page++;
+        // Obtain and relay progress info
+        let totalPageMatch, totalPages;
+        if ((totalPageMatch = $(dom).find('.page-of-pages').text().match(/\d+.*?(\d+)/)))
+          totalPages = totalPageMatch[1];
+        plugin.report(`Fetching page ${page} of ${totalPages} &hellip;`);
+        // Fetch next page
+        $.get(nextURL).done(processPage);
+      } else {
+        callback(reviews);
+      }
+    } catch (error) {
+      plugin.reportError(`An error occurred processing your reviews.`, error.stack);
     }
   }
 }

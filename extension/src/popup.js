@@ -130,6 +130,17 @@
         $('#retrieve').attr('disabled', false);
       } else if (request.action == 'error' && request.html) {
         $('#error').html(request.html);
+        if ($('#showExtendedError').length && $('#reportBug').length) {
+          $('#showExtendedError').text('show/hide details');
+          $('#reportBug').text('report bug');
+          let siteParam = encodeURI($('#siteName').text());
+          let bodyParam = encodeURI($('#extendedError').text());
+          $('#reportBug').attr('href', `https://github.com/eloquence/freeyourstuff.cc/issues/new?title=Error with ${siteParam} plugin&body=${bodyParam}`);
+          $('#showExtendedError').click(function() {
+            $('#extendedError').toggle();
+            return false;
+          });
+        }
         $('#retrieve').attr('disabled', false);
       } else if (request.action == 'redirect' && request.url) {
         var autoRetrieve = request.autoRetrieve;

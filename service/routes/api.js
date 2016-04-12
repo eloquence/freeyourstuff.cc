@@ -3,11 +3,11 @@
 // Routes for handling API requests
 
 // External dependencies
-let router = require('koa-route');
+const router = require('koa-route');
 
 // Internal dependnecies
-let SiteSet = require('../models/siteset');
-let User = require('../models/user');
+const SiteSet = require('../models/siteset');
+const User = require('../models/user');
 
 module.exports = {
   nameCheck: router.get('/api/name', function* get(next) {

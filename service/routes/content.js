@@ -3,13 +3,13 @@
 // Routes for rendering/managing datasets
 
 // External dependencies
-let router = require('koa-route');
-let send = require('koa-send');
+const router = require('koa-route');
+const send = require('koa-send');
 
 // Internal dependencies
-let SiteSet = require('../models/siteset.js');
-let User = require('../models/user.js');
-let render = require('../routes/render.js');
+const SiteSet = require('../models/siteset.js');
+const User = require('../models/user.js');
+const render = require('../routes/render.js');
 
 // Naming convention for routes: Anything that is not a GET method
 // is suffixed with method name, e.g. _POST.

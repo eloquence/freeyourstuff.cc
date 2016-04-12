@@ -4,11 +4,11 @@
 // therefore available in the web service as soon as it is restarted.
 
 // External dependencies
-let mongoose = require('mongoose');
-let ObjectId = mongoose.Schema.Types.ObjectId;
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 // Internal dependencies
-let schemas = require('../load-schemas.js');
+const schemas = require('../load-schemas.js');
 
 let models = {};
 

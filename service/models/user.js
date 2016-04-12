@@ -1,10 +1,10 @@
 'use strict';
 // External dependencies
-let mongoose = require('mongoose');
-let bcrypt = require('bcrypt-nodejs');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-nodejs');
 
 // Internal dependencies
-let config = require('../load-config');
+const config = require('../load-config');
 
 // Schema definition
 let userSchema = mongoose.Schema({

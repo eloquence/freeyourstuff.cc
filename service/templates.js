@@ -1,6 +1,6 @@
 'use strict';
-let fs = require('fs');
-let ejs = require('ejs');
+const fs = require('fs');
+const ejs = require('ejs');
 
 module.exports = loadTemplate;
 

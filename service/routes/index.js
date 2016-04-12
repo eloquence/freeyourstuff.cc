@@ -1,10 +1,10 @@
 'use strict';
 
 // Bundle all routes into one module
-let content = require('./content.js');
-let user = require('./user.js');
-let api = require('./api.js');
-let pages = require('./pages.js');
+const content = require('./content.js');
+const user = require('./user.js');
+const api = require('./api.js');
+const pages = require('./pages.js');
 
 module.exports = {
   content,

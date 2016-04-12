@@ -1,20 +1,20 @@
 'use strict';
 // External dependencies
-let app = require('koa')(); // extremely lightweight framework for web apps
-let gzip = require('koa-gzip');
-let fs = require('fs');
-let ejs = require('ejs'); // simple templates with embedded JS
-let mongoose = require('mongoose'); // MongoDB ODB
-let session = require('koa-generic-session');
-let bodyParser = require('koa-bodyparser');
-let flash = require('koa-connect-flash');
-let chokidar = require('chokidar'); // monitor file changes
-let path = require('path');
+const app = require('koa')(); // extremely lightweight framework for web apps
+const gzip = require('koa-gzip');
+const fs = require('fs');
+const ejs = require('ejs'); // simple templates with embedded JS
+const mongoose = require('mongoose'); // MongoDB ODB
+const session = require('koa-generic-session');
+const bodyParser = require('koa-bodyparser');
+const flash = require('koa-connect-flash');
+const chokidar = require('chokidar'); // monitor file changes
+const path = require('path');
 
 // Internal dependencies
-let loadTemplate = require('./templates');
-let passport = require('./auth'); // exports koa-passport
-let routes = require('./routes/index.js');
+const loadTemplate = require('./templates');
+const passport = require('./auth'); // exports koa-passport
+const routes = require('./routes/index.js');
 app.config = require('./load-config');
 
 mongoose.connect(app.config.dbHost, app.config.dbName, app.config.dbPort);
@@ -24,7 +24,7 @@ app.keys = app.config.sessionKeys;
 // We don't want to restart the server anytime we change a template, so we'll
 // use the magic of chokidar to keep an eye on changes. The 'add' event fires
 // upon startup.
-let watcher = chokidar.watch(app.config.pathToTemplates);
+const watcher = chokidar.watch(app.config.pathToTemplates);
 
 app.templates = {};
 watcher.on('add', (filename) => {

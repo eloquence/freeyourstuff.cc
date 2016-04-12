@@ -3,13 +3,13 @@
 // Routes for handling login/user management
 
 // External dependencies
-let passport = require('koa-passport');
-let router = require('koa-route');
+const passport = require('koa-passport');
+const router = require('koa-route');
 
 // Internal dependencies
-let User = require('../models/user');
-let SiteSet = require('../models/siteset');
-let render = require('../routes/render');
+const User = require('../models/user');
+const SiteSet = require('../models/siteset');
+const render = require('../routes/render');
 
 module.exports = {
   user: router.get('/user/(.*)/(.*)', function*(method, uid, next) {

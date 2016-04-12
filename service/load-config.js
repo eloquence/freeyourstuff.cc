@@ -1,6 +1,6 @@
 'use strict';
 // External dependencies
-let jsonfile = require('jsonfile');
+const jsonfile = require('jsonfile');
 
 let config = {};
 

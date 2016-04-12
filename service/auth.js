@@ -1,14 +1,14 @@
 'use strict';
-let passport = require('koa-passport');
-let LocalStrategy = require('passport-local').Strategy;
-let FacebookStrategy = require('passport-facebook').Strategy;
-let TwitterStrategy = require('passport-twitter').Strategy;
-let GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-let url = require('url');
+const passport = require('koa-passport');
+const LocalStrategy = require('passport-local').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+const TwitterStrategy = require('passport-twitter').Strategy;
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const url = require('url');
 
 // Internal dependencies
-let config = require('./load-config');
-let User = require('./models/user');
+const config = require('./load-config');
+const User = require('./models/user');
 
 // Save to the session
 passport.serializeUser(function(user, done) {

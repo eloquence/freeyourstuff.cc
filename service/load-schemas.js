@@ -6,7 +6,7 @@
 // We therefore need to have a checkout of the extension alongside the web
 // service in order to use this module.
 'use strict';
-let jsonfile = require('jsonfile');
+const jsonfile = require('jsonfile');
 let sitesDir = '../extension';
 let pluginDir = '../extension/src/plugins';
 let sites = jsonfile.readFileSync(`${sitesDir}/sites.json`);

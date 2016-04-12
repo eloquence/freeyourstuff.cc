@@ -1,5 +1,7 @@
 'use strict';
 
+// Routes for handling login/user management
+
 // External dependencies
 let passport = require('koa-passport');
 let router = require('koa-route');

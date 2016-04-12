@@ -1,4 +1,7 @@
 'use strict';
+
+// Routes for handling API requests
+
 // External dependencies
 let router = require('koa-route');
 

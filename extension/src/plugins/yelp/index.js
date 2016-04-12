@@ -65,13 +65,16 @@ function retrieveReviews(callback) {
     $(dom).find('div.review').each((i, e) => {
       let text = $(e).find('.review-content p').first().html();
       let subject = $(e).find('.biz-name').text();
-      let subjectYelpURL = 'http://yelp.com' + $(e).find('.biz-name').attr('href');
+      let subjectYelpURL;
+      let base = 'https://yelp.com';
+      let path = $(e).find('.biz-name').attr('href');
+      if (path)
+        subjectYelpURL = base + path;
       let date = $(e).find('.rating-qualifier').text().trim(); // TODO: other qualifiers
 
-      let starRatingClass = $(e).find("[class^='star-img stars_']").attr('class');
-
       let starRatingMatch, starRating;
-      if ((starRatingMatch = starRatingClass.match(/[0-9]/)))
+      let starRatingClass = $(e).find("[class^='star-img stars_']").attr('class');
+      if (starRatingClass && (starRatingMatch = starRatingClass.match(/[0-9]/)))
         starRating = starRatingMatch[0];
 
       let checkins = $(e).find("[class$='checkin_c-common_sprite-wrap review-tag']")

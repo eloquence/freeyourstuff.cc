@@ -24,8 +24,15 @@ var main = {
   root: router.get('/', function*(next) {
     render.call(this, 'index.ejs');
     return yield next;
+  }),
+  plugins: router.get('/plugins', function*(next) {
+    render.call(this, 'plugins.ejs');
+    return yield next;
+  }),
+  mirrors: router.get('/mirrors', function*(next) {
+    render.call(this, 'mirrors.ejs');
+    return yield next;
   })
-
 };
 
 module.exports = main;

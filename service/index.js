@@ -54,6 +54,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(routes.pages.static);
 app.use(routes.pages.root);
+app.use(routes.pages.plugins);
+app.use(routes.pages.mirrors);
 app.use(routes.content.view);
 app.use(routes.content.browse);
 app.use(routes.user.user);

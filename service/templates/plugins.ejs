@@ -1,0 +1,169 @@
+<%- include('head', {siteSection: 'Plugin docs', load: {}}); -%>
+<%- include('nav'); %>
+<div class="container">
+  <h1>Write your own plugins</h1>
+  <p>
+    Plugins enable the freeyourstuff.cc browser extension to retrieve your content for a supported website. For the up-to-date list of currently supported sites, see the file
+    <code>
+      <a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/sites.json">
+        sites.json</a></code>.
+  </p>
+  <p>
+    freeyourstuff.cc is entirely written in <a href="https://en.wikipedia.org/wiki/JavaScript">JavaScript</a>. It consists of a browser extension and a <a href="https://en.wikipedia.org/wiki/Node.js">Node.js</a> web service. The browser extension loads the plugins; the Node.js service includes a simple test runner to automatically verify that they're still working.
+  </p>
+  To write a plugin, you'll need the following:
+  <ul>
+    <li>a working knowledge of JavaScript and <a href="https://jquery.com/">jQuery</a>
+    <li>a working knowledge of Git/GitHub
+  </ul>
+  <p>
+    There are countless free resources to help you get started with JavaScript; we can recommend
+    <a href="http://eloquentjavascript.net/">Eloquent JavaScript</a>
+    by Marijn Haverbeke,
+    <a href="http://exercism.io/">exercism.io</a>
+    as an exercise platform, and
+    <a href="http://nodeschool.io/">Nodeschool</a>
+    for self-directed learning of Node.js.
+  </p>
+  <p>
+    Basic familiarity with ECMASCript 6 (the latest version of JavaScript) is helpful; you may wish to consult the
+    <a href="http://help.wtf/es6">ES6 cheatsheet</a>
+    for quick reference.
+  </p>
+  <p>
+    jQuery has its own
+    <a href="https://learn.jquery.com/">learning center</a>; so does
+    <a href="https://guides.github.com/">GitHub</a>. Finally, while programming, you may want to keep a
+    <a href="https://devdocs.io/">DevDocs</a>
+    tab open. As a code editor, we recommend
+    <a href="https://atom.io/">Atom</a>, which has good Git integration. All of these tools are free and (except for GitHub itself) open source. Yay!
+  </p>
+  <p>
+    With that out of the way, let's get started. First, you'll need a Git checkout of the freeyourstuff.cc repository. If you want to skip the Git part for now, you can
+    <a href="https://github.com/eloquence/freeyourstuff.cc/archive/master.zip">download a ZIP file</a>
+    that contains the latest version of the repository. To install the extension, unpack it into your working directory and then follow the instructions for <a href="https://developer.chrome.com/extensions/getstarted#unpacked">loading unpacked extensions</a>. As you work on the extension, you will sometimes have to reload it from your extensions list, but note that plugins are dynamically loaded so you should be able to skip that step while working on your plugin.
+
+    The plugins themselves can be found in the <code><a href="https://github.com/eloquence/freeyourstuff.cc/tree/master/extension/src/plugins">extension/src/plugins</a></code> codepath. Go ahead and look at the contents of those folders. Each plugin's <code>index.js</code> contains the main code, while its <code>schema.json</code> describes the data the plugin can handle.
+  </p>
+  <p>
+    To write a plugin, you don't need to worry too much about the main architecture of the extension. Still, you may want to take a look at Google's documentation of
+    <a href="https://developer.chrome.com/extensions">Chrome extension development</a>. Essentially, our extension injects the plugin's JavaScript into a supported page like Yelp or Amazon.com. The plugin is a
+    <a href="https://developer.chrome.com/extensions/content_scripts">content script</a>
+    in Chrome extension terminology and runs in what's called an "isolated world"; it can't modify the scripts run by the site, but it can access the document, fetch pages from the same domain, and so on.
+  </p>
+  <h3>Messages, events and the Chrome API</h3>
+  <p>
+    A plugin communicates with the rest of the extension through
+    <i>messages</i>, which it receives by listening for relevant <i>events</i> using the Chrome API. It can listen for messages from the extension's popup (the thing that opens when you click the button in the browser). These messages will typically tell it to go and fetch some data. Once it's done that, the plugin then sends a message back to a background page that's always listening. That way, we don't need to have the popup open to show the results.
+  </p>
+  <p>
+  While it's doing its thing, a plugin can send little updates back to the popup, showing progress notices or error messages. A couple of convenience functions are provided for this purpose, which you can find in
+  <code>
+    <a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/src/plugin.js">extension/src/plugin.js</a></code>.</p>
+    <p>
+  Within a plugin, you'll generally want to be careful with direct calls to the Chrome extension API. The reason is that plugins can also get called in the Node.js context
+  for testing purposes, in which case that API is not available. A sane way to check for
+  the existence of the API is the expression <code>typeof chrome !== 'undefined'</code>. We typically wrap extension-only code in functions and call them after this check.
+</p>
+
+  <h3>Schemas and datasets</h3>
+  <p>
+  Plugins handle different kinds of data. We send data around in JavaScript's lightweight <a href="https://en.wikipedia.org/wiki/JSON">JSON</a> format, and we use very simple schemas to describe the data structure. The point of those schemas is primarily to ensure that we only stash the data we actually want, enforce type constraints, and can track schema changes.
+</p>
+<p>
+  These schemas are pretty important; they're also used by the freeyourstuff.cc web service to parse data submissions and store them in its MongoDB backend. The schema system is still pretty basic and designed for textual data right now. We'll need to make changes to it over time to support new data types and more complex data structures.
+</p>
+<p>
+  Check out <code><a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/src/examples/yelp.js">extension/src/examples/yelp.js</a></code> as an example of data represented by a schema, and the schema itself. If you view your local copy of <code><a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/src/result.html">extension/src/result.html</a></code> in your browser, it will attempt to render this data using <code><a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/src/result.js">extension/src/result.js</a></code>. You can use this method to verify that your schema and data are handled as expected -- feel free to submit pull requests for additional examples.
+</p>
+<p>
+  Data is validated against its schema by <code><a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/src/dataset.js">extension/src/dataset.js</a></code>. A single schema describes all the kinds of data that can be stored for a given site (e.g., reviews, comments, blog posts). Together, we call this a <i>SiteSet</i>, while we call the sets that comprise it <i>DataSets</i>. Each DataSet has a header (for non-repeating information like the author) and rows of data. That's it.
+</p>
+<p>
+  Note that descriptive metadata (like column titles) isn't parsed by <code>dataset.js</code>, but it <i>is</i> used in rendering results both in the extension and on the website. Simply follow the example and make sure you add longer descriptions and shorter labels for all your data. Right now we add the language code 'en' for all labels and descriptions, so we can potentially support translations later.
+</p>
+<p>
+  The schema version is a simple integer and should be increased with each update to the schema once the first data has been published (you can keep it at 1 while in development).
+</p>
+
+<h3>Plugin registration</h3>
+<p>
+  To create a new plugin, first add the relevant directory under <code>extension/src/plugins</code> and create an <code>index.js</code> and <code>schema.json</code>. Keep directory and filenames all lowercase (use a hyphen for separating words), since not all platforms store files in a case-sensitive way.
+</p>
+<p>
+  In addition, you will need to register a plugin in <code><a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/sites.json">extensions/sites.json</a></code>:
+</p>
+
+  <ul><li><code>name</code>: the proper name of the supported site as the site itself uses it. <li><code>plugin</code>: the name of the subdirectory in which the plugin can be found
+  <li><code>canonicalURL</code>: when we link to the site, what URL should we link to?
+  <li><code>regex</code>: the regular expression the extension uses to show its icon, using a <a href="https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher">PageStateMatcher</a>'s urlMatches rule, following <a href="https://github.com/google/re2">RE2 syntax</a>.
+  <li><code>supported</code>, <code>unsupported</code>: the types of content we can and cannot retrieve for the given site. This is only shown in the popup.
+  </ul>
+  <p>
+  Once you've added a plugin to sites.json, you will want to reload the extension to refresh the matching rules.
+</p>
+
+<h3>Retrieving data with jQuery</h3>
+<p>
+  If you've not worked with your browser's developer tools before, for Chrome/Chromium, you may want to read the <a href="https://developer.chrome.com/devtools">dev tools tutorial</a> before getting started on your plugin in earnest. In many cases sites don't offer a full, unlimited API to get your data, so you'll need to process HTML. Dev tools help you analyze the page's layout, and jQuery makes it easy to process the HTML.
+</p>
+<p>
+  A plugin can do everything that the user can do, though sometimes you'll have to jump through a few hoops to do it. freeyourstuff.cc is not a web scraping tool -- it's a tool for managing data you own. So a plugin should always first check that the user is logged in (a visual element you can use a jQuery selector on is a fine indicator).
+</p>
+<p>
+  Depending on the content type you want to retrieve, you typically want to look for a page that shows all information of that type (all reviews, comments, posts, etc.). Take into account that there's usually some pagination for users with lots of content.
+</p>
+<p>
+  What you have to do next depends on how the page is built. Use your dev tools to look at the browser's network requests to see if the page already arrives in your browser fully formed (static HTML) or if it's dynamically constructed using JavaScript requests.
+</p>
+<p>
+  The former case is more common and more straightforward: you loop through the relevant elements using jQuery, stash them in an array, fetch follow-up pages as needed, and then finally send the result (schema-parsed using <code>dataset.js</code>) back to the extension.
+</p>
+<p>
+  The latter case can get fairly hairy. You may have to figure out how a website's internal API works. This also often involves some kind of generated token which you have to extract from the page source. Check out the TripAdvisor plugin's AJAX code for an example of this. On the flip side, an API may be less fragile than the page's layout.
+</p>
+
+<h3>Basic tests</h3>
+<p>
+  Many people don't like to write tests, but since plugins are likely to break every now and then, it's a requirement for any new plugin submission to at least be basically testable. Fortunately, that may be a matter of adding a single statement to your code:
+</p>
+<pre>
+var jsonTests = {
+  someData: retrieveSomeData,
+  someOtherData: retrieveSomeOtherData
+};
+</pre>
+<p>
+  The testrunner in <code><a href="https://github.com/eloquence/freeyourstuff.cc/tree/master/service/tests">service/tests</a></code> will attempt to run the functions defined in this variable for all plugins defined in <code>sites.json</code>. The fact that it sits in the <code>service/</code> directory indicates that it runs under Node.js.
+</p>
+<p>
+  To run the tests, you'll have to first have a full Node.js environment (version 4 or later) running on your system. Then you'll need to run <code>npm install</code> within the <code>service/</code> directory in order to get all the packages the service relies on.
+</p>
+<p>
+  If you want, you can play with the service itself (for example, to test importing data obtained through your plugin), but in order to run the plugins you'll simply need to run <code>node tests</code> in the <code>service/</code> directory. You can also specify individual plugins, like so: <code>node tests <i>pluginname</i></code>.
+</p>
+<p>
+  We have to do some magic to make what's written to be client-side code fully runnable in the Node.js environment. Specifically, we're using the <a href="https://www.npmjs.com/package/jsdom">jsdom</a> package to simulate a page loaded by a browser environment including the DOM, the <code>window</code> object, and so on. We inject the jQuery library and the plugin code into this simulated page. Keep this in mind when debugging -- jsdom doesn't always behave in exactly the same way a browser would, yet.
+</p>
+<p>
+  Web-based login forms often trigger captchas. In order to avoid those, and to simply re-use existing credentials, we look for the user's local Chrome cookie database and run the tests using those. Upon the first run, the JSON result of each plugin will simply be stored. In future runs, we compare the existing JSON result with the new one and highlight any differences.
+</p>
+<h3>HTTP vs. HTTPS</h3>
+<p>
+  One common pitfall for some sites is that they support both HTTP (unencrypted connection) and HTTPS. If the user is on HTTP but the resource we need to fetch is on HTTPS, the browser's security model won't let us fetch that resource.
+</p>
+<p>
+There doesn't seem to be an elegant way to address this. If we redirect the user (and <code><a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/src/popup.js">extension/src/popup.js</a></code> provides some facilities to do so), Chrome no longer allows us to insert scripts without special permissions for that domain. We can ask for those permissions at install time, but that's very scary for the user.
+</p>
+<p>
+  Instead, in the <a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/extension/src/plugins/amazon/index.js">Amazon.com plugin</a> where we encounter this issue, we simply ask the user to visit the HTTPS version of the site. The good news is that this problem should slowly go away, as freeyourstuff.cc targets logged-in users of sites, and it's a terrible security practice to send logged-in users of a site to its unencrypted version.
+</p>
+
+<h3>Happy hacking!</h3>
+
+<p>
+freeyourstuff.cc is born out of a simple motivation -- we think users ought to be able to control the destiny of the content they contribute around the web. Whether this remains a singular experiment useful for a few websites or turns into a larger movement is entirely up to you! We hope you join us in turning this into a better tool, and look forward to your pull requests. You can also find us on <b>irc.freenode.net</b> on the <code>#freeyourstuff</code> channel (you can <a href="https://webchat.freenode.net/?channels=freeyourstuff">use the web interface</a> if you're new to IRC).
+</p>
+
+</div>
+<%- include('tail', { load: { signin: true } } ); -%>

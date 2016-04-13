@@ -63,3 +63,9 @@
     font-size: small;
     color: #666;
   }
+  /* For large blocks of text on the site, like FAQ type stuff */
+  .texty {
+    margin-left: 10%;
+    margin-right: 10%;
+    font-size: 110%;
+  }

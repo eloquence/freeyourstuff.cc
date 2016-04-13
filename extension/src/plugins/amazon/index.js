@@ -21,15 +21,7 @@ function setupExtensionEvents() {
         return false;
       }
       if (window.location.protocol == 'http:') {
-        chrome.runtime.sendMessage({
-          action: 'notice',
-          html: 'Moving to an HTTPS URL for secure download.'
-        });
-        chrome.runtime.sendMessage({
-          action: 'redirect',
-          url: 'https://www.amazon.com/',
-          autoRetrieve: true
-        });
+        plugin.reportError('Please visit <a href="https://www.amazon.com/" target="_blank">the HTTPS version</a> of Amazon.com.');
         init = false;
         return false;
       }

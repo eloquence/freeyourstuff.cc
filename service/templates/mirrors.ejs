@@ -1,36 +1,12 @@
 <%- include('head', {siteSection: 'Plugin docs', load: {}}); -%>
 <%- include('nav'); %>
-<div class="jumbotron">
-  <div class="container">
-    <h1>Run a mirror</h1>
-    <p>
-    </p>
-  </div>
-</div>
-
 <div class="container">
-  <div class="row">
-    <div class="col-md-4">
-      <h2>Browse collections</h2>
-      <p>Take a look at content that has been liberated so far.</p>
-      <p>
-        <a class="btn btn-default" href="browse" role="button">Browse &raquo;</a>
-      </p>
-    </div>
-    <div class="col-md-4">
-      <h2>Write a plugin</h2>
-      <p>Contributing a plugin for your favorite website is not hard, as long as you know JavaScript.</p>
-      <p>
-        <a class="btn btn-default" href="#" role="button">Learn more &raquo;</a>
-      </p>
-    </div>
-    <div class="col-md-4">
-      <h2>Run a mirror</h2>
-      <p>We need as many people as possible to maintain public copies of content that has been liberated, so it remains online forever.</p>
-      <p>
-        <a class="btn btn-default" href="#" role="button">Learn more &raquo;</a>
-      </p>
-    </div>
-  </div>
+  <h1>Run a mirror</h1>
+  <p class="lead">Lots of copies keep stuff safe! We hope you'll help us out by running a mirror of the content that's been liberated through the freeyourstuff.cc platform.</p>
+  <p><a href="http://freeyourstuff.cc/latest/">http://freeyourstuff.cc/latest</a> always redirects to the most recent dump of all publicly available freeyourstuff.cc data. <code>wget -N</code> will download a copy only if you don't already have it, so you can safely add it to a cron-job. Filenames are in the form <code>freeyourstuff-MM-DD-YYYY.tgz</code>. </p>
+  <p>The contents of the file are the result of a daily <a href="https://docs.mongodb.org/manual/reference/program/mongodump/">mongodump</a> run excluding private data, so the files are in <a href="https://en.wikipedia.org/wiki/BSON">BSON</a> format. You can convert them to JSON using the <a href="https://docs.mongodb.org/manual/reference/program/bsondump/">bsondump</a> utility. Please consult the schemas for the relevant freeyourstuff.cc plugins (found in the plugin's directory in <code><a href="https://github.com/eloquence/freeyourstuff.cc/tree/master/extension/src/plugins">extension/src/plugins</a></code>) for metadata like field labels and descriptions. See the <a href="/plugins">plugin docs</a> for more info.</p>
+  <p>If you run a public mirror, please submit a GitHub pull request for <a href="https://github.com/eloquence/freeyourstuff.cc/blob/master/service/templates/mirrors.ejs">this file</a> to add it to the list below.</p>
+  <h3>Current mirrors</h3>
+  <i>None yet. Be the first! <span class="fa fa-rocket"></span></i>
 </div>
 <%- include('tail', { load: { signin: true } } ); -%>

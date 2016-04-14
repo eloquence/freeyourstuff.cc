@@ -54,11 +54,13 @@ function retrieveReviews(callback) {
   let pages = [1];
   let profileURL = 'https://www.amazon.com/gp/profile/';
 
+  plugin.report('Fetching your profile info &hellip;');
   // We use XMLHttpRequest here because jQuery does not expose responseURL,
   // due to limited support for it; see https://bugs.jquery.com/ticket/15173
   let req = new XMLHttpRequest();
   req.addEventListener('load', processProfile);
-  req.open('GET', 'https://www.amazon.com/gp/profile/');
+  req.addEventListener('error', plugin.handleConnectionError(profileURL));
+  req.open('GET', profileURL);
   req.send();
 
   function processProfile() {
@@ -69,7 +71,10 @@ function retrieveReviews(callback) {
       // The requests redirects to the full profile URL
       reviews.head.reviewerURL = this.responseURL;
       let firstURL = 'https://www.amazon.com/gp/cdp/member-reviews/';
-      $.get(firstURL).done(processPage);
+      plugin.report('Fetching page 1 &hellip;');
+      $.get(firstURL)
+        .done(processPage)
+        .fail(plugin.handleConnectionError(firstURL));
     } catch (error) {
       plugin.reportError('An error occurred processing your user profile.', error.stack);
     }
@@ -118,7 +123,10 @@ function retrieveReviews(callback) {
         let progress = `Fetching page ${nextPage} &hellip;`;
         plugin.report(progress);
         pages.push(nextPage);
-        $.get('https://www.amazon.com' + nextPageLink.attr('href')).done(processPage);
+        let nextPageURL = 'https://www.amazon.com' + nextPageLink.attr('href');
+        $.get(nextPageURL)
+          .done(processPage)
+          .fail(plugin.handleConnectionError(nextPageURL));
       } else {
         callback(reviews);
       }

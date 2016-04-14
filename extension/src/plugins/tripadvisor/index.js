@@ -56,20 +56,26 @@ function retrieveReviews(callback) {
     path = $('.updateProfile a').attr('href');
     reviews.head.reviewerID = path.match('/members/(.*)')[1];
     directoryURL = base + path;
-    $.get(directoryURL).done(processDirectory);
+    $.get(directoryURL)
+      .done(processDirectory)
+      .fail(plugin.handleConnectionError(directoryURL));
   } else {
-    $.get(base).done(html => {
-      let dom = $.parseHTML(html);
-      if ($(dom).find('.updateProfile a').length) {
-        path = $(dom).find('.updateProfile a').attr('href');
-        reviews.head.reviewerID = path.match('/members/(.*)')[1];
-        directoryURL = base + path;
-        $.get(directoryURL).done(processDirectory);
-      } else {
-        plugin.reportError('Could not find your user profile.');
-        return false;
-      }
-    });
+    $.get(base)
+      .done(html => {
+        let dom = $.parseHTML(html);
+        if ($(dom).find('.updateProfile a').length) {
+          path = $(dom).find('.updateProfile a').attr('href');
+          reviews.head.reviewerID = path.match('/members/(.*)')[1];
+          directoryURL = base + path;
+          $.get(directoryURL)
+            .done(processDirectory)
+            .fail(plugin.handleConnectionError(directoryURL));
+        } else {
+          plugin.reportError('Could not find your user profile.');
+          return false;
+        }
+      })
+      .fail(plugin.handleConnectionError(base));
   }
 
   function processDirectory(directoryHTML) {
@@ -97,7 +103,9 @@ function retrieveReviews(callback) {
       let url = reviewURLs.shift();
       if (url) {
         plugin.report(`Fetching review ${count} of ${total} &hellip;`);
-        $.get(url).done(processReview);
+        $.get(url)
+          .done(processReview)
+          .fail(plugin.handleConnectionError(url));
       }
 
       function processReview(html) {
@@ -165,19 +173,22 @@ function retrieveReviews(callback) {
                 "id": "clientaction576"
               }])
             };
-            $.post('https://www.tripadvisor.com/ModuleAjax?', data, null, 'json').done(function(response) {
-              let dir = response.store['modules.unimplemented.entity.AnnotatedItem'];
-              for (let itemKey in dir) {
-                if (dir[itemKey].url)
-                  reviewURLs.push(base + dir[itemKey].url);
-              }
-              if (reviewURLs.length)
-                processReviewList();
-              else {
-                plugin.reportError('No additional reviews received!');
-                callback(reviews);
-              }
-            });
+            let postURL = 'https://www.tripadvisor.com/ModuleAjax?';
+            $.post(postURL, data, null, 'json')
+              .done(function(response) {
+                let dir = response.store['modules.unimplemented.entity.AnnotatedItem'];
+                for (let itemKey in dir) {
+                  if (dir[itemKey].url)
+                    reviewURLs.push(base + dir[itemKey].url);
+                }
+                if (reviewURLs.length)
+                  processReviewList();
+                else {
+                  plugin.reportError('No additional reviews received!');
+                  callback(reviews);
+                }
+              })
+              .fail(plugin.handleConnectionError(postURL));
           } else {
             callback(reviews);
           }

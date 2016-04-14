@@ -47,17 +47,20 @@ function loggedIn() {
 // pages which don't have the profile link on them (e.g., error pages).
 function getBaseURL(callback) {
   let baseURL = extractBaseURL();
+  let mainURL = 'http://www.imdb.com/';
   if (baseURL) {
     callback(baseURL);
   } else {
-    $.get('http://www.imdb.com/').done(function(html) {
-      let doc = $.parseHTML(html);
-      baseURL = extractBaseURL(doc);
-      if (baseURL)
-        callback(baseURL);
-      else
-        plugin.reportError('Could not obtain IMDB base URL.');
-    });
+    $.get(mainURL)
+      .done(function(html) {
+        let doc = $.parseHTML(html);
+        baseURL = extractBaseURL(doc);
+        if (baseURL)
+          callback(baseURL);
+        else
+          plugin.reportError('Could not obtain IMDB base URL.');
+      })
+      .fail(plugin.handleConnectionError(mainURL));
   }
 }
 
@@ -90,7 +93,9 @@ function retrieveReviews(callback) {
   getBaseURL(baseURL => {
     let firstURL = baseURL + 'comments-expanded';
     doneURLs.push(firstURL);
-    $.get(firstURL).done(processPage);
+    $.get(firstURL)
+      .done(processPage)
+      .fail(plugin.handleConnectionError(firstURL));
 
     function processPage(html) {
       try {
@@ -150,7 +155,9 @@ function retrieveReviews(callback) {
           let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
           plugin.report(progress);
           // Fetch next page
-          $.get(nextURL).done(processPage);
+          $.get(nextURL)
+            .done(processPage)
+            .fail(plugin.handleConnectionError(nextURL));
         } else {
           callback(reviews);
         }

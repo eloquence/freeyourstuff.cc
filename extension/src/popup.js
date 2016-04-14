@@ -133,8 +133,8 @@
         if ($('#showExtendedError').length && $('#reportBug').length) {
           $('#showExtendedError').text('show/hide details');
           $('#reportBug').text('report bug');
-          let siteParam = encodeURI($('#siteName').text());
-          let bodyParam = encodeURI($('#extendedError').text());
+          let siteParam = encodeURIComponent($('#siteName').text());
+          let bodyParam = encodeURIComponent($('#extendedError').text());
           $('#reportBug').attr('href', `https://github.com/eloquence/freeyourstuff.cc/issues/new?title=Error with ${siteParam} plugin&body=${bodyParam}`);
           $('#showExtendedError').click(function() {
             $('#extendedError').toggle();

@@ -49,7 +49,9 @@ function retrieveReviews(callback) {
     data: []
   };
   let firstURL = 'https://www.yelp.com/user_details_reviews_self';
-  $.get(firstURL).done(processPage);
+  $.get(firstURL)
+    .done(processPage)
+    .fail(plugin.handleConnectionError(firstURL));
 
   function processPage(html) {
     try {
@@ -103,7 +105,9 @@ function retrieveReviews(callback) {
           totalPages = totalPageMatch[1];
         plugin.report(`Fetching page ${page} of ${totalPages} &hellip;`);
         // Fetch next page
-        $.get(nextURL).done(processPage);
+        $.get(nextURL)
+          .done(processPage)
+          .fail(plugin.handleConnectionError(nextURL));
       } else {
         callback(reviews);
       }

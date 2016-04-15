@@ -7,8 +7,8 @@
 // service in order to use this module.
 'use strict';
 const jsonfile = require('jsonfile');
-let sitesDir = '../extension';
-let pluginDir = '../extension/src/plugins';
+let sitesDir = `${__dirname}/../extension`;
+let pluginDir = `${__dirname}/../extension/src/plugins`;
 let sites = jsonfile.readFileSync(`${sitesDir}/sites.json`);
 let schemas = {};
 for (let site of sites) {

@@ -5,10 +5,10 @@ const jsonfile = require('jsonfile');
 let config = {};
 
 try {
-  config = jsonfile.readFileSync('config.json');
+  config = jsonfile.readFileSync(`${__dirname}/config.json`);
 } catch(e) {
-  console.log('config.json was not found. Loading defaultConfig.json instead.');
-  config = jsonfile.readFileSync('defaultConfig.json');
+  console.log(`${__dirname}/config.json was not found. Loading defaultConfig.json instead.`);
+  config = jsonfile.readFileSync(`${__dirname}/defaultConfig.json`);
 }
 
 if (+process.argv[2])

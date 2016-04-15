@@ -1,5 +1,8 @@
-// Tests must be run from the project's service/ folder, e.g.:
-// `/freeyourstuff.cc/service$ node tests`
+// A simple test runner.
+// Run as follows:
+//
+// $ node tests # from service directory
+// $ node index.js # from this directory
 //
 // It relies on the existence of a full extension checkout, since it executes
 // each of the (client-side) plugins using a JSDOM environment. Since the
@@ -29,8 +32,8 @@ const JSDiff = require('diff');
 const DataSet = require('../../extension/src/dataset.js');
 const plugin = require('../../extension/src/plugin.js');
 const schemas = require('../load-schemas');
-const pluginDir = '../../extension/src/plugins';
-const resultsDir = 'tests/results';
+const pluginDir = `${__dirname}/../../extension/src/plugins`;
+const resultsDir = `${__dirname}/results`;
 
 let schemaKeys = Object.keys(schemas);
 if (process.argv.length > 2) {

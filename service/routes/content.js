@@ -5,6 +5,7 @@
 // External dependencies
 const router = require('koa-route');
 const send = require('koa-send');
+const fs = require('fs');
 
 // Internal dependencies
 const SiteSet = require('../models/siteset.js');
@@ -48,6 +49,28 @@ var main = {
     render.call(this, 'browse.ejs', {
       siteSets
     });
+    return yield next;
+  }),
+  // Fetch latest dump, if available
+  latest: router.get('/latest', function*(next) {
+    let date = new Date();
+    let getFilename = () => `freeyourstuff-${date.toISOString().match(/(.*)T/)[1]}.tgz`;
+    let getFullPath = () => `${__dirname}/../static/dumps/${getFilename(date)}`;
+    let fullPath = getFullPath();
+    try {
+      fs.statSync(fullPath);
+    } catch(e) {
+      // Yesterday
+      date.setDate(date.getDate() - 1);
+      fullPath = getFullPath();
+      try {
+        fs.statSync(fullPath);
+      } catch(e) {
+        this.body = 'No dump available for today or yesterday. Sorry!';
+        return yield next;
+      }
+    }
+    this.redirect(`/static/dumps/${getFilename(date)}`);
     return yield next;
   })
 };

@@ -58,6 +58,7 @@ app.use(routes.pages.plugins);
 app.use(routes.pages.mirrors);
 app.use(routes.content.view);
 app.use(routes.content.browse);
+app.use(routes.content.latest);
 app.use(routes.user.user);
 app.use(routes.user.signin);
 app.use(routes.user.signin_POST);

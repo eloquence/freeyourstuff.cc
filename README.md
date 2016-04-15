@@ -15,6 +15,11 @@ The web service allows you publication of your contributions under the [CC-0](ht
 
 In other words: Free your stuff! :-)
 
+# Mailing list and chat
+
+* [Mailing list for developers and users](http://www.freelists.org/list/freeyourstuff)
+* Chat: #freeyourstuff on irc.freenode.net ([web interface](https://webchat.freenode.net/?channels=freeyourstuff))
+
 # Contributor notice
 
 The extension, plugins and web service are licensed under the CC-0 License (see LICENSE file),

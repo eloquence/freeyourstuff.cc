@@ -39,7 +39,7 @@ try {
 let promises = [];
 
 for (let coll of Object.keys(schemas)) {
-  let cmd = `mongodump --db ${config.dbName} --collection ${coll} --out static/dumps/tmp`;
+  let cmd = `mongodump --db ${config.dbName} --collection ${coll} --out ${tmpdir}`;
   promises.push(exec(cmd));
 }
 Promise.all(promises).then(arr => {

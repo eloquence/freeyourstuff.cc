@@ -79,9 +79,9 @@ userSchema.methods.getDisplayName = function() {
     this.facebook.displayName || this.google.displayName || null;
 };
 
-userSchema.methods.getLink = function() {
+userSchema.methods.getLink = function(linkTitle) {
   let url = config.baseURL + 'user/' + this.getMethod() + '/' + this._id;
-  return `<a href="${url}">${this.getDisplayName()}</a>`;
+  return `<a href="${url}">${linkTitle || this.getDisplayName()}</a>`;
 };
 
 userSchema.methods.getMethod = function() {

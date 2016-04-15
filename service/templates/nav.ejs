@@ -22,10 +22,11 @@
             </span>
           <% } %>
           <% if (user) { %>
-            <span id="userNameNav"><span class="fa fa-user"></span> <%- user.getLink() -%>
+            <span id="userNameNav"><span class="fa fa-user"></span> <%- user.getDisplayName() -%>
             <% if (method != 'local') { %>
             <span class="fa fa-<%- method -%> <%-method -%>-small social-small"></span>
             <% } %>
+            &ndash; <%- user.getLink('Your stuff'); -%>
             </span>
             <form action="/signout" method="post" id="signoutForm">
             <input class="btn btn-default" id="signoutButton" type="submit" value="Sign out">

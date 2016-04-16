@@ -10,6 +10,7 @@ const bodyParser = require('koa-bodyparser');
 const flash = require('koa-connect-flash');
 const chokidar = require('chokidar'); // monitor file changes
 const path = require('path');
+const url = require('url');
 
 // Internal dependencies
 const loadTemplate = require('./templates');
@@ -52,6 +53,17 @@ app.use(bodyParser({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// For subdomains, IP address access, etc., we redirect to the base URL
+app.use(function*(next) {
+  let baseURL = url.parse(app.config.baseURL);
+  if (baseURL.host && baseURL.host != this.header.host) {
+    this.redirect(app.config.baseURL + this.url.slice(1));
+    return;
+  }
+  yield next;
+});
+
 app.use(routes.pages.static);
 app.use(routes.pages.root);
 app.use(routes.pages.plugins);

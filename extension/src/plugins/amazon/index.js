@@ -119,7 +119,7 @@ function retrieveReviews(callback) {
       let nextPageLink = $(dom).find('div[align="right"] b a').last();
       let nextPage = Number(nextPageLink.text());
 
-      if (pages.indexOf(nextPage) == -1) {
+      if (nextPage && pages.indexOf(nextPage) == -1) {
         let progress = `Fetching page ${nextPage} &hellip;`;
         plugin.report(progress);
         pages.push(nextPage);

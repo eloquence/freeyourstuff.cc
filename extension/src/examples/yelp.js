@@ -191,7 +191,7 @@ var exampleSchema = {
         "label": {
           "en": "Check-ins"
         },
-        "descrption": {
+        "description": {
           "en": "Number of times the reviewer has checked into the restaurant"
         }
       }

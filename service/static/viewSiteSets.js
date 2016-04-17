@@ -11,6 +11,29 @@
       let columns = [];
       let fields = [];
       let htmlWarning = false;
+
+      $('#siteSets').append(`<h4>${siteSet.siteSetSchema[setName].label.en}</h4>`);
+
+      // Show header information
+      if (siteSet[setName].head) {
+        $('#siteSets').append(`<table id="resultHeader${tableIndex}" class="headerTable"></table>`);
+        for (let headerKey in siteSet[setName].head) {
+          let rowValue = siteSet[setName].head[headerKey];
+          if (siteSet.siteSetSchema[setName].head[headerKey].type == 'weburl')
+            rowValue = `<a href="${rowValue}">${rowValue}</a>`;
+
+          // Show the header field's description as title attribute if we have one
+          let title = '';
+          if (siteSet.siteSetSchema[setName].head[headerKey].description)
+            title = `class="headerKey" title="${siteSet.siteSetSchema[setName].head[headerKey].description.en}"`;
+
+          let row = `<tr><td class="headerCell">` +
+            `<span ${title}>${siteSet.siteSetSchema[setName].head[headerKey].label.en}</span>` +
+            `</td><td>${rowValue}</td></tr>`;
+          $(`#resultHeader${tableIndex}`).append(row);
+        }
+      }
+
       // Loop through each data object in the set
       for (let dataObj of siteSet[setName].data) {
 
@@ -49,7 +72,6 @@
           }
         }
       }
-      $('#siteSets').append(`<h4>${siteSet.siteSetSchema[setName].label.en}</h4>`);
       if (htmlWarning) {
         $('#siteSets').append('<div class="technicalNotice">Since this may not be your own dataset, HTML characters have been escaped for security reasons.<br><br></div>');
       }

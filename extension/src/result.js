@@ -49,8 +49,7 @@
       $('#messages').empty();
       $('#messages').append(`<div class="${msg.type} message">${msg.text}</div>`);
       $('#messages').show();
-    }
-    else {
+    } else {
       $('#messages').fadeOut().fadeIn();
     }
   }
@@ -126,7 +125,7 @@
             `<br><br><code>${err.responseJSON.error}</code>`;
         }
         text += '<br><br>You can help us out by ' +
-        '<a target="_blank" href="https://github.com/eloquence/freeyourstuff.cc/issues/new">filing a bug</a>.';
+          '<a target="_blank" href="https://github.com/eloquence/freeyourstuff.cc/issues/new">filing a bug</a>.';
         showMessage({
           text,
           type: 'error'
@@ -164,6 +163,29 @@
       let columns = [];
       let fields = [];
 
+      $('#results').append(`<h3>${schema[setName].label.en}</h3>`);
+
+      // Show header information
+      if (data[setName].head) {
+        $('#results').append(`<table id="result_${setName}_header" class="headerTable"></table>`);
+        for (let headerKey in data[setName].head) {
+          let rowValue = data[setName].head[headerKey];
+          if (schema[setName].head[headerKey].type == 'weburl')
+            rowValue = `<a href="${rowValue}">${rowValue}</a>`;
+
+          // Show the header field's description as title attribute if we have one
+          let title = '';
+          if (schema[setName].head[headerKey].description)
+            title = `class="headerKey" title="${schema[setName].head[headerKey].description.en}"`;
+
+          let row = `<tr><td class="headerCell">` +
+            `<span ${title}>${schema[setName].head[headerKey].label.en}</span>` +
+            `</td><td>${rowValue}</td></tr>`;
+          $(`#result_${setName}_header`).append(row);
+        }
+      }
+
+
       // Loop through each data object in the set
       for (let dataObj of data[setName].data) {
         // Aggregate information from the schema as we go --
@@ -193,7 +215,6 @@
         }
       }
 
-      $('#results').append(`<h3>${schema[setName].label.en}</h3>`);
       $('#results').append(`<table id="result_${setName}" class="table table-hover table-responsive">`);
       $(`#result_${setName}`).dataTable({
         "data": data[setName].data,

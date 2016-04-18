@@ -19,7 +19,7 @@ const passport = require('./auth'); // exports koa-passport
 const routes = require('./routes/index.js');
 app.config = require('./load-config');
 
-const accessLogStream = fs.createWriteStream(app.config.accessLog);
+const accessLogStream = fs.createWriteStream(app.config.accessLog || `${__dirname}/logs/access.log`);
 
 mongoose.connect(app.config.dbHost, app.config.dbName, app.config.dbPort);
 

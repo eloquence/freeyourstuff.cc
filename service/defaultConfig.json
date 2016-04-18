@@ -5,6 +5,7 @@
   "dbHost": "localhost",
   "dbPort": 27017,
   "dbName": "freeyourstuff",
+  "accessLog": "logs/access.log",
   "sessionKeys": ["EighteenHeartlessBeggars", "ScrumptiousPelicansDelight"],
   "facebookClientID": "0",
   "facebookClientSecret": "0",

@@ -9,6 +9,7 @@ const session = require('koa-generic-session');
 const MongoStore = require('koa-generic-session-mongo');
 const bodyParser = require('koa-bodyparser');
 const flash = require('koa-connect-flash');
+const morgan = require('koa-morgan');
 const chokidar = require('chokidar'); // monitor file changes
 const path = require('path');
 const url = require('url');
@@ -17,6 +18,8 @@ const loadTemplate = require('./templates');
 const passport = require('./auth'); // exports koa-passport
 const routes = require('./routes/index.js');
 app.config = require('./load-config');
+
+const accessLogStream = fs.createWriteStream(app.config.accessLog);
 
 mongoose.connect(app.config.dbHost, app.config.dbName, app.config.dbPort);
 
@@ -37,6 +40,8 @@ watcher.on('change', (filename) => {
   console.log('Reloading modified template: ' + filename);
   app.templates[path.basename(filename)] = loadTemplate(filename);
 });
+
+app.use(morgan.middleware('combined', { stream: accessLogStream }) );
 
 /* ----- Begin middleware section ----- */
 app.use(session({

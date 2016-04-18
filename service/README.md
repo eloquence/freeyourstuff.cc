@@ -7,6 +7,6 @@ This is a Node/Koa service for publishing datasets using the freeyourstuff.cc Ch
 
 Main TODOs right now:
 
-- vet various security bits
-- add library browse features, tech docs & mirror instructions
-- deploy/build/logging fundamentals
+- more security vetting
+- add better library browse features
+- deploy/build fundamentals

@@ -13,8 +13,8 @@ var main = {
 
   static: router.get('/static/(.*)', function*(asset, next) {
     if (!asset) return yield next;
-    // ms, cache static resources for up to 5 minutes in production
-    let maxage = process.env.NODE_ENV === 'production' ? 300000 : 0;
+    // ms, cache static resources for up to one week in production
+    let maxage = process.env.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 7 : 0;
     yield send(this, asset, {
       maxage,
       root: __dirname + '/../static'

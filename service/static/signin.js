@@ -35,6 +35,9 @@
   }
 
   function checkName(e) {
+    // Don't run name checks if we're logged in & not on the registration page.
+    if (!$('#registerButton').is(':visible') && !$('#registerStatic').is(':visible'))
+      return false;
     var ele = $(this);
     e.preventDefault();
     $.getJSON(window.config.baseURL + 'api/name?name=' + $('#registerUsername').val(), function(data) {

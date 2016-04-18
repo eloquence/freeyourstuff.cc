@@ -4,7 +4,7 @@ Liberate the content you've contributed to websites like IMDB, Yelp, Amazon.com,
 
 # Rationale
 
-Websites come and go. If you don't want your contributions to disappear with them, it can be a good idea to keep your own backups. This Chrome/Chromium browser extension fetches a copy of your contributions to supported website.
+Websites come and go. If you don't want your contributions to disappear with them, it can be a good idea to keep your own backups. This Chrome/Chromium browser extension fetches a copy of your contributions to supported websites.
 
 The [freeyourstuff.cc](http://freeyourstuff.cc/) web service also allows you publication of your contributions under the [CC-0](https://creativecommons.org/publicdomain/zero/1.0/) license, to enable easy re-use by anyone. This is a good idea, to mitigate the [network effect](https://en.wikipedia.org/wiki/Network_effect) which enables first movers to lock in a given market. This effect makes it harder for open source, non-profit, community-driven alternatives to emerge, which is the principal motivation for this project. It also lets the whole Internet backup your data for you.
 

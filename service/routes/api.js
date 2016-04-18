@@ -39,7 +39,7 @@ module.exports = {
     } else {
       this.body = {
         loggedIn: true,
-        displayName: this.session.passport.user[this.session.method].displayName,
+        displayName: this.req.user[this.session.method].displayName,
         method: this.session.method
       };
     }
@@ -58,7 +58,7 @@ module.exports = {
     if (SiteSet.hasOwnProperty(c.schemaKey)) {
       let siteSet = new SiteSet[c.schemaKey]();
       siteSet.uploadDate = new Date();
-      siteSet.uploader = this.session.passport.user._id;
+      siteSet.uploader = this.req.user._id;
 
       // We store the version, but not the key of the schema.
       // The key is already implicitly stored through the MongoDB collection name.

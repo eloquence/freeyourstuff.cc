@@ -214,12 +214,15 @@
           }
         }
       }
-
-      $('#results').append(`<table id="result_${setName}" class="table table-hover table-responsive">`);
-      $(`#result_${setName}`).dataTable({
-        "data": data[setName].data,
-        "columns": columns
-      });
+      if (Array.isArray(data[setName].data) && data[setName].data.length) {
+        $('#results').append(`<table id="result_${setName}" class="table table-hover table-responsive">`);
+        $(`#result_${setName}`).dataTable({
+          "data": data[setName].data,
+          "columns": columns
+        });
+      } else {
+        $('#results').append('No data of this type included in the set.');
+      }
     }
   }
 })();

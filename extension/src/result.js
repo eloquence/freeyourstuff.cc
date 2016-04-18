@@ -56,7 +56,7 @@
 
   // retry: Whether this was user-triggered.
   function checkLoginStatus(retry) {
-    $.get('http://freeyourstuff.cc/api/loginstatus').done(res => {
+    $.get('https://freeyourstuff.cc/api/loginstatus').done(res => {
       // Hide previous warning messages
       $('#messages').hide();
       if (typeof res == 'object' && res.loggedIn) {
@@ -107,7 +107,7 @@
       $.ajax({
         type: 'POST',
         contentType: 'application/json',
-        url: 'http://freeyourstuff.cc/api/siteset',
+        url: 'https://freeyourstuff.cc/api/siteset',
         data: json,
         dataType: 'json'
       }).done(res => {
@@ -143,10 +143,10 @@
     $('#download').attr('download', 'data.json');
 
     $('#publish').click(getPublishClickHandler(json));
-    $('#facebook').click(getLinkOpener('http://freeyourstuff.cc/auth/facebook'));
-    $('#twitter').click(getLinkOpener('http://freeyourstuff.cc/auth/twitter'));
-    $('#google').click(getLinkOpener('http://freeyourstuff.cc/auth/google'));
-    $('#local').click(getLinkOpener('http://freeyourstuff.cc/signin'));
+    $('#facebook').click(getLinkOpener('https://freeyourstuff.cc/auth/facebook'));
+    $('#twitter').click(getLinkOpener('https://freeyourstuff.cc/auth/twitter'));
+    $('#google').click(getLinkOpener('https://freeyourstuff.cc/auth/google'));
+    $('#local').click(getLinkOpener('https://freeyourstuff.cc/signin'));
     $('#stop').click(stopPinging);
 
     checkLoginStatus();

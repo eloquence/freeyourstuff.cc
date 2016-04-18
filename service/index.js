@@ -74,7 +74,8 @@ app.use(function*(next) {
   yield next;
 });
 
-app.use(routes.pages.static);
+app.use(routes.assets.static);
+app.use(routes.assets.favicon);
 app.use(routes.pages.root);
 app.use(routes.pages.plugins);
 app.use(routes.pages.mirrors);

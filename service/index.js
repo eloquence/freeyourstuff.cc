@@ -13,6 +13,8 @@ const morgan = require('koa-morgan');
 const chokidar = require('chokidar'); // monitor file changes
 const path = require('path');
 const url = require('url');
+const createServer = require('auto-sni');
+
 // Internal dependencies
 const loadTemplate = require('./templates');
 const passport = require('./auth'); // exports koa-passport
@@ -41,7 +43,9 @@ watcher.on('change', (filename) => {
   app.templates[path.basename(filename)] = loadTemplate(filename);
 });
 
-app.use(morgan.middleware('combined', { stream: accessLogStream }) );
+app.use(morgan.middleware('combined', {
+  stream: accessLogStream
+}));
 
 /* ----- Begin middleware section ----- */
 app.use(session({
@@ -101,7 +105,16 @@ app.use(routes.api.siteSet_POST);
 app.use(gzip());
 /* ----- End middleware section ------ */
 
-app.listen(app.config.port);
+createServer({
+  email: app.config.adminEmail,
+  agreeTos: true,
+  debug: process.env.NODE_ENV == 'production' ? false : true,
+  domains: [ app.config.httpsDomains ],
+  forceSSL: process.env.NODE_ENV == 'production' ? true : false,
+  ports: {
+    http: app.config.httpPort,
+    https: app.config.httpsPort
+  }
+}, app.callback());
 console.log(app.config.siteName + ' service loaded.');
-
 module.exports = app; // For testability

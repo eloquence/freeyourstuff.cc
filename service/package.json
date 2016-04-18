@@ -13,6 +13,7 @@
   "author": "Erik Moeller",
   "license": "CC0-1.0",
   "dependencies": {
+    "auto-sni": "^1.0.2",
     "bcrypt-nodejs": "0.0.3",
     "chokidar": "^1.4.1",
     "ejs": "^2.3.4",

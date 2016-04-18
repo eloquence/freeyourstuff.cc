@@ -11,8 +11,10 @@ try {
   config = jsonfile.readFileSync(`${__dirname}/defaultConfig.json`);
 }
 
-if (+process.argv[2])
-  config.port = process.argv[2];
+if (+process.argv[2] && +process.argv[3]) {
+  config.httpPort = process.argv[2];
+  config.httpsPort = process.argv[3];
+}
 
 // We're hardcoding this one, assuming it's not something you'll need to change.
 config.pathToTemplates = __dirname + '/templates/*.ejs';

@@ -116,5 +116,6 @@ createServer({
     https: app.config.httpsPort
   }
 }, app.callback());
-console.log(app.config.siteName + ' service loaded.');
+let siteMode = process.env.NODE_ENV === 'production' ? 'PRODUCTION' : 'DEVELOPMENT';
+console.log(`${app.config.siteName} service loaded. Running in ${siteMode} mode.`);
 module.exports = app; // For testability

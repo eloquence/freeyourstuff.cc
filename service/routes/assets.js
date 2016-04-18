@@ -18,7 +18,7 @@ let main = {
     });
     return yield next;
   }),
-  favicon: router.get('/favicon.ico', function*(next) {
+  favicon: router.get('/favicon.ico(\\?.*)*', function*(v, next) {
       this.status = 301;
       this.redirect('/static/favicon.ico');
       return yield next;

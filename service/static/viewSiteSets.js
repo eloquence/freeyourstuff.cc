@@ -3,7 +3,13 @@
   let tableIndex = 0; // each siteSet can produce multiple tables
   for (let siteSet of window.siteSets) {
     $('#siteSets').append(`<h2>${siteSet.siteSetSchema.schema.label.en}</h2>`);
-    $('#siteSets').append(`<B>Upload by ${getUploaderLink(siteSet.uploader)} on ${getSiteSetLink(siteSet)}</b>`);
+    $('#siteSets').append(`<b id="uploadInfo${tableIndex}">Upload by ${getUploaderLink(siteSet.uploader)} on ${getSiteSetLink(siteSet)}</b> &ndash; <b><a id="downloadLink${tableIndex}">Download JSON</a></b>`);
+    let json = jsonExport(siteSet);
+    // We need to URI-encode it so we can stash it into the href attribute
+    let encodedJSON = encodeURIComponent(json);
+    $(`#downloadLink${tableIndex}`).attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
+    $(`#downloadLink${tableIndex}`).attr('download', 'data.json');
+
     for (let setName of Object.keys(siteSet.siteSetSchema)) {
       if (setName == 'schema')
         continue;
@@ -131,4 +137,22 @@
     });
   }
 
+  // Prepare a clean JSON export of siteset data without database ID elements
+  // and freeyourstuff.cc metadata.
+  function jsonExport(siteSet) {
+    let siteSetCopy = Object.assign({}, siteSet);
+    siteSetCopy.schemaKey = siteSet.siteSetSchema.schema.key;
+    siteSetCopy.siteSetSchema = undefined;
+    siteSetCopy.uploader = undefined;
+    siteSetCopy.uploadDate = undefined;
+
+    // Filter DB key info from JSON export with replacer function
+    let json = JSON.stringify(siteSetCopy, (key, value) => {
+      if (['__v', '_id'].indexOf(key) !== -1)
+        return undefined;
+      else
+        return value;
+    }, 2);
+    return json;
+  }
 })();

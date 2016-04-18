@@ -10,14 +10,14 @@ const url = require('url');
 const config = require('./load-config');
 const User = require('./models/user');
 
-// Save to the session
 passport.serializeUser(function(user, done) {
-  done(null, user);
+  done(null, user._id);
 });
 
-// Load from the session
-passport.deserializeUser(function(user, done) {
-  done(null, user);
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
 });
 
 let localOptions = {

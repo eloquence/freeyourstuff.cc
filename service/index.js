@@ -6,12 +6,12 @@ const fs = require('fs');
 const ejs = require('ejs'); // simple templates with embedded JS
 const mongoose = require('mongoose'); // MongoDB ODB
 const session = require('koa-generic-session');
+const MongoStore = require('koa-generic-session-mongo');
 const bodyParser = require('koa-bodyparser');
 const flash = require('koa-connect-flash');
 const chokidar = require('chokidar'); // monitor file changes
 const path = require('path');
 const url = require('url');
-
 // Internal dependencies
 const loadTemplate = require('./templates');
 const passport = require('./auth'); // exports koa-passport
@@ -41,9 +41,14 @@ watcher.on('change', (filename) => {
 /* ----- Begin middleware section ----- */
 app.use(session({
   cookie: {
-    maxAge: 24 * 60 * 60 * 30000
-  }
-})); // 30 d default cookie
+    maxAge: 24 * 60 * 60 * 30000 // 30 d default cookie
+  },
+  store: new MongoStore({
+    db: app.config.dbName,
+    host: app.config.dbHost,
+    port: app.config.dbPort
+  })
+}));
 app.use(flash());
 app.use(bodyParser({
   strict: false,

@@ -2,8 +2,8 @@
 
 // Variables that are exposed to all EJS templates, including flash notifications
 function getStandardVars() {
-  let user = this.isAuthenticated() && this.session.passport.user ?
-    this.session.passport.user : null;
+  let user = this.isAuthenticated() && this.req.user ?
+    this.req.user : null;
   let notifications = this.flash('once-notifications');
   let stv = {
     conf: this.app.config.expose(),

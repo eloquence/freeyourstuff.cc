@@ -18,16 +18,20 @@
 
   // Promise-based script injection. First injection needs to be called
   // like this: injectScript('filename')()
-  function injectScript(file) {
-    return () => {
-      return new Promise((resolve) => {
-        chrome.tabs.executeScript({
-          file
-        }, function(result) {
-          resolve(result);
+  function injectScript(file, skipDep) {
+    if (!skipDep) {
+      return () => {
+        return new Promise((resolve) => {
+          chrome.tabs.executeScript({
+            file
+          }, function(result) {
+            resolve(result);
+          });
         });
-      });
-    };
+      };
+    } else {
+      return () => {};
+    }
   }
 
   // Promise-based convenience function to get active tab
@@ -81,6 +85,10 @@
         $.getJSON("/sites.json").done(sites => {
           for (let site of sites) {
             if (tab.url.match(site.regex)) {
+
+              if (!site.deps)
+                site.deps = []; // for convenient access later
+
               $('#siteName').text(site.name);
               fileName = site.name.toLowerCase().replace(/ /g, '_') + '.json';
               $('#availableContent').html('');
@@ -96,13 +104,14 @@
               $.getJSON(`/src/plugins/${site.plugin}/schema.json`).done(data => {
                 schema = data;
                 injectScript('/src/plugin.js')()
-                .then(injectScript(`/src/plugins/${site.plugin}/index.js`))
-                .then(() => {
-                  $('#retrieve').attr('hidden', false);
-                  $('#retrieve').attr('disabled', false);
-                  if(autoRetrieve)
-                    $('#retrieve').click();
-                });
+                  .then(injectScript(`/src/lib/js/papaparse.min.js`, site.deps.indexOf('papaparse') == -1))
+                  .then(injectScript(`/src/plugins/${site.plugin}/index.js`))
+                  .then(() => {
+                    $('#retrieve').attr('hidden', false);
+                    $('#retrieve').attr('disabled', false);
+                    if (autoRetrieve)
+                      $('#retrieve').click();
+                  });
               });
               break;
             }

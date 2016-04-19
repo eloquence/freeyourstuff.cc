@@ -46,7 +46,6 @@ var plugin = {
       details.statusCode = src.status;
       details.statusText = src.statusText;
       details.url = url;
-      console.log(details);
       this.reportError(`There was a problem connecting to the site.`,
         JSON.stringify(details, null, 2));
     };

@@ -8,10 +8,11 @@
 }, {
   "name": "IMDB",
   "plugin": "imdb",
+  "deps": ["papaparse"],
   "canonicalURL": "http://www.imdb.com",
   "regex": "http(s)*://(www.)*imdb.com",
-  "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Lists"]
+  "supported": ["Reviews", "Ratings"],
+  "unsupported": ["Comments", "Lists"]
 },
 {
   "name": "TripAdvisor",

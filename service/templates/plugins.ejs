@@ -34,6 +34,7 @@
         <ul>
             <li><code>name</code>: the proper name of the supported site as the site itself uses it.</li>
             <li><code>plugin</code>: the name of the subdirectory in which the plugin can be found</li>
+            <li><code>deps</code>: (optional) additional JavaScript library dependencies (array). Currently supported: "papaparse" for CSV parser <a href="http://papaparse.com/">PapaParse</a>
             <li><code>canonicalURL</code>: when we link to the site, what URL should we link to?</li>
             <li>
                 <code>regex</code>: the regular expression the extension uses to show its icon, using a <a href="https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher">PageStateMatcher</a>'s urlMatches rule, following <a href="https://github.com/google/re2">RE2 syntax</a>.

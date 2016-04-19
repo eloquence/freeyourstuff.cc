@@ -25,11 +25,14 @@ function setupExtensionEvents() {
       datasets.schemaVersion = request.schema.schema.version;
       retrieveReviews(reviews => {
         datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
-        chrome.runtime.sendMessage({
-          action: 'dispatch',
-          data: datasets,
-          schema: request.schema
-        });
+        retrieveRatings(ratings => {
+          datasets.ratings = new DataSet(ratings, request.schema.ratings).set;
+          chrome.runtime.sendMessage({
+            action: 'dispatch',
+            data: datasets,
+            schema: request.schema
+          });
+        }, reviews.head);
       });
     }
   });
@@ -74,9 +77,13 @@ function extractBaseURL(pageDocument) {
   // Strips off query string
   let menuLink = $(pageDocument).find('#nb_personal a').first().attr('href');
   let menuMatch = menuLink !== undefined ? menuLink.match(/(.*)\?/) : [];
-  if (menuMatch[1])
-    return mainPart + menuMatch[1];
-  else
+  // Sometimes we get an absolute URL, sometimes a relative one
+  if (menuMatch[1]) {
+    if (/^http:/.test(menuMatch[1]))
+      return menuMatch[1];
+    else
+      return mainPart + menuMatch[1];
+  } else
     return null;
 }
 
@@ -93,6 +100,7 @@ function retrieveReviews(callback) {
   getBaseURL(baseURL => {
     let firstURL = baseURL + 'comments-expanded';
     doneURLs.push(firstURL);
+    plugin.report('Fetching reviews &hellip;');
     $.get(firstURL)
       .done(processPage)
       .fail(plugin.handleConnectionError(firstURL));
@@ -165,5 +173,34 @@ function retrieveReviews(callback) {
         plugin.reportError(`An error occurred processing your reviews.`, error.stack);
       }
     }
+  });
+}
+
+function retrieveRatings(callback, head) {
+  let ratings = {
+    head,
+    data: []
+  };
+  let csvURL = `http://www.imdb.com/list/export?list_id=ratings&author_id=${head.reviewerID}`;
+  plugin.report('Fetching ratings &hellip;');
+  Papa.parse(csvURL, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      ratings.data = results.data.map(function(ele) {
+        // We're using only the parts of the CSV which are the user's own work.
+        // The CSV also contains a "modified" date, which does not appear to
+        // be used, see: https://getsatisfaction.com/imdb/topics/gobn1q01nbd5o
+        return {
+          starRating: ele["You rated"],
+          subject: ele.Title,
+          subjectIMDBURL: ele.URL,
+          datePosted: ele.created
+        };
+      });
+      callback(ratings);
+    },
+    error: plugin.handleConnectionError(csvURL)
   });
 }

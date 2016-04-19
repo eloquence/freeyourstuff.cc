@@ -4,7 +4,71 @@
     "label": {
       "en": "IMDB"
     },
-    "version": 1
+    "version": 2
+  },
+  "ratings": {
+    "label": {
+      "en": "IMDB ratings"
+    },
+    "head": {
+      "reviewerName": {
+        "type": "text",
+        "label": {
+          "en": "Reviewer name"
+        },
+        "description": {
+          "en": "The publicly visible username of the reviewer"
+        }
+      },
+      "reviewerID": {
+        "type": "text",
+        "label": {
+          "en": "Reviewer ID"
+        },
+        "description": {
+          "en": "The unique ID assigned to the user"
+        }
+      }
+    },
+    "data": {
+      "subject": {
+        "type": "text",
+        "label": {
+          "en": "Subject"
+        },
+        "description": {
+          "en": "The movie/show/etc. that is being rated"
+        }
+      },
+      "subjectIMDBURL": {
+        "type": "weburl",
+        "describes": "subject",
+        "label": {
+          "en": "IMDB URL"
+        },
+        "description": {
+          "en": "The URL pointing to the movie/show/etc. that is being rated"
+        }
+      },
+      "datePosted": {
+        "type": "date",
+        "label": {
+          "en": "Date posted"
+        },
+        "description": {
+          "en": "The date the rating was posted"
+        }
+      },
+      "starRating": {
+        "type": "number",
+        "label": {
+          "en": "Rating"
+        },
+        "description": {
+          "en": "The 1-10 star rating of the review"
+        }
+      }
+    }
   },
   "reviews": {
     "label": {

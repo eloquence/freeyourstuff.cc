@@ -11,7 +11,7 @@
     $(`#downloadLink${tableIndex}`).attr('download', 'data.json');
 
     for (let setName of Object.keys(siteSet.siteSetSchema)) {
-      if (setName == 'schema')
+      if (setName == 'schema' || !siteSet[setName])
         continue;
 
       let columns = [];

@@ -1,7 +1,8 @@
 'use strict';
 // Result comparison tests to be run by NodeJS/JSDOM test runner
 var jsonTests = {
-  reviews: retrieveReviews
+  reviews: retrieveReviews,
+  ratings: retrieveRatings
 };
 
 if (typeof init === 'undefined')
@@ -48,48 +49,52 @@ function loggedIn() {
 // we're on to find the profile URL. When running in Node, we need to get at
 // least one IMDB page first to extract it. This is also a nice fallback for
 // pages which don't have the profile link on them (e.g., error pages).
-function getBaseURL(callback) {
-  let baseURL = extractBaseURL();
+function getHead(callback) {
+  let head = extractHeadInfo();
   let mainURL = 'http://www.imdb.com/';
-  if (baseURL) {
-    callback(baseURL);
+  if (head) {
+    callback(head);
   } else {
     $.get(mainURL)
       .done(function(html) {
         let doc = $.parseHTML(html);
-        baseURL = extractBaseURL(doc);
-        if (baseURL)
-          callback(baseURL);
+        head = extractHeadInfo(doc);
+        if (head)
+          callback(head);
         else
-          plugin.reportError('Could not obtain IMDB base URL.');
+          plugin.reportError('Could not find your IMDB profile.');
       })
       .fail(plugin.handleConnectionError(mainURL));
   }
 }
 
+// Extract a link to the user's profile from an IMDB page.
 // Factored out so we can call it on current page or another; expects DOM element
 // or array of them ($.parseHTML produces the latter).
-function extractBaseURL(pageDocument) {
+function extractHeadInfo(pageDocument) {
+  let head = {};
   if (!pageDocument)
     pageDocument = document;
 
   let mainPart = 'http://www.imdb.com';
   // Strips off query string
-  let menuLink = $(pageDocument).find('#nb_personal a').first().attr('href');
-  let menuMatch = menuLink !== undefined ? menuLink.match(/(.*)\?/) : [];
-  // Sometimes we get an absolute URL, sometimes a relative one
-  if (menuMatch[1]) {
-    if (/^http:/.test(menuMatch[1]))
-      return menuMatch[1];
-    else
-      return mainPart + menuMatch[1];
-  } else
-    return null;
+  let profileLink = $(pageDocument).find('#nb_personal a').first().attr('href');
+  if (profileLink) {
+    let reviewerIDMatch = profileLink.match(/\/user\/(ur[0-9]+)/);
+    if (reviewerIDMatch)
+      head.reviewerID = reviewerIDMatch[1];
+  }
+
+  let reviewerName = $(pageDocument).find('#consumer_user_nav a').first().text().trim();
+  if (reviewerName)
+    head.reviewerName = reviewerName;
+
+  return Object.keys(head).length ? head : null;
+
 }
 
-
 function retrieveReviews(callback) {
-  let baseURL;
+  let profileURL;
   let page = 1;
   let reviews = {
     head: {},
@@ -97,8 +102,9 @@ function retrieveReviews(callback) {
   };
   let doneURLs = [];
 
-  getBaseURL(baseURL => {
-    let firstURL = baseURL + 'comments-expanded';
+  getHead(head => {
+    reviews.head = head;
+    let firstURL = `http://www.imdb.com/user/${head.reviewerID}/comments-expanded`;
     doneURLs.push(firstURL);
     plugin.report('Fetching reviews &hellip;');
     $.get(firstURL)
@@ -108,10 +114,6 @@ function retrieveReviews(callback) {
     function processPage(html) {
       try {
         let dom = $.parseHTML(html);
-        if (page === 1) {
-          reviews.head.reviewerName = $(dom).find('#consumer_user_nav a').first().text().trim();
-          reviews.head.reviewerID = baseURL.match(/ur[0-9]*/)[0];
-        }
         while ($(dom).find('table#outerbody div').length) {
           let subject = $(dom).find('table#outerbody div a').first().text();
           let subjectIMDBURL = 'http://www.imdb.com' + $(dom).find('table div a').first().attr('href');
@@ -152,7 +154,7 @@ function retrieveReviews(callback) {
         let nextURL = $(dom).find('table table td a img').last().parent().attr('href');
         //nextURL = 'http://www.imdb.com/user/ur3274830/' + nextURL;
         if (nextURL)
-          nextURL = baseURL + nextURL;
+          nextURL = profileURL + nextURL;
         if (nextURL && doneURLs.indexOf(nextURL) === -1) {
           doneURLs.push(nextURL);
           page++;
@@ -177,6 +179,12 @@ function retrieveReviews(callback) {
 }
 
 function retrieveRatings(callback, head) {
+  if (head === undefined) {
+    getHead(head => {
+      retrieveRatings(callback, head);
+    });
+    return;
+  }
   let ratings = {
     head,
     data: []

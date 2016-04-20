@@ -33,6 +33,7 @@ const DataSet = require('../../extension/src/dataset.js');
 const plugin = require('../../extension/src/plugin.js');
 const schemas = require('../load-schemas');
 const pluginDir = `${__dirname}/../../extension/src/plugins`;
+const libDir = `${__dirname}/../../extension/src/lib/js`;
 const resultsDir = `${__dirname}/results`;
 
 let schemaKeys = Object.keys(schemas);
@@ -78,28 +79,58 @@ function runTests() {
         url: schemas[schemaKey].schema.site.canonicalURL // needed for setting document origin
       });
       let window = document.defaultView;
+      window.plugin = plugin;
+
       jsdom.jQueryify(window, 'https://code.jquery.com/jquery-1.12.2.min.js', () => {
-        window.plugin = plugin;
-        let $ = window.$;
-        let pluginJS = fs.readFileSync(require.resolve(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`));
-        const scriptEl = document.createElement('script');
-        scriptEl.textContent = pluginJS;
-        scriptEl.addEventListener('load', function() {
-          if (typeof window.jsonTests !== 'object') {
-            console.log(`No JSON tests defined for plugin ${schemaKey}.`);
-            console.log(`Tests must be defined in the plugin itself in its jsonTests variable.`);
-            runTests();
-          } else {
-            for (let testName in window.jsonTests) {
-              window.jsonTests[testName](result => {
-                validateResult(`${schemaKey}.${testName}`, JSON.stringify(result, undefined, 2));
-                runTests();
-              });
-            }
-          }
-        });
-        document.body.appendChild(scriptEl);
+        injectDependency('papaparse')
+          .then(injectScript(require.resolve(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`),
+            jsonTests));
       });
+
+      function injectScript(path, callback) {
+        return new Promise((resolve, reject) => {
+          let pluginJS = fs.readFileSync(path).toString();
+          let scriptEl = document.createElement('script');
+          scriptEl.textContent = pluginJS;
+          scriptEl.addEventListener('load', () => {
+            resolve();
+            if (callback)
+              callback();
+          });
+          document.body.appendChild(scriptEl);
+        });
+      }
+
+      function injectDependency(dep) {
+        switch (dep) {
+          case 'papaparse':
+            if (Array.isArray(schemas[schemaKey].schema.site.deps) &&
+              schemas[schemaKey].schema.site.deps.indexOf(dep) !== -1) {
+                console.log('Loading plugin dependency '+dep);
+                return injectScript(`${libDir}/papaparse.min.js`);
+            }
+            /* falls through */
+          default:
+            return new Promise((resolve) => {
+              resolve();
+            });
+        }
+      }
+
+      function jsonTests() {
+        if (typeof window.jsonTests !== 'object') {
+          console.log(`No JSON tests defined for plugin ${schemaKey}.`);
+          console.log(`Tests must be defined in the plugin itself in its jsonTests variable.`);
+          runTests();
+        } else {
+          for (let testName in window.jsonTests) {
+            window.jsonTests[testName](result => {
+              validateResult(`${schemaKey}.${testName}`, JSON.stringify(result, undefined, 2));
+              runTests();
+            });
+          }
+        }
+      }
     });
   }
 }
@@ -126,7 +157,7 @@ function validateResult(testName, newResult) {
   let diffSize = 0;
   diff.forEach(function(part) {
     if (part.added || part.removed)
-      diffSize ++;
+      diffSize++;
     // green for additions, red for deletions
     // grey for common parts
     let color = part.added ? 'green' :

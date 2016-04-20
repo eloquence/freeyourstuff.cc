@@ -49,40 +49,33 @@ function retrieveReviews(callback) {
     data: []
   };
   let base = 'https://www.tripadvisor.com';
-  let path, directoryURL;
-  if ($('.updateProfile a').length) {
-    // There does not appear to be a difference between the /members
-    // and /members-reviews path.
-    path = $('.updateProfile a').attr('href');
-    reviews.head.reviewerID = path.match('/members/(.*)')[1];
-    directoryURL = base + path;
-    $.get(directoryURL)
-      .done(processDirectory)
-      .fail(plugin.handleConnectionError(directoryURL));
-  } else {
-    $.get(base)
-      .done(html => {
-        let dom = $.parseHTML(html);
-        if ($(dom).find('.updateProfile a').length) {
-          path = $(dom).find('.updateProfile a').attr('href');
-          reviews.head.reviewerID = path.match('/members/(.*)')[1];
-          directoryURL = base + path;
-          $.get(directoryURL)
-            .done(processDirectory)
-            .fail(plugin.handleConnectionError(directoryURL));
-        } else {
-          plugin.reportError('Could not find your user profile.');
-          return false;
-        }
-      })
-      .fail(plugin.handleConnectionError(base));
-  }
+  let directoryURL = `${base}/MemberProfile`;
 
-  function processDirectory(directoryHTML) {
+  // We use XMLHttpRequest here because jQuery does not expose responseURL,
+  // due to limited support for it; see https://bugs.jquery.com/ticket/15173
+  let req = new XMLHttpRequest();
+  req.addEventListener('load', processDirectory);
+  req.addEventListener('error', plugin.handleConnectionError(directoryURL));
+  req.open('GET', directoryURL);
+  req.send();
+
+  function processDirectory() {
     try {
-      var directoryDOM = $.parseHTML(directoryHTML);
+      let directoryURL = this.responseURL;
+      if (!/\members\//.test(directoryURL)) {
+        plugin.reportError('We did not find any reviews for this account.', 'Profile URL was: '+directoryURL);
+        return;
+      }
+      let reviewerID = directoryURL.match('/members/(.*)')[1];
+
+      var directoryHTML = this.responseText;
+      var directoryDOM = $.parseHTML(this.responseText);
+
+      reviews.head.reviewerID = reviewerID;
       reviews.head.reviewerName = $(directoryDOM).find('.name .nameText').text();
+
       let reviewList = $(directoryDOM).find('li.cs-review').toArray();
+
       var reviewURLs = [];
       reviewURLs = reviewList.map(ele => {
         return base + $(ele).find('a.cs-review-title').attr('href');

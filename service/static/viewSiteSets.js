@@ -97,6 +97,8 @@
           "columns": columns
         });
       }
+      if (hasHead && !hasData)
+        $('#siteSets').append('No data of this type included in the set.');
 
       if (hasHead || hasData)
         tableIndex++;

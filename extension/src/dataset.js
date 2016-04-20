@@ -75,7 +75,8 @@ Attempted data import with unknown key in section "${section}": "${key}"`);
       case NUMBER:
         return Number(value);
       case DATE:
-        return new Date(value).toLocaleDateString();
+        let maybeDate = new Date(value).toLocaleDateString();
+        return maybeDate.toString() === 'Invalid Date' ? undefined : maybeDate;
       case BOOLEAN:
         return Boolean(value);
     }

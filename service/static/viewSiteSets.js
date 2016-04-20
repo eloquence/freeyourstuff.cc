@@ -18,10 +18,17 @@
       let fields = [];
       let htmlWarning = false;
 
-      $('#siteSets').append(`<h4>${siteSet.siteSetSchema[setName].label.en}</h4>`);
+      // For convenience
+      let hasHead = typeof siteSet[setName].head == 'object' &&
+        Object.keys(siteSet[setName].head).length ? true : false;
+      let hasData = Array.isArray(siteSet[setName].data) && siteSet[setName].data.length ? true : false;
+
+      if (hasHead || hasData) {
+        $('#siteSets').append(`<h4>${siteSet.siteSetSchema[setName].label.en}</h4>`);
+      }
 
       // Show header information
-      if (siteSet[setName].head) {
+      if (hasHead) {
         $('#siteSets').append(`<table id="resultHeader${tableIndex}" class="headerTable"></table>`);
         for (let headerKey in siteSet[setName].head) {
           let rowValue = siteSet[setName].head[headerKey];
@@ -40,54 +47,59 @@
         }
       }
 
-      // Loop through each data object in the set
-      for (let dataObj of siteSet[setName].data) {
+      // Prepare table output
+      if (hasData) {
+        // Loop through each data object in the set
+        for (let dataObj of siteSet[setName].data) {
 
-        // Aggregate information from the schema as we go --
-        // this way we only have metadata we have actual data for
-        for (let prop in dataObj) {
-          if (prop === '_id')
-            continue;
-          if (fields.indexOf(prop) == -1) {
-            if (!siteSet.siteSetSchema[setName].data[prop].describes) {
-              let colDef = {
-                data: prop,
-                title: siteSet.siteSetSchema[setName].data[prop].label.en,
-                defaultContent: ''
-              };
-              if (siteSet.uploader._id != window.userID) {
-                if (siteSet.siteSetSchema[setName].data[prop].type == 'html') {
-                  colDef.render = escapeHTML;
-                  htmlWarning = true;
+          // Aggregate information from the schema as we go --
+          // this way we only have metadata we have actual data for
+          for (let prop in dataObj) {
+            if (prop === '_id')
+              continue;
+            if (fields.indexOf(prop) == -1) {
+              if (!siteSet.siteSetSchema[setName].data[prop].describes) {
+                let colDef = {
+                  data: prop,
+                  title: siteSet.siteSetSchema[setName].data[prop].label.en,
+                  defaultContent: ''
+                };
+                if (siteSet.uploader._id != window.userID) {
+                  if (siteSet.siteSetSchema[setName].data[prop].type == 'html') {
+                    colDef.render = escapeHTML;
+                    htmlWarning = true;
+                  }
                 }
-              }
-              columns.push(colDef);
-              fields.push(prop);
-            } else {
-              // We're encountering data that "describes" other data, i.e. a URL
-              // for some text elsewhere. Let's locate the relevant column and
-              // add a render function if it doesn't already have one.
-              for (let col of columns) {
-                if (col.data == siteSet.siteSetSchema[setName].data[prop].describes) {
-                  if (!col.render)
-                    col.render = makeRenderFunction(prop);
-                  break;
+                columns.push(colDef);
+                fields.push(prop);
+              } else {
+                // We're encountering data that "describes" other data, i.e. a URL
+                // for some text elsewhere. Let's locate the relevant column and
+                // add a render function if it doesn't already have one.
+                for (let col of columns) {
+                  if (col.data == siteSet.siteSetSchema[setName].data[prop].describes) {
+                    if (!col.render)
+                      col.render = makeRenderFunction(prop);
+                    break;
+                  }
                 }
               }
             }
           }
         }
-      }
-      if (htmlWarning) {
-        $('#siteSets').append('<div class="technicalNotice">Since this may not be your own dataset, HTML characters have been escaped for security reasons.<br><br></div>');
-      }
-      $('#siteSets').append(`<table id="siteSet_table_${tableIndex}" class="table table-hover table-responsive">`);
-      $(`#siteSet_table_${tableIndex}`).dataTable({
-        "data": siteSet[setName].data,
-        "columns": columns
-      });
-      tableIndex++;
 
+        if (htmlWarning) {
+          $('#siteSets').append('<div class="technicalNotice">Since this may not be your own dataset, HTML characters have been escaped for security reasons.<br><br></div>');
+        }
+        $('#siteSets').append(`<table id="siteSet_table_${tableIndex}" class="table table-hover table-responsive">`);
+        $(`#siteSet_table_${tableIndex}`).dataTable({
+          "data": siteSet[setName].data,
+          "columns": columns
+        });
+      }
+
+      if (hasHead || hasData)
+        tableIndex++;
     }
   }
 
@@ -114,7 +126,7 @@
       return 'unknown user';
 
     let url = window.config.baseURL + 'user/' + method + '/' + user._id;
-    return '<a href="' + url + '">'+ user[method].displayName  + '</a>';
+    return '<a href="' + url + '">' + user[method].displayName + '</a>';
   }
 
 
@@ -129,11 +141,15 @@
 
   // Escape HTML control characters
   function escapeHTML(text) {
-    return text.replace(/[\"&'\/<>]/g, function (a) {
-        return {
-            '"': '&quot;', '&': '&amp;', "'": '&#39;',
-            '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
-        }[a];
+    return text.replace(/[\"&'\/<>]/g, function(a) {
+      return {
+        '"': '&quot;',
+        '&': '&amp;',
+        "'": '&#39;',
+        '/': '&#47;',
+        '<': '&lt;',
+        '>': '&gt;'
+      }[a];
     });
   }
 

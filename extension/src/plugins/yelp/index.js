@@ -73,8 +73,11 @@ function retrieveReviews(callback) {
         let path = $(e).find('.biz-name').attr('href');
         if (path)
           subjectYelpURL = base + path;
-        let date = $(e).find('.rating-qualifier').text().trim(); // TODO: other qualifiers
-
+        let qualifiers = $(e).find('.rating-qualifier').text(); // TODO: other qualifiers
+        let dateMatch = qualifiers.match(/(\d+\/\d+\/\d+)/);
+        let date;
+        if (dateMatch)
+          date=dateMatch[1];
         let starRatingMatch, starRating;
         let starRatingClass = $(e).find("[class^='star-img stars_']").attr('class');
         if (starRatingClass && (starRatingMatch = starRatingClass.match(/[0-9]/)))

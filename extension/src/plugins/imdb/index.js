@@ -72,29 +72,24 @@ function getHead(callback) {
 // Factored out so we can call it on current page or another; expects DOM element
 // or array of them ($.parseHTML produces the latter).
 function extractHeadInfo(pageDocument) {
-  let head = {};
   if (!pageDocument)
     pageDocument = document;
 
   let mainPart = 'http://www.imdb.com';
   // Strips off query string
-  let profileLink = $(pageDocument).find('#nb_personal a').first().attr('href');
-  if (profileLink) {
-    let reviewerIDMatch = profileLink.match(/\/user\/(ur[0-9]+)/);
-    if (reviewerIDMatch)
-      head.reviewerID = reviewerIDMatch[1];
-  }
-
+  let profileLink = $(pageDocument).find('#nb_personal a').first().attr('href') || '';
+  let reviewerID = (profileLink.match(/\/user\/(ur[0-9]+)/) || [])[1];
   let reviewerName = $(pageDocument).find('#consumer_user_nav a').first().text().trim();
-  if (reviewerName)
-    head.reviewerName = reviewerName;
 
-  return Object.keys(head).length ? head : null;
-
+  let head = {
+    reviewerID,
+    reviewerName
+  };
+  // Reviewer name is optional; reviewer ID is required for successful operation
+  return reviewerID ? head : null;
 }
 
 function retrieveReviews(callback) {
-  let profileURL;
   let page = 1;
   let reviews = {
     head: {},
@@ -133,10 +128,8 @@ function retrieveReviews(callback) {
               text += `<p>${e.innerHTML}</p>`;
           });
 
-          let starRating, starRatingMatch;
-          if (reviewScope.closest('img').attr('alt') &&
-            (starRatingMatch = reviewScope.closest('img').attr('alt').match(/(\d+)\//)))
-            starRating = starRatingMatch[1];
+          let altText = reviewScope.closest('img').attr('alt') || '';
+          let starRating = (altText.match(/(\d+)\//) || [])[1];
           // Remove processed bits so the while loop can continue
           $(dom).find('table#outerbody div').first().nextUntil('div').remove();
           $(dom).find('table#outerbody div').first().remove();
@@ -151,17 +144,15 @@ function retrieveReviews(callback) {
           };
           reviews.data.push(reviewObj);
         }
-        let nextURL = $(dom).find('table table td a img').last().parent().attr('href');
-        //nextURL = 'http://www.imdb.com/user/ur3274830/' + nextURL;
-        if (nextURL)
-          nextURL = profileURL + nextURL;
+        let nextLink = $(dom).find('table table td a img').last().parent().attr('href');
+        let nextURL = nextLink ? `http://www.imdb.com/user/${reviews.head.reviewerID}/${nextLink}`
+          : undefined;
+
         if (nextURL && doneURLs.indexOf(nextURL) === -1) {
           doneURLs.push(nextURL);
           page++;
           // Obtain and relay progress info
-          let totalPageMatch, totalPages;
-          if ((totalPageMatch = $(dom).find('table td font').first().text().match(/\d+.*?(\d+)/)))
-            totalPages = totalPageMatch[1];
+          let totalPages = ($(dom).find('table td font').first().text().match(/\d+.*?(\d+)/) || [])[1];
           let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
           plugin.report(progress);
           // Fetch next page
@@ -200,8 +191,11 @@ function retrieveRatings(callback, head) {
         // We're using only the parts of the CSV which are the user's own work.
         // The CSV also contains a "modified" date, which does not appear to
         // be used, see: https://getsatisfaction.com/imdb/topics/gobn1q01nbd5o
+        //
+        // The column "You rated" is called "<reviewerName> rated" for someone
+        // else's CSV. We try either just in case.
         return {
-          starRating: ele["You rated"],
+          starRating: ele['You rated'] || ele[head.reviewerName + ' rated'],
           subject: ele.Title,
           subjectIMDBURL: ele.URL,
           datePosted: ele.created

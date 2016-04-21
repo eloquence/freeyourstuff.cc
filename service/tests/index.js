@@ -84,39 +84,48 @@ function processTestQueue() {
       let window = document.defaultView;
       window.plugin = plugin;
 
-      jsdom.jQueryify(window, 'https://code.jquery.com/jquery-1.12.2.min.js', () => {
-        injectDependency('papaparse')
-          .then(injectScript(require.resolve(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`),
-            runJSONTests));
-      });
+      injectDependency('jquery')() // immediately fire first promise
+        .then(injectDependency('papaparse'))
+        .then(injectScript(require.resolve(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`),
+          runJSONTests))
+        .catch((error) => {
+          console.error(colors.red(error.stack));
+        });
 
       function injectScript(path, callback) {
-        return new Promise((resolve, reject) => {
-          let pluginJS = fs.readFileSync(path).toString();
-          let scriptEl = document.createElement('script');
-          scriptEl.textContent = pluginJS;
-          scriptEl.addEventListener('load', () => {
-            resolve();
-            if (callback)
-              callback();
+        return () => {
+          let p = new Promise((resolve, reject) => {
+            let pluginJS = fs.readFileSync(path).toString();
+            let scriptEl = document.createElement('script');
+            scriptEl.textContent = pluginJS;
+            scriptEl.addEventListener('load', () => {
+              resolve();
+              if (callback)
+                callback();
+            });
+            document.body.appendChild(scriptEl);
           });
-          document.body.appendChild(scriptEl);
-        });
+          return p;
+        };
       }
 
       function injectDependency(dep) {
         switch (dep) {
+          case 'jquery':
+            return injectScript(`${libDir}/jquery-2.1.4.min.js`);
           case 'papaparse':
             if (Array.isArray(schemas[schemaKey].schema.site.deps) &&
               schemas[schemaKey].schema.site.deps.indexOf(dep) !== -1) {
-                console.log('Loading plugin dependency '+dep);
-                return injectScript(`${libDir}/papaparse.min.js`);
+              console.log('Loading plugin dependency ' + dep);
+              return injectScript(`${libDir}/papaparse.min.js`);
             }
             /* falls through */
           default:
-            return new Promise((resolve) => {
-              resolve();
-            });
+            return () => {
+              return new Promise((resolve) => {
+                resolve();
+              });
+            };
         }
       }
 
@@ -128,19 +137,33 @@ function processTestQueue() {
         } else {
           let jsonTests = [];
           for (let jsonTest in window.jsonTests) {
-            jsonTests.push(new Promise(resolve => {
-              window.jsonTests[jsonTest](result => {
-                resolve({
-                  schemaKey,
-                  setName: jsonTest,
-                  result
-                });
-              });
-            }));
+            jsonTests.push(getTestPromise(window.jsonTests[jsonTest], jsonTest));
           }
-          Promise.all(jsonTests).then(validateResults).then(processTestQueue);
+          Promise.all(jsonTests)
+            .then(validateResults)
+            .catch((error) => {
+              console.error(colors.red('There was a problem validating this test.'))
+              console.error(colors.red(error.stack));
+            })
+            .then(processTestQueue);
         }
       }
+
+      function getTestPromise(testFunction, setName) {
+        if (typeof testFunction === 'function')
+          return new Promise(resolve => {
+            testFunction(result => {
+              resolve({
+                schemaKey,
+                setName,
+                result
+              });
+            });
+          });
+        else
+          return;
+      }
+
     });
   }
 }
@@ -181,13 +204,13 @@ function validateResult(resultObj) {
   let diff;
   try {
     diff = execSync(command).toString().trim();
-  } catch(e) {
+  } catch (e) {
     console.error(colors.red('Problem running diff:'));
     console.error(colors.red(e.stack));
     console.error(colors.red('Is the required diff tool installed?'));
     return;
   }
-  if(diff)
+  if (diff)
     console.log(diff);
   else
     console.log('No differences');

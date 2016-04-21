@@ -14,6 +14,8 @@
 // Right now we support loading Chrome's cookies, though support for various
 // cookie exports would be fairly easy to add.
 //
+// We use icdiff by default, which you can find here: https://www.jefftk.com/icdiff
+//
 // If you have any interest in running the plugins server-side for reasons
 // other than testing, this should get you much of the way there.
 
@@ -26,7 +28,7 @@ const jsdom = require('jsdom');
 const CookieJar = require('tough-cookie').CookieJar;
 const cookieJar = new CookieJar();
 const fs = require('fs');
-const JSDiff = require('diff');
+const execSync = require('child_process').execSync;
 
 // Internal dependencies
 const DataSet = require('../../extension/src/dataset.js');
@@ -35,7 +37,7 @@ const schemas = require('../load-schemas');
 const pluginDir = `${__dirname}/../../extension/src/plugins`;
 const libDir = `${__dirname}/../../extension/src/lib/js`;
 const resultsDir = `${__dirname}/results`;
-
+const diffCommand = `icdiff --cols=${process.stdout.columns} --show-all-spaces --line-numbers --no-headers %file1 %file2`;
 let schemaKeys = Object.keys(schemas);
 if (process.argv.length > 2) {
   let myTests = process.argv;
@@ -53,18 +55,19 @@ if (process.argv.length > 2) {
   console.log(colors.gray('To test only some plugins, specify them as command line arguments, separated with spaces.'));
 }
 
-runTests();
+processTestQueue();
 
 // Since we have a lot of async code that could throw errors, we'll make sure
 // tests keep running when that happens.
 process.on('uncaughtException', function(e) {
   console.log(colors.red(e.stack));
-  runTests();
+  processTestQueue();
 });
 
-function runTests() {
+function processTestQueue() {
   if (schemaKeys.length) {
     let schemaKey = schemaKeys.shift();
+    console.log('-'.repeat(process.stdout.columns));
     console.log(`Testing plugin "${schemaKey}"...`);
     chromeCookies.getCookies(schemas[schemaKey].schema.site.canonicalURL, 'set-cookie', (err, cookies) => {
       for (let cookie of cookies) {
@@ -84,7 +87,7 @@ function runTests() {
       jsdom.jQueryify(window, 'https://code.jquery.com/jquery-1.12.2.min.js', () => {
         injectDependency('papaparse')
           .then(injectScript(require.resolve(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`),
-            jsonTests));
+            runJSONTests));
       });
 
       function injectScript(path, callback) {
@@ -117,26 +120,46 @@ function runTests() {
         }
       }
 
-      function jsonTests() {
+      function runJSONTests() {
         if (typeof window.jsonTests !== 'object') {
           console.log(`No JSON tests defined for plugin ${schemaKey}.`);
           console.log(`Tests must be defined in the plugin itself in its jsonTests variable.`);
-          runTests();
+          processTestQueue();
         } else {
-          for (let testName in window.jsonTests) {
-            window.jsonTests[testName](result => {
-              validateResult(`${schemaKey}.${testName}`, JSON.stringify(result, undefined, 2));
-              runTests();
-            });
+          let jsonTests = [];
+          for (let jsonTest in window.jsonTests) {
+            jsonTests.push(new Promise(resolve => {
+              window.jsonTests[jsonTest](result => {
+                resolve({
+                  schemaKey,
+                  setName: jsonTest,
+                  result
+                });
+              });
+            }));
           }
+          Promise.all(jsonTests).then(validateResults).then(processTestQueue);
         }
       }
     });
   }
 }
 
-function validateResult(testName, newResult) {
-  let filename = `${resultsDir}/${testName}.json`;
+function validateResults(resultArray) {
+  for (let resultObj of resultArray) {
+    validateResult(resultObj);
+  }
+}
+
+function validateResult(resultObj) {
+  console.log(`Parsing ${resultObj.testID} against schema ...`);
+  let testID = `${resultObj.schemaKey}.${resultObj.setName}`;
+  let dataSet = new DataSet(resultObj.result, schemas[resultObj.schemaKey][resultObj.setName]);
+
+  let jsonData = JSON.stringify(dataSet.set, null, 2);
+  console.log(`Running diff for ${testID} ...`);
+  let filename = `${resultsDir}/${testID}.json`;
+  let tmpFilename = `${resultsDir}/tmp.json`;
   try {
     fs.statSync(filename);
   } catch (e) {
@@ -144,31 +167,28 @@ function validateResult(testName, newResult) {
       console.log('No previous test result found.');
       console.log('The result of this run will be used to evaluate future correctness.');
       console.log(`Please evaluate ${filename} and delete it if you need to regenerate it.`);
-      fs.writeFileSync(filename, newResult);
+      fs.writeFileSync(filename, jsonData);
     } else {
       throw e;
     }
     return;
   }
   let oldResult = fs.readFileSync(filename).toString();
-  let diff = JSDiff.diffChars(oldResult, newResult);
-  console.log('Comparing with previous result.');
-  let str = '';
-  let diffSize = 0;
-  diff.forEach(function(part) {
-    if (part.added || part.removed)
-      diffSize++;
-    // green for additions, red for deletions
-    // grey for common parts
-    let color = part.added ? 'green' :
-      part.removed ? 'red' : 'gray';
-    str += colors[color](part.value);
-  });
-  if (diffSize) {
-    console.log(`Found ${diffSize} differences with previous result.`);
-    console.log(`Additions are green, removals are red.`);
-    console.log(str);
-  } else {
-    console.log('No differences with first run.');
+  fs.writeFileSync(tmpFilename, jsonData);
+  let command = diffCommand
+    .replace(/%file1/, filename)
+    .replace(/%file2/, tmpFilename);
+  let diff;
+  try {
+    diff = execSync(command).toString().trim();
+  } catch(e) {
+    console.error(colors.red('Problem running diff:'));
+    console.error(colors.red(e.stack));
+    console.error(colors.red('Is the required diff tool installed?'));
+    return;
   }
+  if(diff)
+    console.log(diff);
+  else
+    console.log('No differences');
 }

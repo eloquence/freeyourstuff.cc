@@ -2,13 +2,18 @@
   'use strict';
   let tableIndex = 0; // each siteSet can produce multiple tables
   for (let siteSet of window.siteSets) {
+
+    let sep = '&ndash;';
     $('#siteSets').append(`<h2>${siteSet.siteSetSchema.schema.label.en}</h2>`);
-    $('#siteSets').append(`<b id="uploadInfo${tableIndex}">Upload by ${getUploaderLink(siteSet.uploader)} on ${getSiteSetLink(siteSet)}</b> &ndash; <b><a id="downloadLink${tableIndex}">Download JSON</a></b>`);
+    $('#siteSets').append(`<b id="uploadInfo${tableIndex}">Upload by ` +
+      `${getUploaderLink(siteSet.uploader)} on ${getSiteSetLink(siteSet)}</b> ` +
+      `${sep} <b><a id="downloadLink${tableIndex}">Download JSON</a></b> ${sep} ` +
+      `<b><a id="schemaLink${tableIndex}">Download schema</a></b>`);
+
     let json = jsonExport(siteSet);
-    // We need to URI-encode it so we can stash it into the href attribute
-    let encodedJSON = encodeURIComponent(json);
-    $(`#downloadLink${tableIndex}`).attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
-    $(`#downloadLink${tableIndex}`).attr('download', 'data.json');
+    let schema = schemaExport(siteSet);
+    addJSONToLink(`#downloadLink${tableIndex}`, json, 'data.json');
+    addJSONToLink(`#schemaLink${tableIndex}`, schema, 'schema.json');
 
     for (let setName of Object.keys(siteSet.siteSetSchema)) {
       if (setName == 'schema' || !siteSet[setName])
@@ -108,7 +113,7 @@
   function getSiteSetLink(siteSet) {
     if (window.siteSets.length > 1) {
       let url = window.config.baseURL + 'view/' + siteSet.siteSetSchema.schema.key + '/' + siteSet._id;
-      return '<a href="' + url + '">' + siteSet.uploadDate + '</a>';
+      return '<a href="' + url + '">' + new Date(siteSet.uploadDate) + '</a>';
     } else {
       return siteSet.uploadDate;
     }
@@ -157,15 +162,21 @@
 
   // Prepare a clean JSON export of siteset data without database ID elements
   // and freeyourstuff.cc metadata.
-  function jsonExport(siteSet) {
-    let siteSetCopy = Object.assign({}, siteSet);
-    siteSetCopy.schemaKey = siteSet.siteSetSchema.schema.key;
-    siteSetCopy.siteSetSchema = undefined;
-    siteSetCopy.uploader = undefined;
-    siteSetCopy.uploadDate = undefined;
+  function jsonExport(siteSet, schemaOnly) {
+    let exportObj;
+    if (!schemaOnly) {
+      exportObj = Object.assign({}, siteSet);
+      exportObj.schemaKey = siteSet.siteSetSchema.schema.key;
+      exportObj.siteSetSchema = undefined;
+      exportObj.uploader = undefined;
+      exportObj.uploadDate = undefined;
+    } else {
+      exportObj = Object.assign({}, siteSet.siteSetSchema);
+      exportObj.schema.site = undefined;
+    }
 
     // Filter DB key info from JSON export with replacer function
-    let json = JSON.stringify(siteSetCopy, (key, value) => {
+    let json = JSON.stringify(exportObj, (key, value) => {
       if (['__v', '_id'].indexOf(key) !== -1)
         return undefined;
       else
@@ -173,4 +184,17 @@
     }, 2);
     return json;
   }
+
+  // Convenience function
+  function schemaExport(siteSet) {
+    return jsonExport(siteSet, true);
+  }
+
+  function addJSONToLink(ele, data, filename) {
+    // We need to URI-encode it so we can stash it into the href attribute
+    let encodedJSON = encodeURIComponent(data);
+    $(ele).attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
+    $(ele).attr('download', filename);
+  }
+
 })();

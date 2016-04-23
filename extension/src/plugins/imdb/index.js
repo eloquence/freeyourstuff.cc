@@ -110,10 +110,21 @@ function retrieveReviews(callback) {
       try {
         let $dom = $($.parseHTML(html));
         while ($dom.find('table#outerbody div').length) {
-          let subject = $dom.find('table#outerbody div a').first().text();
-          let subjectIMDBURL = 'http://www.imdb.com' + $dom.find('table div a').first().attr('href');
-          let reviewScope = $dom.find('table div').first().nextUntil('div,hr');
-          let title = reviewScope.closest('b').first().text();
+          let subject = $dom
+            .find('table#outerbody div a')
+            .first()
+            .text();
+          let subjectIMDBURL = 'http://www.imdb.com' + $dom
+            .find('table div a')
+            .first()
+            .attr('href');
+          let reviewScope = $dom
+            .find('table div')
+            .first()
+            .nextUntil('div,hr');
+          let title = reviewScope.closest('b')
+            .first()
+            .text();
           // "<small>x of y people found the following review useful:</small>" is only present where y > 0
           let date = reviewScope.closest('small').length == 1 ? $(reviewScope.closest('small')[0]).text() :
             $(reviewScope.closest('small')[1]).text();
@@ -128,11 +139,20 @@ function retrieveReviews(callback) {
               text += `<p>${e.innerHTML}</p>`;
           });
 
-          let altText = reviewScope.closest('img').attr('alt') || '';
+          let altText = reviewScope
+            .closest('img')
+            .attr('alt') || '';
           let starRating = (altText.match(/(\d+)\//) || [])[1];
           // Remove processed bits so the while loop can continue
-          $dom.find('table#outerbody div').first().nextUntil('div').remove();
-          $dom.find('table#outerbody div').first().remove();
+          $dom
+            .find('table#outerbody div')
+            .first()
+            .nextUntil('div')
+            .remove();
+          $dom
+            .find('table#outerbody div')
+            .first()
+            .remove();
           let reviewObj = {
             subject,
             subjectIMDBURL,
@@ -144,7 +164,11 @@ function retrieveReviews(callback) {
           };
           reviews.data.push(reviewObj);
         }
-        let nextLink = $dom.find('table table td a img').last().parent().attr('href');
+        let nextLink = $dom
+          .find('table table td a img')
+          .last()
+          .parent()
+          .attr('href');
         let nextURL = nextLink ?
           `http://www.imdb.com/user/${reviews.head.reviewerID}/${nextLink}` :
           undefined;
@@ -153,7 +177,11 @@ function retrieveReviews(callback) {
           doneURLs.push(nextURL);
           page++;
           // Obtain and relay progress info
-          let totalPages = ($dom.find('table td font').first().text().match(/\d+.*?(\d+)/) || [])[1];
+          let totalPages = ($dom
+            .find('table td font')
+            .first()
+            .text()
+            .match(/\d+.*?(\d+)/) || [])[1];
           let progress = `Fetching page ${page} of ${totalPages} &hellip;`;
           plugin.report(progress);
           // Fetch next page

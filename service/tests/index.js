@@ -142,7 +142,7 @@ function processTestQueue() {
           Promise.all(jsonTests)
             .then(validateResults)
             .catch((error) => {
-              console.error(colors.red('There was a problem validating this test.'))
+              console.error(colors.red('There was a problem validating this test.'));
               console.error(colors.red(error.stack));
             })
             .then(processTestQueue);

@@ -61,6 +61,21 @@ function retrieveReviews(callback) {
         reviews.head.reviewerName = idLink.text();
         reviews.head.reviewerID = (idLink.attr('href').match(/userid=(.*)/) || [])[1];
       }
+
+      // Helper functions common to different review types
+      let getRating = $root => (($root
+          .find("[class^='star-img stars_']")
+          .attr('class') || '')
+          .match(/[0-9]/) || [])[0];
+
+      let getDate = $root => {
+        let qualifiers = $root
+          .find('.rating-qualifier')
+          .text(); // TODO: other qualifiers
+        let date = (qualifiers.match(/(\d+\/\d+\/\d+)/) || [])[1];
+        return date;
+      };
+
       // Parse contents
       $dom.find('div.review').each((i, e) => {
 
@@ -80,14 +95,6 @@ function retrieveReviews(callback) {
           .attr('href');
         if (path)
           subjectYelpURL = base + path;
-        let qualifiers = $e
-          .find('.rating-qualifier')
-          .text(); // TODO: other qualifiers
-        let date = (qualifiers.match(/(\d+\/\d+\/\d+)/) || [])[1];
-        let starRating = (($e
-          .find("[class^='star-img stars_']")
-          .attr('class') || '')
-          .match(/[0-9]/) || [])[0];
 
         let checkins = $e
           .find("[class$='checkin_c-common_sprite-wrap review-tag']")
@@ -97,9 +104,9 @@ function retrieveReviews(callback) {
         let reviewObj = {
           subject,
           subjectYelpURL,
-          date,
+          date: getDate($e),
           text,
-          starRating,
+          starRating: getRating($e),
           checkins
         };
 
@@ -108,25 +115,16 @@ function retrieveReviews(callback) {
         // Process older reviews
         $e.find('.previous-review').each((j, p) => {
           let $p = $(p);
-          let qualifiers = $p
-            .find('.rating-qualifier')
-            .text(); // TODO: other qualifiers
-          let date = (qualifiers.match(/(\d+\/\d+\/\d+)/) || [])[1];
-          let starRating = (($p
-            .find("[class^='star-img stars_']")
-            .attr('class') || '')
-            .match(/[0-9]/) || [])[0];
           let text = $p.find('.hidden').html();
           let reviewObj = {
             subject,
             subjectYelpURL,
-            date,
+            date: getDate($p),
             text,
-            starRating
+            starRating: getRating($p)
           };
           reviews.data.push(reviewObj);
         });
-
 
       });
 

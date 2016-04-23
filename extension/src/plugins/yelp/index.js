@@ -90,17 +90,16 @@ function retrieveReviews(callback) {
         let checkins = $e
           .find("[class$='checkin_c-common_sprite-wrap review-tag']")
           .text()
-          .match(/\d+/);
+          .match(/\d+/) || undefined;
 
         let reviewObj = {
           subject,
           subjectYelpURL,
           date,
           text,
-          starRating
+          starRating,
+          checkins
         };
-        if (checkins)
-          reviewObj.checkins = checkins;
 
         reviews.data.push(reviewObj);
       });

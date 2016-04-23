@@ -39,7 +39,7 @@
     return new Promise(function(resolve) {
       chrome.tabs.query({
         active: true,
-        lastFocusedWindow: true // Ensure we're in the right window
+        currentWindow: true // Ensure we're in the right window
       }, function(tabs) {
         resolve(tabs[0]);
       });
@@ -55,10 +55,9 @@
   function init(newTab, autoRetrieve) {
     // Ensure we have jQuery available before loading anything else
     injectScript('src/lib/js/jquery-2.1.4.min.js')()
-      .then(injectScript('src/dataset.js'));
-
-    getTab()
-      .then((tab) => {
+      .then(injectScript('src/dataset.js'))
+      .then(getTab)
+      .then(tab => {
         // This click handler isn't visible yet til all the necessary prep work
         // is done.
         if (newTab)

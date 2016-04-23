@@ -100,9 +100,10 @@ function retrieveReviews(callback) {
 
         // We ignore decimals, although the number is exressed as "3.0" etc.
         // this seems to be only used for averages
-        let starRatingAlt = $reviewElement.find('div img[width="64"]').attr('alt');
-        if (starRatingAlt)
-          starRating = starRatingAlt.match(/^\d/)[0];
+        starRating = (($reviewElement
+            .find('div img[width="64"]')
+            .attr('alt') || '')
+          .match(/^\d/) || [])[0];
 
         let reviewObj = {
           product,

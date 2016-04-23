@@ -145,8 +145,9 @@ function retrieveReviews(callback) {
           reviews.data.push(reviewObj);
         }
         let nextLink = $dom.find('table table td a img').last().parent().attr('href');
-        let nextURL = nextLink ? `http://www.imdb.com/user/${reviews.head.reviewerID}/${nextLink}`
-          : undefined;
+        let nextURL = nextLink ?
+          `http://www.imdb.com/user/${reviews.head.reviewerID}/${nextLink}` :
+          undefined;
 
         if (nextURL && doneURLs.indexOf(nextURL) === -1) {
           doneURLs.push(nextURL);

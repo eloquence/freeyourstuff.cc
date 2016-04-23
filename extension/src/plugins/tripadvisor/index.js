@@ -69,12 +69,12 @@ function retrieveReviews(callback) {
       let reviewerID = directoryURL.match('/members/(.*)')[1];
 
       var directoryHTML = this.responseText;
-      var directoryDOM = $.parseHTML(this.responseText);
+      var $directoryDOM = $($.parseHTML(this.responseText));
 
       reviews.head.reviewerID = reviewerID;
-      reviews.head.reviewerName = $(directoryDOM).find('.name .nameText').text();
+      reviews.head.reviewerName = $directoryDOM.find('.name .nameText').text();
 
-      let reviewList = $(directoryDOM).find('li.cs-review').toArray();
+      let reviewList = $directoryDOM.find('li.cs-review').toArray();
 
       var reviewURLs = [];
       reviewURLs = reviewList.map(ele => {
@@ -85,7 +85,7 @@ function retrieveReviews(callback) {
         return false;
       }
       var count = 0;
-      var total = $(directoryDOM).find('a[name="reviews"]').text().match(/[0-9]*/);
+      var total = $directoryDOM.find('a[name="reviews"]').text().match(/[0-9]*/);
       processReviewList();
     } catch (error) {
       plugin.reportError('An error occurred processing the list of reviews.', error.stack);
@@ -103,10 +103,10 @@ function retrieveReviews(callback) {
 
       function processReview(html) {
         try {
-          let dom = $.parseHTML(html);
-          let subject = $(dom).find('.altHeadInline a').first().text();
-          let subjectTripAdvisorURL = base + $(dom).find('.altHeadInline a').first().attr('href');
-          let $review = $(dom).find('.reviewSelector').first();
+          let $dom = $($.parseHTML(html));
+          let subject = $dom.find('.altHeadInline a').first().text();
+          let subjectTripAdvisorURL = base + $dom.find('.altHeadInline a').first().attr('href');
+          let $review = $dom.find('.reviewSelector').first();
           let text = $review.find('[property="reviewBody"]').html().trim();
           let date = $review.find('.ratingDate').attr('content');
           let overallRatingClass, overallRating;
@@ -149,7 +149,7 @@ function retrieveReviews(callback) {
           else if (total - count > 0) {
             plugin.report('Attempting to get more data &hellip;');
             let id = directoryHTML.match(/\{"memberId":"(.*?)"\}/)[1];
-            let token = $(directoryDOM).find('input[name="token"]').val();
+            let token = $directoryDOM.find('input[name="token"]').val();
             var data = {
               token,
               version: 5,

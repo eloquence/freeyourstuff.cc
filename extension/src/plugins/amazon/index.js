@@ -65,8 +65,8 @@ function retrieveReviews(callback) {
 
   function processProfile() {
     try {
-      let dom = $.parseHTML(this.responseText);
-      reviews.head.reviewerName = $(dom).find('.public-name-text').text();
+      let $dom = $($.parseHTML(this.responseText));
+      reviews.head.reviewerName = $dom.find('.public-name-text').text();
 
       // The requests redirects to the full profile URL
       reviews.head.reviewerURL = this.responseURL;
@@ -83,23 +83,24 @@ function retrieveReviews(callback) {
 
   function processPage(html) {
     try {
-      let dom = $.parseHTML(html);
-      let reviewElements = $(dom).find('table[cellpadding="0"][cellspacing="0"] tr').has('div.reviewText');
+      let $dom = $($.parseHTML(html));
+      let reviewElements = $dom.find('table[cellpadding="0"][cellspacing="0"] tr').has('div.reviewText');
       reviewElements.each((i, reviewElement) => {
         let product, productURL, headline, date, text, starRating;
+        let $reviewElement = $(reviewElement);
 
-        let productLink = $(reviewElement).prev().find('b a');
+        let productLink = $reviewElement.prev().find('b a');
         product = $(productLink).text();
 
         productURL = $(productLink).attr('href');
         productURL = normalizeURL(productURL);
-        headline = $(reviewElement).find('td b').first().text();
-        text = $(reviewElement).find('.reviewText').first().html();
-        date = $(reviewElement).find('td nobr').first().text();
+        headline = $reviewElement.find('td b').first().text();
+        text = $reviewElement.find('.reviewText').first().html();
+        date = $reviewElement.find('td nobr').first().text();
 
         // We ignore decimals, although the number is exressed as "3.0" etc.
         // this seems to be only used for averages
-        let starRatingAlt = $(reviewElement).find('div img[width="64"]').attr('alt');
+        let starRatingAlt = $reviewElement.find('div img[width="64"]').attr('alt');
         if (starRatingAlt)
           starRating = starRatingAlt.match(/^\d/)[0];
 
@@ -116,7 +117,7 @@ function retrieveReviews(callback) {
 
       // There's no "Next / Prev", so we grab the rightmost link in the page nav
       // and make sure it's not a page we've seen before
-      let nextPageLink = $(dom).find('div[align="right"] b a').last();
+      let nextPageLink = $dom.find('div[align="right"] b a').last();
       let nextPage = Number(nextPageLink.text());
 
       if (nextPage && pages.indexOf(nextPage) == -1) {

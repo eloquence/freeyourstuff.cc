@@ -1,4 +1,4 @@
-<%- include('head', {siteSection: 'Welcome', load: { viewSiteSets: true } }); -%>
+<%- include('head', {siteSection: 'Welcome', load: { siteSets: true } }); -%>
 <%- include('nav'); -%>
 <div class="container">
 <h1>Recent uploads</h1>
@@ -6,4 +6,4 @@
 <div id="siteSets">
 </div>
 </div>
-<%- include('tail', { load: { signin: true, dataTables: true, viewSiteSets: true} } ); -%>
+<%- include('tail', { load: { siteSets: true} } ); -%>

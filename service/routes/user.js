@@ -40,9 +40,7 @@ module.exports = {
   }),
   signin: router.get('/signin', function*(next) {
     let signinMessages = this.flash('signinMessages');
-    let conf = this.app.config.expose();
-    this.body = this.app.templates['signin.ejs']({
-      conf,
+    render.call(this, 'signin.ejs', {
       signinMessages
     });
     return yield next;
@@ -91,9 +89,7 @@ module.exports = {
 
   register: router.get('/register', function*(next) {
     let registerMessages = this.flash('registerMessages');
-    let conf = this.app.config.expose();
-    this.body = this.app.templates['register.ejs']({
-      conf,
+    render.call(this, 'register.ejs', {
       registerMessages
     });
     return yield next;

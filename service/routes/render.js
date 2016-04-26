@@ -6,6 +6,10 @@ function getStandardVars() {
     this.req.user : null;
   let notifications = this.flash('once-notifications');
   let stv = {
+    cssFile: (file, raw) => process.env.NODE_ENV === 'production' && !raw ?
+      `/static/css/${file}.min.css` : `/static/css/${file}.css`,
+    jsFile: (file, raw) => process.env.NODE_ENV === 'production' && !raw ?
+      `/static/js/${file}.min.js` : `/static/js/${file}.js`,
     conf: this.app.config.expose(),
     user,
     method: this.session.method,

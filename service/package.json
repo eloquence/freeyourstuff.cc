@@ -10,14 +10,29 @@
     "type": "git",
     "url": "https://github.com/eloquence/freeyourstuff.cc/tree/master/service"
   },
+  "scripts": {
+    "postinstall": "./node_modules/grunt/bin/grunt"
+  },
   "author": "Erik Moeller",
   "license": "CC0-1.0",
   "dependencies": {
     "auto-sni": "^1.0.2",
     "bcrypt-nodejs": "0.0.3",
+    "bootstrap": "^3.3.6",
+    "bootstrap-show-password": "^1.0.2",
     "chokidar": "^1.4.1",
+    "datatables.net": "^1.10.11",
+    "datatables.net-bs": "^1.10.11",
     "ejs": "^2.3.4",
+    "font-awesome": "^4.6.1",
     "generator-bind": "^1.0.1",
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^1.0.1",
+    "grunt-contrib-uglify": "^1.0.1",
+    "jquery": "^2.2.3",
+    "jquery.cookie": "^1.4.1",
     "jsonfile": "^2.2.3",
     "koa": "^1.1.2",
     "koa-bodyparser": "^2.0.1",
@@ -33,13 +48,13 @@
     "passport-facebook": "^2.0.0",
     "passport-google-oauth": "^0.2.0",
     "passport-local": "^1.0.0",
-    "passport-twitter": "^1.0.3"
+    "passport-twitter": "^1.0.3",
+    "uglify-save-license": "^0.4.1"
   },
   "devDependencies": {
     "child-process-promise": "^2.0.1",
     "chrome-cookies-secure": "^1.1.4",
     "colors": "^1.1.2",
-    "diff": "^2.2.2",
     "jsdom": "^8.3.0",
     "tough-cookie": "^2.2.2"
   }

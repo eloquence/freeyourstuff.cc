@@ -4,11 +4,8 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <title><%- conf.siteName -%>: <%- siteSection -%></title>
-    <link href="/static/lib/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/static/lib/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/lib/css/bootstrap-theme.min.css" rel="stylesheet">
-    <link href="/static/freeyourstuff.css" rel="stylesheet">
-    <% if (load.viewSiteSets) { %>
-    <link href="/static/lib/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="<%- cssFile('main') -%>" rel="stylesheet">
+    <% if (typeof load !== 'undefined' && load.siteSets) { %>
+    <link href="<%- cssFile('datatables') -%>" rel="stylesheet" type="text/css">
     <% } %>
   </head>

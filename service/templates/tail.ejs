@@ -16,10 +16,7 @@
 <!-- /container -->
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="/static/lib/js/jquery.min.js"></script>
-<script src="/static/lib/js/bootstrap.min.js"></script>
-<script src="/static/lib/js/bootstrap-show-password.min.js"></script>
-<script src="/static/lib/js/jquery.cookie.min.js"></script>
+<script src="<%- jsFile('main') -%>"></script>
 <script type="text/javascript">
   // Expose config variables
   window.config = <%- JSON.stringify(conf) -%>;
@@ -27,16 +24,12 @@
   // Expose user ID
   window.userID = <%- typeof user !== 'undefined' && user ? JSON.stringify(user._id) : 'null' -%>;
 </script>
-<% if (load.viewSiteSets) { %>
-  <script src="/static/lib/js/jquery.dataTables.min.js"></script>
-  <script src="/static/lib/js/dataTables.bootstrap.min.js"></script>
+<% if (typeof load !== 'undefined' && load.siteSets) { %>
   <script type="text/javascript">
   window.siteSets = <%- JSON.stringify(siteSets) -%>;
   </script>
-  <script src="/static/viewSiteSets.js"></script>
-<% } %>
-<% if (load.signin) { %>
-  <script src="/static/signin.js"></script>
+  <script src="<%- jsFile('datatables') -%>"></script>
+  <script src="<%- jsFile('view-sitesets', true) -%>"></script>
 <% } %>
 </body>
 </html>

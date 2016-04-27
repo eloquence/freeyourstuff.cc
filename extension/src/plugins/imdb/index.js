@@ -223,12 +223,13 @@ function retrieveRatings(callback, head) {
         //
         // The column "You rated" is called "<reviewerName> rated" for someone
         // else's CSV. We try either just in case.
-        return {
-          starRating: ele['You rated'] || ele[head.reviewerName + ' rated'],
-          subject: ele.Title,
-          subjectIMDBURL: ele.URL,
-          datePosted: ele.created
-        };
+        if (ele.URL || ele.Title) // To ensure we have minimal informaiton
+          return {
+            starRating: ele['You rated'] || ele[head.reviewerName + ' rated'],
+            subject: ele.Title,
+            subjectIMDBURL: ele.URL,
+            datePosted: ele.created
+          };
       });
       callback(ratings);
     },

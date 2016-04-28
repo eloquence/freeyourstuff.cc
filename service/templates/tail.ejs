@@ -24,12 +24,19 @@
   // Expose user ID
   window.userID = <%- typeof user !== 'undefined' && user ? JSON.stringify(user._id) : 'null' -%>;
 </script>
-<% if (typeof load !== 'undefined' && load.siteSets) { %>
-  <script type="text/javascript">
-  window.siteSets = <%- JSON.stringify(siteSets) -%>;
-  </script>
-  <script src="<%- jsFile('datatables') -%>"></script>
-  <script src="<%- jsFile('view-sitesets', true) -%>"></script>
-<% } %>
-</body>
+<% if (typeof load !== 'undefined') { %>
+    <% if (load.siteSets) { %>
+        <script type="text/javascript">
+            window.siteSets = <%- JSON.stringify(siteSets) -%>;
+        </script>
+        <script src="<%- jsFile('datatables') -%>"></script>
+        <script src="<%- jsFile('view-sitesets', true) -%>"></script>
+    <% } %>
+    <% if (load.recentUploads) { %>
+      <script type="text/javascript">
+          window.recentUploads = <%- JSON.stringify(recentUploads) -%>;
+      </script>
+      <script src="<%- jsFile('datatables') -%>"></script>
+    <% } %>
+<% } %></body>
 </html>

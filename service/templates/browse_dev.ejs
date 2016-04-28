@@ -1,0 +1,9 @@
+<%- include('head', {siteSection: 'Welcome', load: { siteSets: true } }); -%>
+<%- include('nav'); -%>
+<div class="container">
+<h1>Recent uploads</h1>
+<p class="lead">These are the most recent uploads we have received.</p>
+<div id="recentUploads">
+</div>
+</div>
+<%- include('tail', { load: { recentUploads: true} } ); -%>

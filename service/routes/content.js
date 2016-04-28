@@ -10,7 +10,11 @@ const fs = require('fs');
 // Internal dependencies
 const SiteSet = require('../models/siteset.js');
 const User = require('../models/user.js');
+const Upload = require('../models/upload.js');
 const render = require('../routes/render.js');
+
+
+const uploadFilter = '_id twitter.displayName local.displayName facebook.displayName google.displayName';
 
 // Naming convention for routes: Anything that is not a GET method
 // is suffixed with method name, e.g. _POST.
@@ -24,7 +28,7 @@ var main = {
       try {
         let siteSet = yield SiteSet[schemaKey].findOne({
           _id: id
-        }).populate('uploader').lean();
+        }).populate('uploader', uploadFilter).lean();
         siteSet.siteSetSchema = SiteSet[schemaKey].siteSetSchema;
         siteSets.push(siteSet);
       } catch(e) {
@@ -40,7 +44,7 @@ var main = {
     for (var c in SiteSet) {
       let rv = yield SiteSet[c].find({}).limit(1).sort({
         uploadDate: -1
-      }).populate('uploader').lean();
+      }).populate('uploader', uploadFilter).lean();
       if (rv !== null && rv.length) {
         rv[0].siteSetSchema = SiteSet[c].siteSetSchema;
         siteSets.push(rv[0]);
@@ -48,6 +52,18 @@ var main = {
     }
     render.call(this, 'browse.ejs', {
       siteSets
+    });
+    return yield next;
+  }),
+  browse_dev: router.get('/browse_dev', function*(next) {
+    let recentUploads = yield Upload
+      .find({})
+      .sort({
+        uploadDate: -1
+      })
+      .populate('uploader', uploadFilter);
+    render.call(this, 'browse_dev.ejs', {
+      recentUploads
     });
     return yield next;
   }),

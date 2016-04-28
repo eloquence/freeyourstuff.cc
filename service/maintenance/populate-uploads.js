@@ -18,18 +18,16 @@ mongoose.connect(config.dbHost, config.dbName, config.dbPort);
 
 // We want to count up the records in each siteSet, so we process the schema list
 // to build MongoDB aggregates matching the different schemas
-let aggregateTemplate = {
-  $project: {
-    uploader: 1,
-    uploadDate: 1,
-    _id: 1,
-  }
-};
 let aggregates = {};
 for (let schemaKey in schemas) {
   let siteSets = Object.keys(schemas[schemaKey]).filter(ele => ele !== 'schema');
-  aggregates[schemaKey] = {};
-  Object.assign(aggregates[schemaKey], aggregateTemplate);
+  aggregates[schemaKey] = {
+    $project: {
+      uploader: 1,
+      uploadDate: 1,
+      _id: 1,
+    }
+  };
   for (let siteSet of siteSets) {
     aggregates[schemaKey].$project[`number.${siteSet}`] = {
       "$size": {
@@ -38,7 +36,6 @@ for (let schemaKey in schemas) {
     };
   }
 }
-
 
 // Mongoose returns promises but we make a custom promise since we pass the
 // schema key along

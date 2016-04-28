@@ -15,13 +15,13 @@ const fs = require('fs');
 const exec = require('child-process-promise').exec;
 
 // Internal dependencies
-const schemas = require('./load-schemas.js');
-const config = require('./load-config.js');
+const schemas = require('../load-schemas.js');
+const config = require('../load-config.js');
 const colors = require('colors/safe');
 
-let tmpdir = `${__dirname}/static/dumps/tmp`;
+let tmpdir = `${__dirname}/../static/dumps/tmp`;
 let isoDate = new Date().toISOString().match(/(.*)T/)[1];
-let filename = `${__dirname}/static/dumps/freeyourstuff-${isoDate}.tgz`;
+let filename = `${__dirname}/../static/dumps/freeyourstuff-${isoDate}.tgz`;
 
 try {
   fs.mkdirSync(tmpdir);

@@ -80,7 +80,7 @@ userSchema.methods.getDisplayName = function() {
 };
 
 userSchema.methods.getLink = function(linkTitle) {
-  let url = config.baseURL + 'user/' + this.getMethod() + '/' + this._id;
+  let url = config.baseURL + 'user/' + this._id;
   return `<a href="${url}">${linkTitle || this.getDisplayName()}</a>`;
 };
 

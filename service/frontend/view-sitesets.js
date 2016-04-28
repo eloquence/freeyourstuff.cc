@@ -132,7 +132,7 @@
     else
       return 'unknown user';
 
-    let url = window.config.baseURL + 'user/' + method + '/' + user._id;
+    let url = window.config.baseURL + 'user/' + user._id;
     return '<a href="' + url + '">' + user[method].displayName + '</a>';
   }
 

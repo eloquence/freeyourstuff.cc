@@ -12,14 +12,14 @@ const SiteSet = require('../models/siteset');
 const render = require('../routes/render');
 
 module.exports = {
-  user: router.get('/user/(.*)/(.*)', function*(method, uid, next) {
-    if (!method || !uid) {
+  user: router.get('/user/(.*)', function*(_id, next) {
+    if (!_id) {
       return yield next;
     } else {
       let u;
       try {
         u = yield User.findOne({
-          _id: uid
+          _id
         });
       } catch (e) { // In case of invalid query
         u = null;

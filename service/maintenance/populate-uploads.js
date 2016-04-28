@@ -30,7 +30,7 @@ for (let schemaKey in schemas) {
   let siteSets = Object.keys(schemas[schemaKey]).filter(ele => ele !== 'schema');
   aggregates[schemaKey] = {};
   Object.assign(aggregates[schemaKey], aggregateTemplate);
-  for(let siteSet of siteSets) {
+  for (let siteSet of siteSets) {
     aggregates[schemaKey].$project[`number.${siteSet}`] = {
       "$size": {
         "$ifNull": [`$${siteSet}.data`, []]

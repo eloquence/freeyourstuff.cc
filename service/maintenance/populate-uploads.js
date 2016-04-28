@@ -12,20 +12,9 @@ const mongoose = require('mongoose');
 const config = require('../load-config');
 const schemas = require('../load-schemas');
 const SiteSet = require('../models/siteset.js');
+const Upload = require('../models/upload.js');
 
 mongoose.connect(config.dbHost, config.dbName, config.dbPort);
-
-const Schema = mongoose.Schema,
-  ObjectId = Schema.ObjectId;
-
-let UploadSchema = new Schema({
-  schemaKey: String,
-  uploadDate: Date,
-  uploader: ObjectId,
-  siteSet: ObjectId
-});
-
-let Upload = mongoose.model('Upload', UploadSchema);
 
 // Mongoose returns promises but we make a custom promise since we pass the
 // schema key along

@@ -17,7 +17,8 @@ let UploadSchema = new Schema({
     type: ObjectId,
     ref: 'User'
   },
-  siteSet: ObjectId
+  siteSet: ObjectId,
+  number: {}
 });
 
 let Upload = mongoose.model('Upload', UploadSchema);

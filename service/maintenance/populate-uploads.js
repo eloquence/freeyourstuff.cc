@@ -16,17 +16,36 @@ const Upload = require('../models/upload.js');
 
 mongoose.connect(config.dbHost, config.dbName, config.dbPort);
 
+// We want to count up the records in each siteSet, so we process the schema list
+// to build MongoDB aggregates matching the different schemas
+let aggregateTemplate = {
+  $project: {
+    uploader: 1,
+    uploadDate: 1,
+    _id: 1,
+  }
+};
+let aggregates = {};
+for (let schemaKey in schemas) {
+  let siteSets = Object.keys(schemas[schemaKey]).filter(ele => ele !== 'schema');
+  aggregates[schemaKey] = {};
+  Object.assign(aggregates[schemaKey], aggregateTemplate);
+  for(let siteSet of siteSets) {
+    aggregates[schemaKey].$project[`number.${siteSet}`] = {
+      "$size": {
+        "$ifNull": [`$${siteSet}.data`, []]
+      }
+    };
+  }
+}
+
+
 // Mongoose returns promises but we make a custom promise since we pass the
 // schema key along
 function getQuery(schemaKey) {
   return new Promise((resolve, reject) => {
     SiteSet[schemaKey]
-      .find({})
-      .select({
-        _id: 1,
-        uploader: 1,
-        uploadDate: 1
-      })
+      .aggregate(aggregates[schemaKey])
       .exec((err, data) => {
         if (err)
           reject(err);
@@ -40,8 +59,8 @@ function getQuery(schemaKey) {
 }
 
 let queries = [];
-for (let schema in schemas)
-  queries.push(getQuery(schema));
+for (let schemaKey in schemas)
+  queries.push(getQuery(schemaKey));
 
 let saves = [];
 Promise.all(queries).then(results => {
@@ -52,6 +71,7 @@ Promise.all(queries).then(results => {
         uploader: uploadObj.uploader,
         schemaKey: result.schemaKey,
         siteSet: uploadObj._id,
+        number: uploadObj.number
       });
       saves.push(upload.save());
     }
@@ -61,8 +81,12 @@ Promise.all(queries).then(results => {
   }).catch(error => {
     console.error('Something went wrong saving the upload information:');
     console.error(error);
-  }).then(()=>{ process.exit(); });
+    process.exit();
+  }).then(() => {
+    process.exit();
+  });
 }).catch(error => {
   console.error('Something went wrong looking for the upload metadata:');
   console.error(error);
+  process.exit();
 });

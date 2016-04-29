@@ -116,9 +116,9 @@
     function getSiteSetLink(siteSet) {
       if (window.siteSets.length > 1) {
         let url = window.config.baseURL + 'view/' + siteSet._schema.schema.key + '/' + siteSet._id;
-        return '<a href="' + url + '">' + new Date(siteSet.uploadDate) + '</a>';
+        return '<a href="' + url + '">' + new Date(siteSet._upload.uploadDate) + '</a>';
       } else {
-        return siteSet.uploadDate;
+        return siteSet._upload.uploadDate;
       }
     }
 

@@ -8,6 +8,7 @@ const router = require('koa-route');
 // Internal dependnecies
 const SiteSet = require('../models/siteset');
 const User = require('../models/user');
+const Upload = require('../models/upload');
 
 module.exports = {
   nameCheck: router.get('/api/name', function* get(next) {
@@ -55,10 +56,14 @@ module.exports = {
     if (!apiValidateSiteSet(this, c))
       return yield next;
 
+    let upload = new Upload();
+
     if (SiteSet.hasOwnProperty(c.schemaKey)) {
       let siteSet = new SiteSet[c.schemaKey]();
-      siteSet.uploadDate = new Date();
-      siteSet.uploader = this.req.user._id;
+      upload.uploadDate = new Date();
+      upload.uploader = this.req.user._id;
+      upload.schemaKey = c.schemaKey;
+      upload.siteSet = siteSet._id;
 
       // We store the version, but not the key of the schema.
       // The key is already implicitly stored through the MongoDB collection name.
@@ -72,7 +77,16 @@ module.exports = {
           continue;
         if (!apiValidateDataset(this, c[d]))
           return yield next;
+
         siteSet[d] = c[d];
+
+        // Keep track of # of records for upload log
+        if (siteSet[d].data && siteSet[d].data.length) {
+          if (upload.number === undefined)
+            upload.number = {};
+          upload.number[d] = siteSet[d].data.length;
+        }
+
       }
 
       // Attempt to save the data to MongoDB
@@ -83,6 +97,12 @@ module.exports = {
         return yield next;
       }
       apiReportSuccess(this);
+      upload
+        .save()
+        .catch(error => {
+          console.error('Problem saving to upload log.');
+          console.error(error);
+        });
       return yield next;
     } else {
       this.body = {

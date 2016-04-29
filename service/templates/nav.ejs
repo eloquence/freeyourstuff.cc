@@ -8,7 +8,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/"><%- conf.siteName -%></a>
+        <a class="navbar-brand" href="/"><%- conf.siteName -%> <% if (process.env.NODE_ENV !== 'production') { %>- DEVELOPMENT MODE<% } %></a>
       </div>
       <div class="navbar-collapse collapse" id="navbar">
         <div class="navbar-right navbar-form">

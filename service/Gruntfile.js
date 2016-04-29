@@ -42,7 +42,7 @@ module.exports = function(grunt) {
       // Until uglify supports ES6, we're not including this file in the main bundle
       siteSetViewer: {
         'cwd': 'frontend/',
-        'src': ['view-sitesets.js'],
+        'src': ['view-sitesets.js', 'view-uploads.js'],
         expand: true,
         'dest': 'static/js'
       },

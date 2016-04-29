@@ -1,4 +1,4 @@
-<%- include('head', {siteSection: 'Welcome', load: {} }); -%>
+<%- include('head', {siteSection: 'Welcome', load: {uploads: true} }); -%>
 <%- include('nav'); %>
 <div class="container">
 <br>
@@ -10,11 +10,12 @@
 
   <% } else { %>
 
-  <h2>Your published datasets:</h2>
+  <h2>Your published datasets</h2>
+  <p>Select any upload to see its contents.</p>
 
   <% } %>
 
-  <% if (!siteSetCount) { %>
+  <% if (!uploads.length) { %>
     <% if (!user || !user._id.equals(siteSetUser._id)) { %>
       This user has not published any data using
       <%- conf.siteName -%> yet. <span class="fa fa-frown-o"></span>
@@ -24,16 +25,7 @@
       started.
     <% } %>
   <% } else { %>
-    <% for (var siteSetFamily in siteSets) { %>
-      <% if (!siteSets[siteSetFamily].length) continue; %>
-      <h3><%- SiteSet[siteSetFamily].siteSetSchema.schema.label.en -%></h3>
-        <ul>
-        <% for (var siteSet of siteSets[siteSetFamily]) { %>
-          <li> <a href="<%- conf.baseURL + 'view/' + siteSetFamily + '/' + siteSet._id -%>">
-            Upload from <%- siteSet.uploadDate.toLocaleString() -%></a>
-        <% } %>
-      </ul>
-    <% } %>
+    <table id="uploads" class="table table-hover table-responsive"></table>
   <% } %>
 
 <% } else { %>
@@ -41,4 +33,4 @@ We don't know a user with this ID.
 <% } %>
 
 </div>
-<%- include('tail'); -%>
+<%- include('tail', { load: { uploads: true } } ); -%>

@@ -1,9 +1,10 @@
-<%- include('head', {siteSection: 'Welcome', load: { siteSets: true } }); -%>
+<%- include('head', {siteSection: 'Welcome', load: { uploads: true } }); -%>
 <%- include('nav'); -%>
 <div class="container">
 <h1>Recent uploads</h1>
-<p class="lead">These are the most recent uploads we received for each supported site.</p>
-<div id="siteSets">
+<p class="lead">These are the most recent uploads we have received.</p>
+<p>Select any upload to see its contents. Select a username to see all uploads by that user.
+<table id="uploads" class="table table-hover table-responsive">
+</table>
 </div>
-</div>
-<%- include('tail', { load: { siteSets: true} } ); -%>
+<%- include('tail', { load: { uploads: true } } ); -%>

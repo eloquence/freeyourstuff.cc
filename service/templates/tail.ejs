@@ -32,11 +32,13 @@
         <script src="<%- jsFile('datatables') -%>"></script>
         <script src="<%- jsFile('view-sitesets', true) -%>"></script>
     <% } %>
-    <% if (load.recentUploads) { %>
+    <% if (load.uploads) { %>
       <script type="text/javascript">
-          window.recentUploads = <%- JSON.stringify(recentUploads) -%>;
+          window.uploads = <%- JSON.stringify(uploads) -%>;
+          window.siteSetSchemas = <%- JSON.stringify(siteSetSchemas) -%>;
       </script>
       <script src="<%- jsFile('datatables') -%>"></script>
+      <script src="<%- jsFile('view-uploads', true) -%>"></script>
     <% } %>
 <% } %></body>
 </html>

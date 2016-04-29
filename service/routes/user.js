@@ -8,6 +8,7 @@ const router = require('koa-route');
 
 // Internal dependencies
 const User = require('../models/user');
+const Upload = require('../models/upload');
 const SiteSet = require('../models/siteset');
 const render = require('../routes/render');
 
@@ -24,16 +25,20 @@ module.exports = {
       } catch (e) { // In case of invalid query
         u = null;
       }
-      let resultObj, count = 0;
+      let uploads = [];
       if (u && u._id) {
-        resultObj = yield SiteSet.findAllByUploaderID(u._id);
-        for (let c in resultObj)
-          count += resultObj[c].length;
+        uploads = yield Upload.find({uploader: u._id}, {uploader: 0}).sort({uploadDate: -1}).lean();
       }
+
+      let siteSetSchemas = {};
+
+      // Export schemas along with upload metadata
+      for (let key of Object.keys(SiteSet))
+        siteSetSchemas[key] = SiteSet[key].siteSetSchema;
+
       render.call(this, 'user.ejs', {
-        SiteSet,
-        siteSets: resultObj,
-        siteSetCount: count,
+        siteSetSchemas,
+        uploads,
         siteSetUser: u
       });
     }

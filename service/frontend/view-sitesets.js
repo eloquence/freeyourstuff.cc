@@ -5,10 +5,12 @@
     for (let siteSet of window.siteSets) {
 
       let sep = '&ndash;';
-      $('#siteSets').append(`<h2>${siteSet.siteSetSchema.schema.label.en}</h2>`);
-      $('#siteSets').append(`<b id="uploadInfo${tableIndex}">Upload by ` +
-        `${getUploaderLink(siteSet.uploader)} on ${getSiteSetLink(siteSet)}</b> ` +
-        `${sep} <b><a id="downloadLink${tableIndex}">Download JSON</a></b> ${sep} ` +
+      $('#siteSets').append(`<h2>${siteSet._schema.schema.label.en}</h2>`);
+      if (siteSet._upload) {
+        $('#siteSets').append(`<b id="uploadInfo${tableIndex}">Upload by ` +
+          `${getUploaderLink(siteSet._upload.uploader)} on ${getSiteSetLink(siteSet)}</b> `);
+      }
+      $('#siteSets').append(`${sep} <b><a id="downloadLink${tableIndex}">Download JSON</a></b> ${sep} ` +
         `<b><a id="schemaLink${tableIndex}">Download schema</a></b>`);
 
       let json = jsonExport(siteSet);
@@ -16,7 +18,7 @@
       addJSONToLink(`#downloadLink${tableIndex}`, json, 'data.json');
       addJSONToLink(`#schemaLink${tableIndex}`, schema, 'schema.json');
 
-      for (let setName of Object.keys(siteSet.siteSetSchema)) {
+      for (let setName of Object.keys(siteSet._schema)) {
         if (setName == 'schema' || !siteSet[setName])
           continue;
 
@@ -30,7 +32,7 @@
         let hasData = Array.isArray(siteSet[setName].data) && siteSet[setName].data.length ? true : false;
 
         if (hasHead || hasData) {
-          $('#siteSets').append(`<h4>${siteSet.siteSetSchema[setName].label.en}</h4>`);
+          $('#siteSets').append(`<h4>${siteSet._schema[setName].label.en}</h4>`);
         }
 
         // Show header information
@@ -38,16 +40,16 @@
           $('#siteSets').append(`<table id="resultHeader${tableIndex}" class="headerTable"></table>`);
           for (let headerKey in siteSet[setName].head) {
             let rowValue = siteSet[setName].head[headerKey];
-            if (siteSet.siteSetSchema[setName].head[headerKey].type == 'weburl')
+            if (siteSet._schema[setName].head[headerKey].type == 'weburl')
               rowValue = `<a href="${rowValue}">${rowValue}</a>`;
 
             // Show the header field's description as title attribute if we have one
             let title = '';
-            if (siteSet.siteSetSchema[setName].head[headerKey].description)
-              title = `class="headerKey" title="${siteSet.siteSetSchema[setName].head[headerKey].description.en}"`;
+            if (siteSet._schema[setName].head[headerKey].description)
+              title = `class="headerKey" title="${siteSet._schema[setName].head[headerKey].description.en}"`;
 
             let row = `<tr><td class="headerCell">` +
-              `<span ${title}>${siteSet.siteSetSchema[setName].head[headerKey].label.en}</span>` +
+              `<span ${title}>${siteSet._schema[setName].head[headerKey].label.en}</span>` +
               `</td><td>${rowValue}</td></tr>`;
             $(`#resultHeader${tableIndex}`).append(row);
           }
@@ -64,14 +66,14 @@
               if (prop === '_id')
                 continue;
               if (fields.indexOf(prop) == -1) {
-                if (!siteSet.siteSetSchema[setName].data[prop].describes) {
+                if (!siteSet._schema[setName].data[prop].describes) {
                   let colDef = {
                     data: prop,
-                    title: siteSet.siteSetSchema[setName].data[prop].label.en,
+                    title: siteSet._schema[setName].data[prop].label.en,
                     defaultContent: ''
                   };
-                  if (siteSet.uploader._id != window.userID) {
-                    if (siteSet.siteSetSchema[setName].data[prop].type == 'html') {
+                  if (!siteSet._upload || (siteSet._upload.uploader._id != window.userID)) {
+                    if (siteSet._schema[setName].data[prop].type == 'html') {
                       colDef.render = escapeHTML;
                       htmlWarning = true;
                     }
@@ -83,7 +85,7 @@
                   // for some text elsewhere. Let's locate the relevant column and
                   // add a render function if it doesn't already have one.
                   for (let col of columns) {
-                    if (col.data == siteSet.siteSetSchema[setName].data[prop].describes) {
+                    if (col.data == siteSet._schema[setName].data[prop].describes) {
                       if (!col.render)
                         col.render = makeRenderFunction(prop);
                       break;
@@ -113,7 +115,7 @@
 
     function getSiteSetLink(siteSet) {
       if (window.siteSets.length > 1) {
-        let url = window.config.baseURL + 'view/' + siteSet.siteSetSchema.schema.key + '/' + siteSet._id;
+        let url = window.config.baseURL + 'view/' + siteSet._schema.schema.key + '/' + siteSet._id;
         return '<a href="' + url + '">' + new Date(siteSet.uploadDate) + '</a>';
       } else {
         return siteSet.uploadDate;
@@ -167,18 +169,17 @@
       let exportObj;
       if (!schemaOnly) {
         exportObj = Object.assign({}, siteSet);
-        exportObj.schemaKey = siteSet.siteSetSchema.schema.key;
-        exportObj.siteSetSchema = undefined;
+        exportObj.schemaKey = siteSet._schema.schema.key;
         exportObj.uploader = undefined;
         exportObj.uploadDate = undefined;
       } else {
-        exportObj = Object.assign({}, siteSet.siteSetSchema);
+        exportObj = Object.assign({}, siteSet._schema);
         exportObj.schema.site = undefined;
       }
 
       // Filter DB key info from JSON export with replacer function
       let json = JSON.stringify(exportObj, (key, value) => {
-        if (['__v', '_id'].indexOf(key) !== -1)
+        if (['__v', '_id', '_schema', '_upload'].indexOf(key) !== -1)
           return undefined;
         else
           return value;

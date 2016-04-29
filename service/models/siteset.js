@@ -9,17 +9,13 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 
 // Internal dependencies
 const schemas = require('../load-schemas.js');
+const Upload = require('./upload.js');
 
 let models = {};
 
 for (let schemaKey in schemas) {
   console.log(`Importing schema "${schemaKey}"...`);
   let modelObj = {};
-  modelObj.uploader = {
-    type: ObjectId,
-    ref: 'User'
-  };
-  modelObj.uploadDate = Date;
   modelObj.schemaVersion = Number;
 
   for (let setName in schemas[schemaKey]) {
@@ -50,24 +46,6 @@ for (let schemaKey in schemas) {
   // metadata such as labels that we need for rendering the data.
   models[schemaKey].siteSetSchema = schemas[schemaKey];
 }
-
-
-// This will only return the collection IDs and upload dates
-function findAllByUploaderID(uid) {
-  let resultObj = {};
-  for (let c of Object.keys(this)) {
-    resultObj[c] = this[c].find({
-      uploader: uid
-    }, { uploadDate: 1 } ).lean();
-  }
-  return resultObj;
-}
-
-// We want the set of SiteSets to be enumerable without the function
-Object.defineProperty(models, 'findAllByUploaderID', {
-  value: findAllByUploaderID,
-  enumerable: false
-});
 
 module.exports = models;
 

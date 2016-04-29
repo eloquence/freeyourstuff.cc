@@ -11,6 +11,11 @@
       };
 
       if (upload.uploader) {
+        // Filter uploads by site admin so they don't clog up the log
+        if (upload.uploader.local && upload.uploader.local.displayName == 'admin' &&
+          window.location.search != '?all')
+          continue;
+
         logEntry.uploaderLink = getUploaderLink(upload.uploader);
         hasUploaders = true;
       }
@@ -63,7 +68,7 @@
       ]
     });
 
-    function getUploaderLink(user) {
+    function getUploaderName(user) {
       let method;
       if (user.local)
         method = 'local';
@@ -76,8 +81,12 @@
       else
         return 'unknown user';
 
+      return user[method].displayName;
+    }
+
+    function getUploaderLink(user) {
       let url = window.config.baseURL + 'user/' + user._id;
-      return '<a href="' + url + '">' + user[method].displayName + '</a>';
+      return '<a href="' + url + '">' + getUploaderName(user) + '</a>';
     }
 
   });

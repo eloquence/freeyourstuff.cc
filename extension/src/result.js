@@ -1,21 +1,38 @@
 (function() {
   'use strict';
 
-  if (window.location.hash !== '#debug') {
-    try {
-      chrome.runtime.onMessage.addListener(displayHandler);
-    } catch (e) {
-      console.log('Chrome API not found. Loading outside of extension context with example data.');
-      loadExample('yelp');
-    }
+  // Can be overridden by granting different permission in manifest.json
+  const defaultBaseURL = 'https://freeyourstuff.cc/';
+
+  if (typeof chrome !== "undefined" && chrome.runtime.onMessage) {
+    chrome.runtime.onMessage.addListener(displayHandler);
   } else {
+    console.log('Chrome API not found. Loading outside of extension context with example data.');
     loadExample('yelp');
+  }
+
+  function getPermissions() {
+    return new Promise(function(resolve) {
+      chrome.permissions.getAll(permissions => {
+        resolve(permissions);
+      });
+    });
   }
 
   function displayHandler(request) {
     if (request.action === 'display' && request.data && request.schema) {
-      showData(request.data, request.schema);
-      chrome.runtime.onMessage.removeListener(displayHandler);
+      getPermissions().then(permissions => {
+
+        let baseURL;
+
+        // If we have a cross-origin permission defined in manifest.json,
+        // we use it for the base URL, matching up to (and including) the
+        // first slash.
+        baseURL = permissions && permissions.origins && permissions.origins[0] ?
+          permissions.origins[0].match(/.*\//)[0] : defaultBaseURL;
+        showData(request.data, request.schema, baseURL);
+        chrome.runtime.onMessage.removeListener(displayHandler);
+      });
     }
   }
 
@@ -37,7 +54,7 @@
   }
 
   function showExampleData() {
-    showData(exampleData, exampleSchema);
+    showData(exampleData, exampleSchema, defaultBaseURL);
   }
 
   // Message object properties:
@@ -55,8 +72,8 @@
   }
 
   // retry: Whether this was user-triggered.
-  function checkLoginStatus(retry) {
-    $.get('https://freeyourstuff.cc/api/loginstatus').done(res => {
+  function checkLoginStatus(retry, baseURL) {
+    $.get(`${baseURL}api/loginstatus`).done(res => {
       // Hide previous warning messages
       $('#messages').hide();
       if (typeof res == 'object' && res.loggedIn) {
@@ -77,22 +94,27 @@
       $('#retry').off();
       $('#retry').click((e) => {
         e.preventDefault();
-        checkLoginStatus(true);
+        checkLoginStatus(true, baseURL);
       });
     });
   }
 
-  function getLinkOpener(url) {
+  // Once the user clicks any of the login links (local, Google, Facebook, etc.),
+  // we start pinging the site in the background so that once the user
+  // is logged in, the "Publish" button automagically appears
+  function getLinkOpener(url, baseURL) {
     return function() {
       $(this).prop('disabled', true);
       window.open(url);
-      startPinging();
+      startPinging(baseURL);
     };
   }
 
-  function startPinging() {
+  function startPinging(baseURL) {
     $('#pinging').show();
-    window.interval = setInterval(checkLoginStatus, 1000);
+    window.interval = setInterval(() => {
+      checkLoginStatus(false, baseURL);
+    }, 1000);
   }
 
   function stopPinging() {
@@ -101,13 +123,13 @@
     $('#pinging').fadeOut();
   }
 
-  function getPublishClickHandler(json) {
+  function getPublishClickHandler(json, baseURL) {
     return function(e) {
       $('#publish').prop('disabled', true); // Prevent repeat submission
       $.ajax({
         type: 'POST',
         contentType: 'application/json',
-        url: 'https://freeyourstuff.cc/api/siteset',
+        url: `${baseURL}api/siteset`,
         data: json,
         dataType: 'json'
       }).done(res => {
@@ -134,7 +156,7 @@
     };
   }
 
-  function showData(data, schema) {
+  function showData(data, schema, baseURL) {
 
     let json = JSON.stringify(data, null, 2);
     // We need to URI-encode it so we can stash it into the href attribute
@@ -142,14 +164,20 @@
     $('#download').attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
     $('#download').attr('download', 'data.json');
 
-    $('#publish').click(getPublishClickHandler(json));
-    $('#facebook').click(getLinkOpener('https://freeyourstuff.cc/auth/facebook'));
-    $('#twitter').click(getLinkOpener('https://freeyourstuff.cc/auth/twitter'));
-    $('#google').click(getLinkOpener('https://freeyourstuff.cc/auth/google'));
-    $('#local').click(getLinkOpener('https://freeyourstuff.cc/signin'));
+    $('#publish').click(getPublishClickHandler(json, baseURL));
+    $('#facebook').click(getLinkOpener(`${baseURL}auth/facebook`, baseURL));
+    $('#twitter').click(getLinkOpener(`${baseURL}auth/twitter`, baseURL));
+    $('#google').click(getLinkOpener(`${baseURL}auth/google`, baseURL));
+    $('#local').click(getLinkOpener(`${baseURL}signin`, baseURL));
     $('#stop').click(stopPinging);
 
-    checkLoginStatus();
+    // For testing/dev purposes, inform user if we're not publishing to prod
+    if (defaultBaseURL != baseURL) {
+      $('#nonStandardURL').text(baseURL);
+      $('#nonStandardURLNotice').show();
+    }
+
+    checkLoginStatus(false, baseURL);
 
     if (data.schemaKey !== schema.schema.key) {
       throw new Error('Schemas do not match. Cannot process data.');

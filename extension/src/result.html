@@ -111,6 +111,10 @@
       border-bottom: 1px dotted #000;
       cursor: help;
     }
+
+    #nonStandardURLNotice {
+      display: none;
+    }
   </style>
 </head>
 
@@ -122,6 +126,10 @@
     data forever.
     <br clear="all">
     <br>
+    <div id="nonStandardURLNotice" class="message">
+      Instead of freeyourstuff.cc, the extension is currently configured to publish to
+      <code><span id="nonStandardURL"></span></code>.
+    </div>
     <div id="signedout">
       You need to be logged into freeyourstuff.cc to publish your content:
       <br>

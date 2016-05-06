@@ -16,7 +16,8 @@
       }
 
       let siteSetName = window.siteSetSchemas[upload.schemaKey].schema.label.en;
-      logEntry.siteSetLink = `<b><a href="${config.baseURL}view/${upload.schemaKey}/${upload.siteSet}">${siteSetName}</a></b>`;
+      let folderIcon = '<span class="folder fa fa-folder-o" style="width:1.5em;"></span>';
+      logEntry.siteSetLink = `<b class="folderLink">${folderIcon}<a href="${config.baseURL}view/${upload.schemaKey}/${upload.siteSet}">${siteSetName}</a></b>`;
 
       let summary = '';
       for (let countKey in upload.number) {
@@ -61,6 +62,15 @@
       order: [
         [sortPos, 'desc']
       ]
+    });
+
+    // Add hover effect for hover icons
+    $('.folderLink').parent().mouseover(function() {
+      $(this).find('.folder').removeClass('fa-folder-o').addClass('fa-folder-open-o');
+    });
+
+    $('.folderLink').parent().mouseout(function() {
+      $(this).find('.folder').removeClass('fa-folder-open-o').addClass('fa-folder-o');
     });
 
     function getUploaderName(user) {

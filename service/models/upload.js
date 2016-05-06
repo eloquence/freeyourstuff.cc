@@ -18,7 +18,14 @@ let UploadSchema = new Schema({
     ref: 'User'
   },
   siteSet: ObjectId,
-  number: {}
+  number: {},
+  isTestUpload: Boolean, // filtered from lists
+  isTrusted: Boolean, // vetted, safe to display as raw HTML
+  trustedDate: Date,
+  trustedBy: {
+    type: ObjectId,
+    ref: 'User'
+  }
 });
 
 let Upload = mongoose.model('Upload', UploadSchema);

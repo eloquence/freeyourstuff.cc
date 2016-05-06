@@ -22,7 +22,9 @@
   window.config = <%- JSON.stringify(conf) -%>;
 
   // Expose user ID
-  window.userID = <%- typeof user !== 'undefined' && user ? JSON.stringify(user._id) : 'null' -%>;
+  const fysUserID = <%- typeof user !== 'undefined' && user ? JSON.stringify(user._id) : 'null' -%>;
+  // Expose UI config
+  const fysShowModerationControls = <%- user ? JSON.stringify(user.canModerate()) : false -%>;
 </script>
 <% if (typeof load !== 'undefined') { %>
     <% if (load.siteSets) { %>

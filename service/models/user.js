@@ -9,6 +9,9 @@ const config = require('../load-config');
 // Schema definition
 let userSchema = mongoose.Schema({
 
+  isModerator: Boolean, // access to reversible & low-risk operations
+  isAdmin: Boolean, //  mod rights + access to hard to reverse & high-risk operations
+  isTester: Boolean, // generated content will be flagged for filtering/removal
   local: {
     username: {
       type: String,
@@ -95,6 +98,10 @@ userSchema.methods.getMethod = function() {
     return 'google';
   else
     return null;
+};
+
+userSchema.methods.canModerate = function() {
+  return this.isAdmin || this.isModerator ? true : false;
 };
 
 // create the model for users and expose it to our app

@@ -13,7 +13,7 @@ const User = require('../models/user.js');
 const Upload = require('../models/upload.js');
 const render = require('../routes/render.js');
 
-const uploadFilter = '_id twitter.displayName local.displayName facebook.displayName google.displayName';
+const userFilter = '_id twitter.displayName local.displayName facebook.displayName google.displayName';
 
 // Naming convention for routes: Anything that is not a GET method
 // is suffixed with method name, e.g. _POST.
@@ -30,7 +30,8 @@ var main = {
         }).lean();
         let upload = yield Upload
           .findOne({ siteSet: id })
-          .populate('uploader', uploadFilter)
+          .populate('uploader', userFilter)
+          .populate('trustedBy', userFilter)
           .lean();
         siteSet._schema = SiteSet[schemaKey].siteSetSchema;
         siteSet._upload = upload;
@@ -45,11 +46,11 @@ var main = {
   }),
   browse: router.get('/browse', function*(next) {
     let recentUploads = yield Upload
-      .find({})
+      .find({isTestUpload: {$ne: true}})
       .sort({
         uploadDate: -1
       })
-      .populate('uploader', uploadFilter)
+      .populate('uploader', userFilter)
       .lean();
 
     let siteSetSchemas = {};

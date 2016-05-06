@@ -47,6 +47,59 @@ module.exports = {
     return yield next;
   }),
 
+  trust_POST: router.post('/api/trust', function* post(next) {
+    if (!this.isAuthenticated()) {
+      this.body = {
+        error: 'You must be signed in to review datasets.'
+      };
+      this.status = 401;
+      return yield next;
+    }
+    if (!this.req.user.canModerate()) {
+      this.body = {
+        error: 'You do not have the required user rights to perform this action.'
+      };
+      this.status = 401;
+      return yield next;
+    }
+    if (!this.request.body || !this.request.body.uploadID || typeof
+      this.request.body.uploadID !== 'string') {
+        this.body = {
+          error: 'You did not specify a valid upload ID.'
+        };
+        this.status = 400;
+        return yield next;
+    }
+    let foundUpload;
+    try {
+      foundUpload = yield Upload.findOneAndUpdate(
+        {
+          _id: this.request.body.uploadID
+        },
+        {
+          $set: {
+            isTrusted: true,
+            trustedDate: new Date(),
+            trustedBy: this.req.user._id
+          }
+        }
+      );
+    } catch(e) {
+      this.body = {
+        error: 'An error occurred when attempting to mark this upload as trusted.'
+      };
+      this.status = 500;
+      console.error('Error with attempt to mark upload as trusted.');
+      console.error(e);
+      return yield next;
+    }
+    this.body = {
+      message: 'Hooray! Thanks for your help reviewing datasets.'
+    };
+    this.status = 200;
+    return yield next;
+  }),
+
   siteSet_POST: router.post('/api/siteset', function* post(next) {
     if (!apiSignedIn(this))
       return yield next;
@@ -64,6 +117,7 @@ module.exports = {
       upload.uploader = this.req.user._id;
       upload.schemaKey = c.schemaKey;
       upload.siteSet = siteSet._id;
+      upload.isTestUpload = this.req.user.isTester ? true : false;
 
       // We store the version, but not the key of the schema.
       // The key is already implicitly stored through the MongoDB collection name.

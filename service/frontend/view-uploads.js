@@ -11,11 +11,6 @@
       };
 
       if (upload.uploader) {
-        // Filter uploads by site admin so they don't clog up the log
-        if (upload.uploader.local && upload.uploader.local.displayName == 'admin' &&
-          window.location.search != '?all')
-          continue;
-
         logEntry.uploaderLink = getUploaderLink(upload.uploader);
         hasUploaders = true;
       }

@@ -18,6 +18,36 @@
       addJSONToLink(`#downloadLink${tableIndex}`, json, 'data.json');
       addJSONToLink(`#schemaLink${tableIndex}`, schema, 'schema.json');
 
+      if(siteSet._upload && !siteSet._upload.isTrusted &&
+        typeof fysShowModerationControls !== 'undefined' && fysShowModerationControls) {
+        $('#siteSets').append(` ${sep} <b><a href="#" id="markAsTrusted">Mark as trusted (no spam/malicious code)</a></b>`);
+        $('#markAsTrusted').click(() => {
+          $.post(`${window.config.baseURL}api/trust`,
+            {
+              uploadID: siteSet._upload._id
+            }
+          ).done(() => {
+            $('#markAsTrustedError').remove();
+            $('#markAsTrusted').replaceWith('Marked as trusted.');
+          }).fail((req) => {
+            $('#markAsTrustedError').remove();
+            let message = req.responseJSON && req.responseJSON.error ?
+              req.responseJSON.error :
+              `There was a problem reaching ${window.config.siteName}.`;
+            $(`<div id="markAsTrustedError" class="dialogMessage">${message}</div>`).
+              insertAfter('#markAsTrusted');
+          });
+          return false;
+        });
+      } else if (siteSet._upload && siteSet._upload.isTrusted) {
+        let trustedBy = getUploaderLink(siteSet._upload.trustedBy);
+        let trustedDate = new Date(siteSet._upload.trustedDate);
+        let checkMark = `<span class="fa fa-check-circle-o" style="color:green;"></span>`;
+        $('#siteSets').append(`<br>${checkMark} Checked for spam/malware` +
+          ` by ${trustedBy} on ${trustedDate}`);
+      }
+
+
       for (let setName of Object.keys(siteSet._schema)) {
         if (setName == 'schema' || !siteSet[setName])
           continue;
@@ -72,7 +102,8 @@
                     title: siteSet._schema[setName].data[prop].label.en,
                     defaultContent: ''
                   };
-                  if (!siteSet._upload || (siteSet._upload.uploader._id != window.userID)) {
+                  if (!siteSet._upload || (!siteSet._upload.isTrusted &&
+                    siteSet._upload.uploader._id != fysUserID)) {
                     if (siteSet._schema[setName].data[prop].type == 'html') {
                       colDef.render = escapeHTML;
                       htmlWarning = true;
@@ -118,7 +149,7 @@
         let url = window.config.baseURL + 'view/' + siteSet._schema.schema.key + '/' + siteSet._id;
         return '<a href="' + url + '">' + new Date(siteSet._upload.uploadDate) + '</a>';
       } else {
-        return siteSet._upload.uploadDate;
+        return new Date(siteSet._upload.uploadDate);
       }
     }
 

@@ -7,7 +7,7 @@
 
     for (let upload of uploads) {
       let logEntry = {
-        uploadDate: upload.uploadDate
+        uploadDate: new Date(upload.uploadDate).toLocaleString()
       };
 
       if (upload.uploader) {

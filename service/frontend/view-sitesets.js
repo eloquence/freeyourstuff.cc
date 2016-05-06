@@ -41,7 +41,7 @@
         });
       } else if (siteSet._upload && siteSet._upload.isTrusted) {
         let trustedBy = getUploaderLink(siteSet._upload.trustedBy);
-        let trustedDate = new Date(siteSet._upload.trustedDate);
+        let trustedDate = new Date(siteSet._upload.trustedDate).toLocaleString();
         let checkMark = `<span class="fa fa-check-circle-o" style="color:green;"></span>`;
         $('#siteSets').append(`<br>${checkMark} Checked for spam/malware` +
           ` by ${trustedBy} on ${trustedDate}`);
@@ -147,9 +147,9 @@
     function getSiteSetLink(siteSet) {
       if (window.siteSets.length > 1) {
         let url = window.config.baseURL + 'view/' + siteSet._schema.schema.key + '/' + siteSet._id;
-        return '<a href="' + url + '">' + new Date(siteSet._upload.uploadDate) + '</a>';
+        return '<a href="' + url + '">' + new Date(siteSet._upload.uploadDate).toLocaleString() + '</a>';
       } else {
-        return new Date(siteSet._upload.uploadDate);
+        return new Date(siteSet._upload.uploadDate).toLocaleString();
       }
     }
 

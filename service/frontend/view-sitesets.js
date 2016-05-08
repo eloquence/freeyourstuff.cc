@@ -18,15 +18,13 @@
       addJSONToLink(`#downloadLink${tableIndex}`, json, 'data.json');
       addJSONToLink(`#schemaLink${tableIndex}`, schema, 'schema.json');
 
-      if(siteSet._upload && !siteSet._upload.isTrusted &&
+      if (siteSet._upload && !siteSet._upload.isTrusted &&
         typeof fysShowModerationControls !== 'undefined' && fysShowModerationControls) {
         $('#siteSets').append(` ${sep} <b><a href="#" id="markAsTrusted">Mark as trusted (no spam/malicious code)</a></b>`);
         $('#markAsTrusted').click(() => {
-          $.post(`${window.config.baseURL}api/trust`,
-            {
-              uploadID: siteSet._upload._id
-            }
-          ).done(() => {
+          $.post(`${window.config.baseURL}api/trust`, {
+            uploadID: siteSet._upload._id
+          }).done(() => {
             $('#markAsTrustedError').remove();
             $('#markAsTrusted').replaceWith('Marked as trusted.');
           }).fail((req) => {
@@ -35,7 +33,7 @@
               req.responseJSON.error :
               `There was a problem reaching ${window.config.siteName}.`;
             $(`<div id="markAsTrustedError" class="dialogMessage">${message}</div>`).
-              insertAfter('#markAsTrusted');
+            insertAfter('#markAsTrusted');
           });
           return false;
         });
@@ -105,7 +103,7 @@
                     defaultContent: ''
                   };
                   if (!siteSet._upload || (!siteSet._upload.isTrusted &&
-                    siteSet._upload.uploader._id != fysUserID)) {
+                      siteSet._upload.uploader._id != fysUserID)) {
                     if (siteSet._schema[setName].data[prop].type == 'html') {
                       colDef.render = escapeHTML;
                       htmlWarning = true;

@@ -28,17 +28,21 @@ var main = {
         let siteSet = yield SiteSet[schemaKey].findOne({
           _id: id
         });
-        siteSet = siteSet.toObject({ getters:true, versionKey: false });
+        siteSet = siteSet.toObject({
+          getters: true,
+          versionKey: false
+        });
         let upload = yield Upload
-          .findOne({ siteSet: id })
+          .findOne({
+            siteSet: id
+          })
           .populate('uploader', userFilter)
           .populate('trustedBy', userFilter)
           .lean();
         siteSet._schema = SiteSet[schemaKey].siteSetSchema;
         siteSet._upload = upload;
         siteSets.push(siteSet);
-      } catch(e) {
-      }
+      } catch (e) {}
     }
     render.call(this, 'view.ejs', {
       siteSets
@@ -47,7 +51,11 @@ var main = {
   }),
   browse: router.get('/browse', function*(next) {
     let recentUploads = yield Upload
-      .find({isTestUpload: {$ne: true}})
+      .find({
+        isTestUpload: {
+          $ne: true
+        }
+      })
       .sort({
         uploadDate: -1
       })
@@ -74,13 +82,13 @@ var main = {
     let fullPath = getFullPath();
     try {
       fs.statSync(fullPath);
-    } catch(e) {
+    } catch (e) {
       // Yesterday
       date.setDate(date.getDate() - 1);
       fullPath = getFullPath();
       try {
         fs.statSync(fullPath);
-      } catch(e) {
+      } catch (e) {
         this.body = 'No dump available for today or yesterday. Sorry!';
         return yield next;
       }

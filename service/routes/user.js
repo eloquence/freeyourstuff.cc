@@ -27,7 +27,10 @@ module.exports = {
       }
       let uploads = [];
       if (u && u._id) {
-        uploads = yield Upload.find({uploader: u._id}, {uploader: 0}).sort({uploadDate: -1}).lean();
+        uploads = yield Upload
+          .find({ uploader: u._id }, { uploader: 0 })
+          .sort({ uploadDate: -1 })
+          .lean();
       }
 
       let siteSetSchemas = {};

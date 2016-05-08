@@ -62,29 +62,25 @@ module.exports = {
       this.status = 401;
       return yield next;
     }
-    if (!this.request.body || !this.request.body.uploadID || typeof
-      this.request.body.uploadID !== 'string') {
-        this.body = {
-          error: 'You did not specify a valid upload ID.'
-        };
-        this.status = 400;
-        return yield next;
+    if (!this.request.body || !this.request.body.uploadID || typeof this.request.body.uploadID !== 'string') {
+      this.body = {
+        error: 'You did not specify a valid upload ID.'
+      };
+      this.status = 400;
+      return yield next;
     }
     let foundUpload;
     try {
-      foundUpload = yield Upload.findOneAndUpdate(
-        {
-          _id: this.request.body.uploadID
-        },
-        {
-          $set: {
-            isTrusted: true,
-            trustedDate: new Date(),
-            trustedBy: this.req.user._id
-          }
+      foundUpload = yield Upload.findOneAndUpdate({
+        _id: this.request.body.uploadID
+      }, {
+        $set: {
+          isTrusted: true,
+          trustedDate: new Date(),
+          trustedBy: this.req.user._id
         }
-      );
-    } catch(e) {
+      });
+    } catch (e) {
       this.body = {
         error: 'An error occurred when attempting to mark this upload as trusted.'
       };

@@ -18,6 +18,7 @@
       addJSONToLink(`#downloadLink${tableIndex}`, json, 'data.json');
       addJSONToLink(`#schemaLink${tableIndex}`, schema, 'schema.json');
 
+      // Add "Mark as trusted" controls if user has requisite permissions
       if (siteSet._upload && !siteSet._upload.isTrusted &&
         typeof fysShowModerationControls !== 'undefined' && fysShowModerationControls) {
         $('#siteSets').append(` ${sep} <b><a href="#" id="markAsTrusted">Mark as trusted (no spam/malicious code)</a></b>`);
@@ -37,6 +38,7 @@
           });
           return false;
         });
+      // Just show trust info if upload is already trusted
       } else if (siteSet._upload && siteSet._upload.isTrusted) {
         let trustedBy = getUploaderLink(siteSet._upload.trustedBy);
         let trustedDate = new Date(siteSet._upload.trustedDate).toLocaleString();
@@ -102,6 +104,12 @@
                     title: siteSet._schema[setName].data[prop].label.en,
                     defaultContent: ''
                   };
+                  if (siteSet._schema[setName].data[prop].type == 'date') {
+                    colDef.className = 'dateColumn';
+                  }
+                  if (siteSet._schema[setName].data[prop].type == 'datetime') {
+                    colDef.className = 'dateTimeColumn';
+                  }
                   if (!siteSet._upload || (!siteSet._upload.isTrusted &&
                       siteSet._upload.uploader._id != fysUserID)) {
                     if (siteSet._schema[setName].data[prop].type == 'html') {

@@ -23,6 +23,7 @@ function DataSet(dataObj, schemaObj) {
   const WEBURL = 'weburl'; // Technically FTP is permitted for legacy reasons
   const NUMBER = 'number';
   const DATE = 'date'; // ISO date string of the format YYYY-MM-DD, no time (where time is stored, it's midnight UTC)
+  const DATETIME = 'datetime'; // ISO date string of the format YYYY-MM-DDTHH:mm:ss.sssZ (UTC time)
   const BOOLEAN = 'boolean';
 
   let key;
@@ -85,6 +86,13 @@ Attempted data import with unknown key in section "${section}": "${key}"`);
         if (!validateISODate(value))
           throw new Error(`Value "${value}" should be an ISO date in the form YYYY-MM-DD, but it is not.`);
         return value;
+      case DATETIME:
+        value = String(value);
+        if (!value)
+          return undefined;
+        if (!validateISODateTime(value))
+          throw new Error(`Value "${value}" should be an ISO date in the form YYYY-MM-DDTHH:mm:ss.sssZ , but it is not.`);
+        return value;
       case BOOLEAN:
         return Boolean(value);
     }
@@ -98,6 +106,10 @@ Attempted data import with unknown key in section "${section}": "${key}"`);
 
   function validateISODate(value) {
     return /^\d\d\d\d-\d\d-\d\d$/.test(value);
+  }
+
+  function validateISODateTime(value) {
+    return /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ$/.test(value);
   }
 
   // Escape HTML control characters

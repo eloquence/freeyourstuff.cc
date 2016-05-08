@@ -221,11 +221,16 @@
         for (let prop in dataObj) {
           if (fields.indexOf(prop) == -1) {
             if (!schema[setName].data[prop].describes) {
-              columns.push({
+              let colDef = {
                 data: prop,
                 title: schema[setName].data[prop].label.en,
                 defaultContent: ''
-              });
+              };
+              if (schema[setName].data[prop].type == 'date')
+                colDef.className = 'dateColumn';
+              if (schema[setName].data[prop].type == 'datetime')
+                colDef.className = 'dateTimeColumn';
+              columns.push(colDef);
               fields.push(prop);
             } else {
               // We're encountering data that "describes" other data, i.e. a URL

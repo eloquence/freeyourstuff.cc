@@ -44,6 +44,9 @@ var main = {
         siteSets.push(siteSet);
       } catch (e) {}
     }
+
+    if (!siteSets.length)
+      this.status = 404;
     render.call(this, 'view.ejs', {
       siteSets
     });

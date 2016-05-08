@@ -1,6 +1,14 @@
 <%- include('head', {siteSection: 'Welcome', load: { siteSets: true } }); -%>
 <%- include('nav'); %>
 <div class="container">
+  <% if (typeof siteSets == 'undefined' || !Array.isArray(siteSets) || !siteSets.length) { %>
+  <h1>Upload not found</h1>
+  <p><b>The requested upload could not be found. The address may be incorrect, or it may have been deleted.
+    <span class="fa fa-frown-o"></span>
+  </b></p>
+  <p>If you think this is a bug, you can <a href="https://github.com/eloquence/freeyourstuff.cc/issues/new">report it<a>.</p>
+  <% } else { %>
   <div id="siteSets"></div>
+  <% } %>
 </div>
 <%- include('tail', { load: { siteSets: true } } ); -%>

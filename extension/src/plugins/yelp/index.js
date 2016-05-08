@@ -73,7 +73,7 @@ function retrieveReviews(callback) {
           .find('.rating-qualifier')
           .text(); // TODO: other qualifiers
         let date = (qualifiers.match(/(\d+\/\d+\/\d+)/) || [])[1];
-        return date;
+        return plugin.getISODate(date);
       };
 
       // Parse contents

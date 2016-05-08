@@ -23,21 +23,30 @@ for (let schemaKey in schemas) {
       continue;
 
     modelObj[setName] = {};
-    modelObj[setName].head = {};
-    modelObj[setName].data = [];
 
+    let headObj = {};
     for (let h in schemas[schemaKey][setName].head) {
-      modelObj[setName].head[h] = getType(schemas[schemaKey][setName].head[h].type);
+      headObj[h] = getType(schemas[schemaKey][setName].head[h].type);
     }
+    let headSchema = mongoose.Schema(headObj, {
+      id: false
+    });
 
     let dataObj = {};
     for (let d in schemas[schemaKey][setName].data) {
       dataObj[d] = getType(schemas[schemaKey][setName].data[d].type);
     }
-    modelObj[setName].data.push(dataObj);
+
+    let dataSchema = mongoose.Schema(dataObj, {
+      id: false
+    });
+
+    modelObj[setName].head = headSchema;
+    modelObj[setName].data = [dataSchema];
   }
   let mSchema = mongoose.Schema(
     modelObj, {
+      id: false, // See https://github.com/Automattic/mongoose/issues/1137
       collection: schemas[schemaKey].schema.key
     }
   );
@@ -56,8 +65,11 @@ function getType(schemaType) {
     case 'html':
     case 'weburl':
       return String;
-    case 'date':
-      return Date;
+    case 'date': // must be set to midnight UTC
+      return {
+        type: Date,
+        get: dateOnly
+      };
     case 'number':
       return Number;
     case 'boolean':
@@ -65,4 +77,8 @@ function getType(schemaType) {
     default:
       throw new Error('Unknown type:' + schemaType);
   }
+}
+
+function dateOnly(date) {
+  return date.toISOString().slice(0, 10);
 }

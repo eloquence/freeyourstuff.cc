@@ -22,12 +22,15 @@ function DataSet(dataObj, schemaObj) {
   const HTML = 'html';
   const WEBURL = 'weburl'; // Technically FTP is permitted for legacy reasons
   const NUMBER = 'number';
-  const DATE = 'date';
+  const DATE = 'date'; // ISO date string of the format YYYY-MM-DD, no time (where time is stored, it's midnight UTC)
   const BOOLEAN = 'boolean';
 
   let key;
   let self = this;
-  self.set = { head: {}, data: [] };
+  self.set = {
+    head: {},
+    data: []
+  };
 
   // Load data into the instance's internal representation. In the process,
   // coerce data into the required types.
@@ -50,9 +53,8 @@ function DataSet(dataObj, schemaObj) {
           coerce(dataObj[section][row][key], schemaObj[section][key].type);
       } else
         self.set[section][key] =
-          coerce(dataObj[section][key], schemaObj[section][key].type);
-    }
-    else {
+        coerce(dataObj[section][key], schemaObj[section][key].type);
+    } else {
       throw new Error(`Parse error against schema "${schemaObj.label.en}".
 Attempted data import with unknown key in section "${section}": "${key}"`);
     }
@@ -69,14 +71,20 @@ Attempted data import with unknown key in section "${section}": "${key}"`);
         return String(value);
       case WEBURL:
         value = String(value);
+        if (!value)
+          return undefined;
         if (!validateURL(value))
           throw new Error(`Value "${value}" should be a qualified web or FTP URL, but is not.`);
-        return String(value);
+        return value;
       case NUMBER:
         return Number(value);
       case DATE:
-        let maybeDate = new Date(value).toLocaleDateString();
-        return maybeDate.toString() === 'Invalid Date' ? undefined : maybeDate;
+        value = String(value);
+        if (!value)
+          return undefined;
+        if (!validateISODate(value))
+          throw new Error(`Value "${value}" should be an ISO date in the form YYYY-MM-DD, but it is not.`);
+        return value;
       case BOOLEAN:
         return Boolean(value);
     }
@@ -84,17 +92,25 @@ Attempted data import with unknown key in section "${section}": "${key}"`);
   }
 
   // true for FTP or HTTP URLs (crazy new TLDs are fine but numeric ones are not)
-  function validateURL(value){
+  function validateURL(value) {
     return /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(value);
+  }
+
+  function validateISODate(value) {
+    return /^\d\d\d\d-\d\d-\d\d$/.test(value);
   }
 
   // Escape HTML control characters
   function escapeHTML(text) {
-    return text.replace(/[\"&'\/<>]/g, function (a) {
-        return {
-            '"': '&quot;', '&': '&amp;', "'": '&#39;',
-            '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
-        }[a];
+    return text.replace(/[\"&'\/<>]/g, function(a) {
+      return {
+        '"': '&quot;',
+        '&': '&amp;',
+        "'": '&#39;',
+        '/': '&#47;',
+        '<': '&lt;',
+        '>': '&gt;'
+      }[a];
     });
   }
 }

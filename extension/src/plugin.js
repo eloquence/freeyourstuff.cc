@@ -50,6 +50,25 @@ var plugin = {
         JSON.stringify(details, null, 2));
     };
     return handler;
+  },
+
+  // Converts date formats recognized by Date.parse() to ISO date, _without_
+  // time (time is set to midnight UTC for the given date). Returns null
+  // for unrecognized/invalid dates.
+  getISODate: function(string) {
+    if (/^\d\d\d\d-\d\d-\d\d$/.test(string)) // Already ISO. Double conversion could mess with timezone
+      return string;
+
+    let date = new Date(string);
+
+    if (date.toString() === 'Invalid Date')
+      return null;
+
+    if (date.getFullYear() > 9999)
+      return null;
+
+    let utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    return utcDate.toISOString().slice(0, 10);
   }
 
 };

@@ -69,6 +69,8 @@
         if (hasHead) {
           $('#siteSets').append(`<table id="resultHeader${tableIndex}" class="headerTable"></table>`);
           for (let headerKey in siteSet[setName].head) {
+            if (headerKey === '_id')
+              continue;
             let rowValue = siteSet[setName].head[headerKey];
             if (siteSet._schema[setName].head[headerKey].type == 'weburl')
               rowValue = `<a href="${rowValue}">${rowValue}</a>`;

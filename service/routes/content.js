@@ -27,7 +27,8 @@ var main = {
       try {
         let siteSet = yield SiteSet[schemaKey].findOne({
           _id: id
-        }).lean();
+        });
+        siteSet = siteSet.toObject({ getters:true, versionKey: false });
         let upload = yield Upload
           .findOne({ siteSet: id })
           .populate('uploader', userFilter)

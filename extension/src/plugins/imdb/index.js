@@ -129,6 +129,8 @@ function retrieveReviews(callback) {
           let date = reviewScope.closest('small').length == 1 ? $(reviewScope.closest('small')[0]).text() :
             $(reviewScope.closest('small')[1]).text();
 
+          date = plugin.getISODate(date);
+
           let spoilers = reviewScope.find('b').length ? true : false;
           // We don't want spoiler warnings in the actual text.
           reviewScope = reviewScope.not('p:has(b)');
@@ -228,7 +230,7 @@ function retrieveRatings(callback, head) {
             starRating: ele['You rated'] || ele[head.reviewerName + ' rated'],
             subject: ele.Title,
             subjectIMDBURL: ele.URL,
-            datePosted: ele.created
+            datePosted: plugin.getISODate(ele.created)
           };
       });
       callback(ratings);

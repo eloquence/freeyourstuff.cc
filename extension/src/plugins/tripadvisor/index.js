@@ -131,6 +131,8 @@ function retrieveReviews(callback) {
               .attr('class') || '')
             .match(/s([0-9])/) || [])[1];
 
+          date = plugin.getISODate(date);
+
           let reviewObj = {
             subject,
             subjectTripAdvisorURL,

@@ -97,6 +97,7 @@ function retrieveReviews(callback) {
         headline = $reviewElement.find('td b').first().text();
         text = $reviewElement.find('.reviewText').first().html();
         date = $reviewElement.find('td nobr').first().text();
+        date = plugin.getISODate(date);
 
         // We ignore decimals, although the number is exressed as "3.0" etc.
         // this seems to be only used for averages

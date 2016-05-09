@@ -227,9 +227,9 @@
                 defaultContent: ''
               };
               if (schema[setName].data[prop].type == 'date')
-                colDef.className = 'dateColumn';
+                colDef.render = renderDate;
               if (schema[setName].data[prop].type == 'datetime')
-                colDef.className = 'dateTimeColumn';
+                colDef.render = renderDateTime;
               columns.push(colDef);
               fields.push(prop);
             } else {
@@ -258,4 +258,20 @@
       }
     }
   }
+
+  // For dates without times, we avoid time shifts by just using the
+  // UTC date information and displaying it in a different format
+  // (without time). We're defaulting to US-style for now.
+  function renderDate(isoDateString) {
+    let isoDate = new Date(isoDateString);
+    return isoDate.toString() === 'Invalid Date' ? undefined :
+      `${isoDate.getUTCMonth()+1}/${isoDate.getUTCDate()}/${isoDate.getUTCFullYear()}`;
+  }
+
+  function renderDateTime(isoDateTimeString) {
+    let isoDateTime = new Date(isoDateTimeString);
+    return isoDateTime.toString() === 'Invalid Date' ? undefined :
+      isoDateTime.toLocaleString('en-US');
+  }
+
 })();

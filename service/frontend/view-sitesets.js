@@ -41,7 +41,7 @@
       // Just show trust info if upload is already trusted
       } else if (siteSet._upload && siteSet._upload.isTrusted) {
         let trustedBy = getUploaderLink(siteSet._upload.trustedBy);
-        let trustedDate = new Date(siteSet._upload.trustedDate).toLocaleString();
+        let trustedDate = new Date(siteSet._upload.trustedDate).toLocaleString('en-US');
         let checkMark = `<span class="fa fa-check-circle-o" style="color:green;"></span>`;
         $('#siteSets').append(`<br>${checkMark} Checked for spam/malware` +
           ` by ${trustedBy} on ${trustedDate}`);
@@ -105,10 +105,10 @@
                     defaultContent: ''
                   };
                   if (siteSet._schema[setName].data[prop].type == 'date') {
-                    colDef.className = 'dateColumn';
+                    colDef.render = renderDate;
                   }
                   if (siteSet._schema[setName].data[prop].type == 'datetime') {
-                    colDef.className = 'dateTimeColumn';
+                    colDef.render = renderDateTime;
                   }
                   if (!siteSet._upload || (!siteSet._upload.isTrusted &&
                       siteSet._upload.uploader._id != fysUserID)) {
@@ -155,9 +155,9 @@
     function getSiteSetLink(siteSet) {
       if (window.siteSets.length > 1) {
         let url = window.config.baseURL + 'view/' + siteSet._schema.schema.key + '/' + siteSet._id;
-        return '<a href="' + url + '">' + new Date(siteSet._upload.uploadDate).toLocaleString() + '</a>';
+        return '<a href="' + url + '">' + new Date(siteSet._upload.uploadDate).toLocaleString('en-US') + '</a>';
       } else {
-        return new Date(siteSet._upload.uploadDate).toLocaleString();
+        return new Date(siteSet._upload.uploadDate).toLocaleString('en-US');
       }
     }
 
@@ -186,6 +186,21 @@
         else
           return val;
       };
+    }
+
+    // For dates without times, we avoid time shifts by just using the
+    // UTC date information and displaying it in a different format
+    // (without time). We're defaulting to US-style for now.
+    function renderDate(isoDateString) {
+      let isoDate = new Date(isoDateString);
+      return isoDate.toString() === 'Invalid Date' ? undefined :
+        `${isoDate.getUTCMonth()+1}/${isoDate.getUTCDate()}/${isoDate.getUTCFullYear()}`;
+    }
+
+    function renderDateTime(isoDateTimeString) {
+      let isoDateTime = new Date(isoDateTimeString);
+      return isoDateTime.toString() === 'Invalid Date' ? undefined :
+        isoDateTime.toLocaleString('en-US');
     }
 
     // Escape HTML control characters

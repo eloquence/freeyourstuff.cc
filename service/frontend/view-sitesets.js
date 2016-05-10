@@ -1,3 +1,4 @@
+// Part of freeyourstuff.cc, licensed under CC-0: https://github.com/eloquence/freeyourstuff.cc
 (function() {
   'use strict';
   $(document).ready(function() {

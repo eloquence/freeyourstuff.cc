@@ -72,8 +72,9 @@
   }
 
   // retry: Whether this was user-triggered.
-  function checkLoginStatus(retry, baseURL) {
+  function checkLoginStatus(retry, baseURL, loginTab) {
     $.get(`${baseURL}api/loginstatus`).done(res => {
+
       // Hide previous warning messages
       $('#messages').hide();
       if (typeof res == 'object' && res.loggedIn) {
@@ -83,6 +84,12 @@
         $('#publish').show();
         $('#signedout').hide();
         clearInterval(window.interval);
+        if (loginTab) {
+          chrome.tabs.remove(loginTab.id, () => {
+            // Reading the property suppresses error on console if tab has been closed
+            if (chrome.runtime.lastError);
+          });
+        }
       } else {
         $('#signedout').show();
         $('#publish').hide();
@@ -109,15 +116,16 @@
   function getLinkOpener(url, baseURL) {
     return function() {
       $(this).prop('disabled', true);
-      window.open(url);
-      startPinging(baseURL);
+      chrome.tabs.create({ url }, (loginTab) => {
+        startPinging(baseURL, loginTab);
+      });
     };
   }
 
-  function startPinging(baseURL) {
+  function startPinging(baseURL, loginTab) {
     $('#pinging').show();
     window.interval = setInterval(() => {
-      checkLoginStatus(false, baseURL);
+      checkLoginStatus(false, baseURL, loginTab);
     }, 1000);
   }
 

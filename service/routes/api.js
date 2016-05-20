@@ -40,6 +40,7 @@ module.exports = {
     } else {
       this.body = {
         loggedIn: true,
+        id: this.req.user._id,
         displayName: this.req.user[this.session.method].displayName,
         method: this.session.method
       };

@@ -77,12 +77,16 @@
       // Hide previous warning messages
       $('#messages').hide();
       if (typeof res == 'object' && res.loggedIn) {
+        let userLink = `<a href="${baseURL}user/${res.id}" target="_blank">${res.displayName}</a>`;
+        $('#loginInfoLink').html(userLink);
+        $('#loginInfo').show();
         $('#publish').show();
         $('#signedout').hide();
         clearInterval(window.interval);
       } else {
         $('#signedout').show();
         $('#publish').hide();
+        $('#loginInfo').hide();
       }
     }).fail(err => {
       showMessage({

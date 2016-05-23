@@ -12,7 +12,9 @@ In other words: Free your stuff! :-)
 
 # Extension setup
 
-To run the extension while we're in alpha, you need to manually [download](https://github.com/eloquence/freeyourstuff.cc/archive/master.zip) a copy of the latest version, then [load the unpacked extension](https://developer.chrome.com/extensions/getstarted#unpacked). In short: unpack the ZIP file anywhere, then navigate to your browser's extensions menu. Activate the "developer mode" checkbox, click "Load unpacked extension", and select the extension subdirectory in the folder where you unpacked the ZIP. That's it!
+You can install the extension directly from https://freeyourstuff.cc/. This will always be the latest version that's ready for wider use.
+
+If you want to work with the development version, you need to manually [download](https://github.com/eloquence/freeyourstuff.cc/archive/master.zip) a copy of the latest version, then [load the unpacked extension](https://developer.chrome.com/extensions/getstarted#unpacked). In short: unpack the ZIP file anywhere, then navigate to your browser's extensions menu. Activate the "developer mode" checkbox, click "Load unpacked extension", and select the extension subdirectory in the folder where you unpacked the ZIP. That's it!
 
 The extension shows a little icon in the address bar on supported sites, and lets you download your contributions as a single JSON file, or publish it with one click. See [sites.json](https://raw.githubusercontent.com/eloquence/freeyourstuff.cc/master/extension/sites.json) for the up-to-date list of currently supported sites and content.
 

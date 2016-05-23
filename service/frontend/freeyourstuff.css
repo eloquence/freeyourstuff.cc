@@ -77,3 +77,8 @@
     border-bottom: 1px dotted #000;
     cursor: help;
   }
+
+  #extensionMessage {
+    color: green;
+    display: none;
+  }

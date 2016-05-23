@@ -15,8 +15,9 @@
 </div>
 <!-- /container -->
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<!-- main JS bundle, including jQuery -->
 <script src="<%- jsFile('main') -%>"></script>
+
 <script type="text/javascript">
   // Expose config variables
   window.config = <%- JSON.stringify(conf) -%>;
@@ -25,8 +26,13 @@
   const fysUserID = <%- typeof user !== 'undefined' && user ? JSON.stringify(user._id) : 'null' -%>;
   // Expose UI config
   const fysShowModerationControls = <%- user ? JSON.stringify(user.canModerate()) : false -%>;
+
+  var fysInstalled = false;
 </script>
 <% if (typeof load !== 'undefined') { %>
+    <% if (load.install) { %>
+      <script src="<%- jsFile('install', true) -%>"></script>
+    <% } %>
     <% if (load.siteSets) { %>
         <script type="text/javascript">
             window.siteSets = <%- JSON.stringify(siteSets) -%>;

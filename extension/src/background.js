@@ -1,5 +1,17 @@
 (function() {
   'use strict';
+  chrome.runtime.onMessageExternal.addListener(
+    (request, sender, sendResponse) => {
+      if (request) {
+        if (request.message && request.message == "version") {
+          sendResponse({
+            version: chrome.runtime.getManifest().version
+          });
+        }
+      }
+      return true;
+    });
+
   chrome.runtime.onMessage.addListener((request, sender) => {
     if (request.action == 'dispatch' && request.data && request.schema) {
       chrome.tabs.create({

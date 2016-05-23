@@ -12,21 +12,15 @@
       Now, with a single click, you can get a copy of your stuff from supported websites!
       And if you want, make it available in the
       <a href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</a>
-      so it can be used and built upon by the global <a href="https://en.wikipedia.org/wiki/Free_culture_movement">free culture movement</a>.
+      so it can be used and built upon by the global <a href="https://en.wikipedia.org/wiki/Free_culture_movement">free culture movement</a>.</p>
       <p>
-      <u>We're in open alpha-testing - if you're feeling brave, give it a spin:</u><br>
-      <ul><li><p><a href="https://github.com/eloquence/freeyourstuff.cc/archive/master.zip">Download</a> and unpack a copy of the latest version of our Chrome/Chromium extension.
-        <li><p>Install the "extension" directory in developer mode, as per <a href="https://developer.chrome.com/extensions/getstarted#unpacked">these instructions</a>.</p>
-        <li><p>Visit a supported site (currently
+      <input type="button" class="btn btn-primary btn-lg" id="installButton" href="#" role="button" value="Install Chrome extension &raquo;"> <span id="extensionMessage"></span>
+
+      </p>
+      <p>Once you have the extension installed, visit a supported site (currently
       <a href="https://www.yelp.com/" target="_new">Yelp</a>, <a href="http://www.imdb.com/" target="_new">IMDB</a>, <a href="https://www.tripadvisor.com/" target="_new">TripAdvisor</a>,
-      <a href="https://www.amazon.com/" target="_new">Amazon.com</a>).</p>
-      <li><p> Click the icon (looks like the box with arrow above) to access your stuff.</p>
-        <li><p>Optionally, <a href="/register">create an account</a> here to share your stuff with the world.</p>
-      </ul>
-      <p><small><span style="color:red;font-weight:bold;">NOTE:</span>
-      You may lose data submitted during the alpha-test as we iron out bugs.</small></p>
-<!--      <a class="btn btn-primary btn-lg" href="#" role="button">Download Chrome extension &raquo;</a> -->
-    </p>
+      <a href="https://www.amazon.com/" target="_new">Amazon.com</a>), then click the <img src="/static/icon24.png" width="24" height="24" alt="icon"> to access (and if you want, share) your stuff.</p>
+      <P><small><i>We're still in beta. You can help by <a href="https://github.com/eloquence/freeyourstuff.cc/issues/new">reporting</a> any issues you encounter.</i></small></p>
   </div>
 </div>
 
@@ -55,4 +49,4 @@
     </div>
   </div>
 </div>
-<%- include('tail'); -%>
+<%- include('tail', {load: { install: true } }); -%>

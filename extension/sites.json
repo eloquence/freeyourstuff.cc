@@ -9,15 +9,24 @@
   "name": "IMDB",
   "plugin": "imdb",
   "deps": ["papaparse"],
-  "canonicalURL": "http://www.imdb.com",
+  "canonicalURL": "http://www.imdb.com/",
   "regex": "http(s)*://(www.)*imdb.com",
   "supported": ["Reviews", "Ratings"],
   "unsupported": ["Comments", "Lists"]
 },
 {
+  "name": "Goodreads",
+  "plugin": "goodreads",
+  "deps": ["papaparse"],
+  "canonicalURL": "https://www.goodreads.com/",
+  "regex": "http(s)*://(www.)*goodreads.com",
+  "supported": ["Reviews", "Ratings"],
+  "unsupported": ["Comments", "Lists", "Quotes"]
+},
+{
   "name": "TripAdvisor",
   "plugin": "tripadvisor",
-  "canonicalURL": "https://www.tripadvisor.com",
+  "canonicalURL": "https://www.tripadvisor.com/",
   "regex": "http(s)*://(www.)*tripadvisor.com",
   "supported": ["Reviews"],
   "unsupported": ["Maps", "Comments", "Questions", "Photographs", "Lists"]
@@ -25,7 +34,7 @@
 {
   "name": "Amazon.com",
   "plugin": "amazon",
-  "canonicalURL": "https://www.amazon.com",
+  "canonicalURL": "https://www.amazon.com/",
   "regex": "http(s)*://(www.)*amazon.com",
   "supported": ["Reviews"],
   "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]

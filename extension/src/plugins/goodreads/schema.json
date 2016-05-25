@@ -1,0 +1,109 @@
+{
+  "schema": {
+    "key": "goodreads",
+    "label": {
+      "en": "Goodreads"
+    },
+    "version": 2
+  },
+  "reviews": {
+    "label": {
+      "en": "Goodreads reviews and ratings"
+    },
+    "head": {
+      "reviewerName": {
+        "type": "text",
+        "label": {
+          "en": "Reviewer name"
+        },
+        "description": {
+          "en": "The publicly visible username of the reviewer"
+        }
+      },
+      "reviewerID": {
+        "type": "text",
+        "label": {
+          "en": "Reviewer ID"
+        },
+        "description": {
+          "en": "The unique ID assigned to the user"
+        }
+      }
+    },
+    "data": {
+      "subject": {
+        "type": "text",
+        "label": {
+          "en": "Subject"
+        },
+        "description": {
+          "en": "The title of the book"
+        }
+      },
+      "author": {
+        "type": "text",
+        "label": {
+          "en": "Author"
+        },
+        "description": {
+          "en": "The author of the book"
+        }
+      },
+      "additionalAuthors": {
+        "type": "text",
+        "label": {
+          "en": "Additional authors"
+        },
+        "description": {
+          "en": "Additional authors of the book"
+        }
+      },
+      "subjectGoodreadsURL": {
+        "type": "weburl",
+        "describes": "subject",
+        "label": {
+          "en": "Goodreads URL"
+        },
+        "description": {
+          "en": "The URL pointing to the Goodreads entry for the book"
+        }
+      },
+      "starRating": {
+        "type": "number",
+        "label": {
+          "en": "Rating"
+        },
+        "description": {
+          "en": "The 1-10 star rating of the review"
+        }
+      },
+      "dateAdded": {
+        "type": "date",
+        "label": {
+          "en": "Date added"
+        },
+        "description": {
+          "en": "The date the book was added by the user"
+        }
+      },
+      "dateRead": {
+        "type": "date",
+        "label": {
+          "en": "Date read"
+        },
+        "description": {
+          "en": "The date the book was read by the user"
+        }
+      },
+      "review": {
+        "type": "html",
+        "label": {
+          "en": "Review"
+        },
+        "description": {
+          "en": "The text of the review"
+        }
+      }
+    }
+  }
+}

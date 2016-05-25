@@ -218,20 +218,22 @@ function retrieveRatings(callback, head) {
     header: true,
     skipEmptyLines: true,
     complete: function(results) {
-      ratings.data = results.data.map(function(ele) {
+      let filteredResults = results.data.filter(ele => {
+        return ele.URL || ele.Title;
+      });
+      ratings.data = filteredResults.map(ele => {
         // We're using only the parts of the CSV which are the user's own work.
         // The CSV also contains a "modified" date, which does not appear to
         // be used, see: https://getsatisfaction.com/imdb/topics/gobn1q01nbd5o
         //
         // The column "You rated" is called "<reviewerName> rated" for someone
         // else's CSV. We try either just in case.
-        if (ele.URL || ele.Title) // To ensure we have minimal informaiton
-          return {
-            starRating: ele['You rated'] || ele[head.reviewerName + ' rated'],
-            subject: ele.Title,
-            subjectIMDBURL: ele.URL,
-            datePosted: plugin.getISODate(ele.created)
-          };
+        return {
+          starRating: ele['You rated'] || ele[head.reviewerName + ' rated'],
+          subject: ele.Title,
+          subjectIMDBURL: ele.URL,
+          datePosted: plugin.getISODate(ele.created) || undefined
+        };
       });
       callback(ratings);
     },

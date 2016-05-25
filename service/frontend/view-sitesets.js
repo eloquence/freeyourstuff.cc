@@ -206,7 +206,7 @@
 
     // Escape HTML control characters
     function escapeHTML(text) {
-      return text.replace(/[\"&'\/<>]/g, function(a) {
+      return text === undefined ? text : text.replace(/[\"&'\/<>]/g, function(a) {
         return {
           '"': '&quot;',
           '&': '&amp;',

@@ -83,5 +83,8 @@ function getType(schemaType) {
 }
 
 function dateOnly(date) {
-  return date.toISOString().slice(0, 10);
+  if (date !== undefined)
+    return date.toISOString().slice(0, 10);
+  else
+    return undefined;
 }

@@ -118,7 +118,7 @@ function retrieveReviews(callback) {
           plugin.report('Waiting for export to complete &hellip;');
           // We now have to ping repeatedly to see if the export has been produced
           let csvURL = `https://www.goodreads.com/review_porter/export/${head.reviewerID}/goodreads_export.csv`;
-          let tries = 0, maxTries = 50;
+          let tries = 0, maxTries = 50, done = false;
           let interval = setInterval(() => {
             tries++;
             $.ajax({
@@ -126,6 +126,9 @@ function retrieveReviews(callback) {
               url: csvURL
             })
             .done(() => {
+              if (done)
+                return;
+              done = true;
               plugin.report('Downloading &hellip;');
               clearInterval(interval);
               // Yay, we can parse it now

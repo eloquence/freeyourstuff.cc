@@ -38,26 +38,30 @@ module.exports = function(grunt) {
         dest: 'static/css/datatables.css'
       }
     },
-    copy: {
-      // Until uglify supports ES6, we're not including this file in the main bundle
-      siteSetViewer: {
-        'cwd': 'frontend/',
-        'src': ['view-sitesets.js', 'view-uploads.js', 'install.js'],
-        expand: true,
-        'dest': 'static/js'
+    babel: {
+      options: {
+        sourceMap: true,
+        presets: ['babel-preset-es2015']
       },
-      fontawesome: {
-        'cwd': 'node_modules/font-awesome/fonts/',
-        'src': ['*'],
-        expand: true,
-        'dest': 'static/fonts/',
-      },
-      glyphicons: {
-        'cwd': 'node_modules/bootstrap/fonts/',
-        'src': ['*'],
-        expand: true,
-        'dest': 'static/fonts/',
+      mainJS: {
+        files: {
+          'static/js/view-sitesets.js': 'frontend/view-sitesets.js',
+          'static/js/view-uploads.js': 'frontend/view-uploads.js',
+          'static/js/install.js': 'frontend/install.js'
+        }
       }
+    },
+    fontawesome: {
+      'cwd': 'node_modules/font-awesome/fonts/',
+      'src': ['*'],
+      expand: true,
+      'dest': 'static/fonts/',
+    },
+    glyphicons: {
+      'cwd': 'node_modules/bootstrap/fonts/',
+      'src': ['*'],
+      expand: true,
+      'dest': 'static/fonts/',
     },
     uglify: {
       options: {
@@ -92,7 +96,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-babel');
 
-  grunt.registerTask('default', ['copy', 'concat', 'uglify', 'cssmin']);
+  grunt.registerTask('default', ['babel', 'concat', 'uglify', 'cssmin']);
 
 };

@@ -4,19 +4,18 @@
   "description": "A web service for publishing liberated content under a CC-0 license",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "./node_modules/grunt/bin/grunt"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/eloquence/freeyourstuff.cc/tree/master/service"
   },
-  "scripts": {
-    "postinstall": "./node_modules/grunt/bin/grunt"
-  },
   "author": "Erik Moeller",
   "license": "CC0-1.0",
   "dependencies": {
     "auto-sni": "^1.0.2",
+    "babel-helper-regex": "^6.9.0",
+    "babel-types": "^6.9.0",
     "bcrypt-nodejs": "0.0.3",
     "bootstrap": "^3.3.6",
     "bootstrap-show-password": "^1.0.2",
@@ -49,12 +48,15 @@
     "passport-google-oauth": "^0.2.0",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.3",
+    "regexpu-core": "^2.0.0",
     "uglify-save-license": "^0.4.1"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.9.0",
     "child-process-promise": "^2.0.1",
     "chrome-cookies-secure": "^1.1.4",
     "colors": "^1.1.2",
+    "grunt-babel": "^6.0.0",
     "jsdom": "^8.3.0",
     "tough-cookie": "^2.2.2"
   }

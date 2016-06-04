@@ -3,6 +3,9 @@
   'use strict';
   $(document).ready(function() {
 
+    if (window.uploads === undefined)
+      return;
+
     let data = [];
     let hasUploaders = false;
 

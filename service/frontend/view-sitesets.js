@@ -2,6 +2,10 @@
 (function() {
   'use strict';
   $(document).ready(function() {
+
+    if (window.siteSets === undefined)
+      return;
+
     let tableIndex = 0; // each siteSet can produce multiple tables
     for (let siteSet of window.siteSets) {
 

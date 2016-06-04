@@ -1,5 +1,10 @@
 'use strict';
 (function() {
+
+  // Triggers on pages with install button
+  if (!$('#installButton').length)
+    return;
+
   // Check if extension is installed by sending a message via Chrome runtime
   if (typeof chrome !== 'undefined' && chrome.runtime) {
     chrome.runtime.sendMessage('hlkhpekhgcaigleojiocoeockhcaglia', {

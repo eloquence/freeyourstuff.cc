@@ -58,25 +58,16 @@
       .then(injectScript('src/dataset.js'))
       .then(getTab)
       .then(tab => {
-        // This click handler isn't visible yet til all the necessary prep work
-        // is done.
+
         if (newTab)
           tab = newTab;
 
-        $('#retrieve').off(); // prevent double initialization
-        $('#retrieve').click(() => {
-          // Tells listener in content.js to perform a download action
-          chrome.tabs.sendMessage(tab.id, {
-            action: 'retrieve',
-            schema
-          });
-          // Avoid repeated clicks by disabling
-          $('#retrieve').attr('disabled', true);
-          // Hide old download link in case of repeated download
-          $('#download').attr('hidden', true);
-          // Hide old errors
-          $('#error').text('');
-        });
+        // Prevent double initialization
+        $('#retrieve').off();
+        // Avoid repeated clicks by disabling
+        $('#retrieve').attr('disabled', true);
+        // Hide old errors
+        $('#error').text('');
 
         // Identify the right plugin, display plugin data in popup, and inject
         // plugin into content. Also initializes schemas variable with the
@@ -100,16 +91,18 @@
               });
 
               // Load schemas + initialize plugin
-              $.getJSON(`/src/plugins/${site.plugin}/schema.json`).done(data => {
-                schema = data;
+              $.getJSON(`/src/plugins/${site.plugin}/schema.json`).done(schema => {
                 injectScript('/src/plugin.js')()
                   .then(injectScript(`/src/lib/js/papaparse.min.js`, site.deps.indexOf('papaparse') == -1))
                   .then(injectScript(`/src/plugins/${site.plugin}/index.js`))
                   .then(() => {
+                    $('#retrieve').click(getRetrievalHandler(site, schema, tab.id));
                     $('#retrieve').attr('hidden', false);
-                    $('#retrieve').attr('disabled', false);
-                    if (autoRetrieve)
-                      $('#retrieve').click();
+                    if (autoRetrieve) {
+                      sendRetrievalMessage(schema, tab.id);
+                    } else {
+                      $('#retrieve').attr('disabled', false);
+                    }
                   });
               });
               break;
@@ -117,6 +110,35 @@
           }
         });
       });
+  }
+
+  function getRetrievalHandler(site, schema, tabId) {
+    return () => {
+      // Prevent repeated clicks
+      $('#retrieve').attr('disabled', true);
+      // We need full cross-origin access, usually because we navigate around
+      // on the site
+      if (site.extraPermissions) {
+        chrome.permissions.request({
+          origins: [ site.canonicalURL ]
+        }, granted => {
+          if (granted) {
+            sendRetrievalMessage(schema, tabId);
+          } else {
+            $('#error').html(`We need additional permissions to get your data for this site, sorry.`);
+          }
+        });
+      } else {
+        sendRetrievalMessage(schema, tabId);
+      }
+    };
+  }
+
+  function sendRetrievalMessage(schema, tabId) {
+    chrome.tabs.sendMessage(tabId, {
+      action: 'retrieve',
+      schema
+    });
   }
 
   function setupListeners() {

@@ -30,5 +30,6 @@
     "storage",
     "unlimitedStorage",
     "https://freeyourstuff.cc/"
-  ]
+  ],
+  "optional_permissions": [ "https://*/" ]
 }

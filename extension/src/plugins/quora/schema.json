@@ -1,0 +1,73 @@
+{
+  "schema": {
+    "key": "quora",
+    "label": {
+      "en": "Quora"
+    },
+    "version": 1
+  },
+  "answers": {
+    "label": {
+      "en": "Quora answers"
+    },
+    "head": {
+      "author": {
+        "type": "text",
+        "label": {
+          "en": "Author"
+        },
+        "description": {
+          "en": "The publicly visible name of the person who wrote the answers"
+        }
+      },
+      "profileURL": {
+        "type": "weburl",
+        "label": {
+          "en": "Profile URL"
+        },
+        "description": {
+          "en": "The author's Quora profile URL"
+        }
+      }
+    },
+    "data": {
+      "question": {
+        "type": "text",
+        "label": {
+          "en": "Question"
+        },
+        "description": {
+          "en": "The question that the answer refers to"
+        }
+      },
+      "questionURL": {
+        "type": "weburl",
+        "describes": "question",
+        "label": {
+          "en": "Question URL"
+        },
+        "description": {
+          "en": "The URL for all answers to this question"
+        }
+      },
+      "answer": {
+        "type": "html",
+        "label": {
+          "en": "Answer"
+        },
+        "description": {
+          "en": "The full text of the answer"
+        }
+      },
+      "date": {
+        "type": "text",
+        "label": {
+          "en": "Date"
+        },
+        "description": {
+          "en": "The date the answer was posted"
+        }
+      }
+    }
+  }
+}

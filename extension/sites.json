@@ -38,4 +38,14 @@
   "regex": "http(s)*://(www.)*amazon.com",
   "supported": ["Reviews"],
   "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
-}]
+},
+{
+  "name": "Quora",
+  "plugin": "quora",
+  "canonicalURL": "https://www.quora.com/",
+  "regex": "http(s)*://(www.)*quora.com",
+  "supported": ["Answers"],
+  "unsupported": ["Questions","Posts"],
+  "extraPermissions": true
+}
+]

@@ -40,6 +40,7 @@
                 <code>regex</code>: the regular expression the extension uses to show its icon, using a <a href="https://developer.chrome.com/extensions/declarativeContent#type-PageStateMatcher">PageStateMatcher</a>'s urlMatches rule, following <a href="https://github.com/google/re2">RE2 syntax</a>.
             </li>
             <li><code>supported</code>, <code>unsupported</code>: the types of content we can and cannot retrieve for the given site. This is only shown in the popup.</li>
+            <li><code>extraPermissions</code>: (optional, true or false) whether we require full cross-origin permissions for the site (primarily needed if we need to visibly navigate); these will be requested at runtime using Chrome's <a href="https://developer.chrome.com/extensions/permissions">optional permissions</a> system</li>
         </ul>
         <p>Once you've added a plugin to sites.json, you will want to reload the extension to refresh the matching rules.</p>
         <h3>Retrieving data with jQuery</h3>

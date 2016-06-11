@@ -1,4 +1,4 @@
-<%- include('head', {siteSection: 'Welcome', load: {uploads: true} }); -%>
+<%- include('head', { siteSection: siteSetUser ? `Uploads by ${siteSetUser.getDisplayName()}` : 'User not found', load: { uploads: true } }); -%>
 <%- include('nav'); %>
 <div class="container">
 <br>
@@ -6,11 +6,11 @@
 <% if (siteSetUser) { %>
   <% if (!user || !user._id.equals(siteSetUser._id)) { %>
 
-  <h2>Published datasets by <%- siteSetUser.getLink() -%>:</h2>
+  <h2>Uploads by <%- siteSetUser.getLink() -%></h2>
 
   <% } else { %>
 
-  <h2>Your published datasets</h2>
+  <h2>Your uploads</h2>
 
   <% } %>
 

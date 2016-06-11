@@ -12,7 +12,7 @@
       },
       reply => {
         if (reply) {
-          if (cmp(reply.version, "0.3.2") == -1) {
+          if (cmp(reply.version, "0.1.0") == -1) {
             $('#extensionMessage').html('<span class="fa fa-exclamation-circle"></span> Update available');
             $('#extensionMessage').fadeIn();
             $('#installButton').fadeOut(400, () => {

@@ -60,12 +60,12 @@
         }
       },
       "date": {
-        "type": "text",
+        "type": "date",
         "label": {
           "en": "Date"
         },
         "description": {
-          "en": "The date the answer was posted"
+          "en": "The date the answer was posted or updated"
         }
       }
     }

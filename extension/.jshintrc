@@ -4,5 +4,5 @@
     "node": false,
     "browser": true,
     "validthis": true,
-    "predef": [ "chrome", "console", "$", "DataSet", "plugin", "Papa" ]
+    "predef": [ "chrome", "console", "$", "DataSet", "plugin", "Papa", "moment" ]
 }

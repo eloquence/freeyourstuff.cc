@@ -42,6 +42,7 @@
 {
   "name": "Quora",
   "plugin": "quora",
+  "deps": ["moment"],
   "canonicalURL": "https://www.quora.com/",
   "regex": "http(s)*://(www.)*quora.com",
   "supported": ["Answers"],

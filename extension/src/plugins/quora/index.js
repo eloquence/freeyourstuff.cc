@@ -95,14 +95,68 @@ function retrieveAnswers(callback) {
         let question = $answer.find('.question_text span').text();
         let questionLink = $answer.find('.question_link').attr('href');
         let questionURL = `https://www.quora.com${questionLink}`;
-        let answerText = $answer.find('.ExpandedAnswer span').html();
-        answerText = answerText
-          .replace(/<p class=".*?">/g, '<p>') // Strip CSS
-          .replace(/(<a href=".*?").*?>/g, "$1>") // Strip click handlers etc.
-          .replace(/<\/?span.*?>/g, ''); // Strip spans completely
 
-        // FIXME: needs transformation
-        let date = $answer.find('.answer_permalink').text();
+        // We create a new jQuery node so we don't unnecessarily
+        // change the visible page content
+        let $answerText = $('<div>' + $answer.find('.ExpandedAnswer span').html() + '</div>');
+
+        // Strip Quora-specific embed code
+        $answerText.find('div.qtext_embed').each((ind, ele) => {
+          $(ele).replaceWith($(ele).attr('data-embed'));
+        });
+        $answerText.find('iframe').removeAttr('width').removeAttr('height');
+
+        // Strip misc. attributes
+        $answerText.find('a,img,p').removeAttr('rel target onclick class onmouseover data-tooltip master_w master_h master_src');
+
+        // Remove divs and spans completely, but keep their contents
+        $answerText.find('span,div').contents().unwrap();
+
+        let answerText = $answerText.html();
+
+        // Quora displays dates in a pretty inconsistent way, ranging from
+        // "8h ago" to "May 12, 2012" type formats. We try to parse all of them
+        // correctly, but if there is an error-prone area in this code, it's
+        // this one.
+        let dateText = ($answer.find('.answer_permalink').text().match(/(Written|Updated) (.*)/) || [])[2];
+        let date;
+        if (/^\d{1,2}(h|m|s) ago$/.test(dateText)) {
+          let match = dateText.match(/^(\d{1,2})(m|h|s)/);
+          let ago = match[1];
+          let unit = match[2];
+          date = moment().subtract(ago, unit).format('YYYY-MM-DD');
+        } else if (/^Mon|Tue|Wed|Thu|Fri|Sat|Sun$/.test(dateText)) {
+          // Moment week begins with Sunday. 'Sun' in Quora always refers to most recent Sunday,
+          // 'Sat' to most recent Saturday.
+          let dayToDay = {
+            'Mon': 1,
+            'Tue': 2,
+            'Wed': 3,
+            'Thu': 4,
+            'Fri': 5,
+            'Sat': -1,
+            'Sun': 0
+          };
+          date = moment().day(dayToDay[dateText]).format('YYYY-MM-DD');
+        } else if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}$/.test(dateText)) {
+          let month = dateText.substr(0, 3);
+          let dayOfMonth = Number(dateText.match(/\d{1,2}/));
+          date = moment().month(month).date(dayOfMonth);
+
+          // Quora also does not always qualify months in the previous year,
+          // so we reinterpret if it would otherwise result in a future date
+          if (date.isAfter(moment()))
+            date = moment().year(moment().year()-1).month(month).date(dayOfMonth);
+
+          date = date.format('YYYY-MM-DD');
+        } else {
+          date = moment(dateText);
+          if (date._d == 'Invalid Date')
+            date = undefined;
+          else
+            date = date.format('YYYY-MM-DD');
+        }
+
         data.push({
           question,
           questionURL,
@@ -110,6 +164,7 @@ function retrieveAnswers(callback) {
           date
         });
       });
+
 
       let answers = {
         head,

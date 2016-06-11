@@ -94,6 +94,7 @@
               $.getJSON(`/src/plugins/${site.plugin}/schema.json`).done(schema => {
                 injectScript('/src/plugin.js')()
                   .then(injectScript(`/src/lib/js/papaparse.min.js`, site.deps.indexOf('papaparse') == -1))
+                  .then(injectScript(`/src/lib/js/moment.min.js`, site.deps.indexOf('moment') == -1))
                   .then(injectScript(`/src/plugins/${site.plugin}/index.js`))
                   .then(() => {
                     $('#retrieve').click(getRetrievalHandler(site, schema, tab.id));

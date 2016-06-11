@@ -62,17 +62,44 @@
         if (newTab)
           tab = newTab;
 
-        // Prevent double initialization
-        $('#retrieve').off();
-        // Avoid repeated clicks by disabling
-        $('#retrieve').attr('disabled', true);
-        // Hide old errors
-        $('#error').text('');
+        // We show a list of supported sites on freeyourstuff.cc itself
+        let renderDirectory = /^http(s)*:\/\/(dev\.)*freeyourstuff.cc/.test(tab.url);
+
+        if (!renderDirectory) {
+
+          // Prevent double initialization
+          $('#retrieve').off();
+
+          // Avoid repeated clicks by disabling
+          $('#retrieve').attr('disabled', true);
+
+          // Hide old errors
+          $('#error').text('');
+
+          // Render default popup
+          $('body').show();
+
+        }
 
         // Identify the right plugin, display plugin data in popup, and inject
         // plugin into content. Also initializes schemas variable with the
         // schemas the plugin requires to get its work done.
         $.getJSON("/sites.json").done(sites => {
+
+          if (renderDirectory) {
+            let footer = $('#footer').html();
+            $('body').html('<p>First, visit any of the following websites - then click this icon again to access your stuff:</p>');
+            $('body').append('<ul id="directory"></ul>');
+            $('body').append('<p>Thank you for using freeyourstuff.cc!</p>');
+            $('body').append(`<div id="footer">${footer}</div>`);
+
+            for (let site of sites) {
+              $('#directory').append(`<li><a href="${site.canonicalURL}" target="_blank">${site.name}</a></li>`);
+            }
+            $('body').show();
+            return;
+          }
+
           for (let site of sites) {
             if (tab.url.match(site.regex)) {
 
@@ -121,7 +148,7 @@
       // on the site
       if (site.extraPermissions) {
         chrome.permissions.request({
-          origins: [ site.canonicalURL ]
+          origins: [site.canonicalURL]
         }, granted => {
           if (granted) {
             sendRetrievalMessage(schema, tabId);

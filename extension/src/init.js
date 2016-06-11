@@ -8,6 +8,11 @@ function replaceRules() {
     req.send();
     req.addEventListener('load', function() {
       let sites = JSON.parse(this.responseText);
+
+      // Add freeyourstuff.cc itself to show extension info when on the site
+      sites.push({
+        regex: 'http(s)*://(dev.)*freeyourstuff.cc'
+      });
       let conditions = [];
       for (let site of sites) {
         conditions.push(

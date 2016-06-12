@@ -146,8 +146,12 @@
         dataType: 'json'
       }).done(res => {
         $('#publish').hide();
+        let link = $('#loginInfoLink a').attr('href');
+        let published = link ? `<a href="${link}" target="_blank">published</a>` : 'published';
+        let text = `Your data was successfully ${published}! Thank you for contributing to the commons. :-)`;
+
         showMessage({
-          text: 'Your data was successfully published! Thank you for contributing to the commons. :-)',
+          text,
           type: 'success'
         });
       }).fail(err => {

@@ -89,7 +89,9 @@ function retrieveReviews(callback) {
       var total = ($directoryDOM
         .find('a[name="reviews"]')
         .text()
-        .match(/[0-9]*/) || [])[0];
+        .match(/[0-9,]*/) || [])[0];
+      if (total)
+        total = Number(total.replace(/,/g,''));
       processReviewList();
     } catch (error) {
       plugin.reportError('An error occurred processing the list of reviews.', error.stack);

@@ -16,7 +16,15 @@
       margin-top: 1em;
       margin-bottom: 1em;
       width: 400px;
+    }
+
+    #ui {
       display: none;
+    }
+
+    #loading {
+      font-size: small;
+      font-style: italic;
     }
 
     ul {
@@ -46,6 +54,7 @@
 </head>
 
 <body>
+  <div id="ui">
   Hooray! freeyourstuff.cc lets you download or publish the following content contributions you have made to <span id="siteName">this site</span>:
   <ul id="availableContent"></ul>
   <button id="retrieve" class="btn btn-primary">Retrieve my contributions</button>
@@ -56,11 +65,12 @@
   <br><br>
   We don't know yet how to download the following contribution types:
     <ul id="unsupportedContent"></ul>
-    </div>
     <div id="footer">
       <a href="https://freeyourstuff.cc/plugins" target="_blank">Contribute a plugin</a> &middot; <a href="https://github.com/eloquence/freeyourstuff.cc/issues/new" target="_blank">Report a bug</a>
     </div>
-    <script src="popup.js"></script>
+  </div>
+  <div id="loading">Loading &hellip;</div>
+  <script src="popup.js"></script>
 </body>
 
 </html>

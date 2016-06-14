@@ -77,7 +77,8 @@
           $('#error').text('');
 
           // Render default popup
-          $('body').show();
+          $('#ui').show();
+          $('#loading').hide();
 
         }
 
@@ -88,15 +89,16 @@
 
           if (renderDirectory) {
             let footer = $('#footer').html();
-            $('body').html('<p>First, visit any of the following websites - then click this icon again to access your stuff:</p>');
-            $('body').append('<ul id="directory"></ul>');
-            $('body').append('<p>Thank you for using freeyourstuff.cc!</p>');
-            $('body').append(`<div id="footer">${footer}</div>`);
+            $('#ui').html('<p>First, visit any of the following websites - then click this icon again to access your stuff:</p>');
+            $('#ui').append('<ul id="directory"></ul>');
+            $('#ui').append('<p>Thank you for using freeyourstuff.cc!</p>');
+            $('#ui').append(`<div id="footer">${footer}</div>`);
 
             for (let site of sites) {
               $('#directory').append(`<li><a href="${site.canonicalURL}" target="_blank">${site.name}</a></li>`);
             }
-            $('body').show();
+            $('#ui').show();
+            $('#loading').hide();
             return;
           }
 

@@ -40,6 +40,7 @@ function retrieveAnswers(callback) {
   let profileLink = $('.hover_menu_item').first().attr('href');
   let profileURL = `https://www.quora.com${profileLink}`;
   let answersURL = `${profileURL}/answers`;
+
   if (decodeURI(window.location.href) != answersURL) {
     plugin.report('Redirecting to answers list &hellip;');
     chrome.runtime.sendMessage({
@@ -50,8 +51,10 @@ function retrieveAnswers(callback) {
     init = false;
     return false;
   }
+
   let author = $('meta[name="twitter:title"]').attr('content');
-  var answerCount = Number($('.AnswersNavItem .list_count').text());
+  // Final search & replace is to remove thousands separators
+  var answerCount = Number($('.AnswersNavItem .list_count').text().replace(/,/g,''));
   let head = {
     author,
     profileURL

@@ -17,6 +17,7 @@ for (let schemaKey in schemas) {
   console.log(`Importing schema "${schemaKey}"...`);
   let modelObj = {};
   modelObj.schemaVersion = Number;
+  modelObj.license = String;
 
   for (let setName in schemas[schemaKey]) {
     if (setName == 'schema')

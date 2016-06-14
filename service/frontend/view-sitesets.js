@@ -51,6 +51,22 @@
         $('#siteSets').append(`<br>${checkMark} Checked for spam/malware` +
           ` by ${trustedBy} on ${trustedDate}`);
       }
+      let license = {};
+      switch (siteSet.license) {
+        case 'cc-by':
+          license.url = 'https://creativecommons.org/licenses/by/4.0/';
+          license.label = 'the Creative Commons CC-BY License';
+          break;
+        case 'cc-by-sa':
+          license.url = 'https://creativecommons.org/licenses/by-sa/4.0/';
+          license.label = 'the Creative Commons CC-BY-SA License';
+          break;
+        default:
+          license.url = 'https://creativecommons.org/publicdomain/zero/1.0/';
+          license.label = 'Creative Commons CC-0';
+      }
+      $('#siteSets').append(`<br>This data is available under <a href="${license.url}" target="_blank">${license.label}</a>.`);
+
 
 
       for (let setName of Object.keys(siteSet._schema)) {

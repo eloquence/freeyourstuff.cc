@@ -81,6 +81,8 @@
         let userLink = `<a href="${baseURL}user/${res.id}" target="_blank">${res.displayName}</a>`;
         $('#loginInfoLink').html(userLink);
         $('#loginInfo').show();
+        $('#licenseInfo').show();
+        $('#licenseSelector').show();
         $('#publish').show();
         $('#signedout').hide();
         clearInterval(window.interval);
@@ -93,6 +95,8 @@
       } else {
         $('#signedout').show();
         $('#publish').hide();
+        $('#licenseSelector').hide();
+        $('#licenseInfo').hide();
         $('#loginInfo').hide();
       }
     }).fail(err => {
@@ -135,8 +139,12 @@
     $('#pinging').fadeOut();
   }
 
-  function getPublishClickHandler(json, baseURL) {
+  function getPublishClickHandler(data, baseURL) {
     return function(e) {
+      data.license = $('#publish').val();
+      let json = JSON.stringify(data, null, 2);
+      console.log(json);
+
       $('#publish').prop('disabled', true); // Prevent repeat submission
       $.ajax({
         type: 'POST',
@@ -146,6 +154,7 @@
         dataType: 'json'
       }).done(res => {
         $('#publish').hide();
+        $('#licenseSelector').hide();
         let link = $('#loginInfoLink a').attr('href');
         let published = link ? `<a href="${link}" target="_blank">published</a>` : 'published';
         let text = `Your data was successfully ${published}! Thank you for contributing to the commons. :-)`;
@@ -180,7 +189,8 @@
     $('#download').attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
     $('#download').attr('download', 'data.json');
 
-    $('#publish').click(getPublishClickHandler(json, baseURL));
+    $('#publish').click(getPublishClickHandler(data, baseURL));
+    $('#licenseSelector a').click(licenseClickHandler);
     $('#facebook').click(getLinkOpener(`${baseURL}auth/facebook`, baseURL));
     $('#twitter').click(getLinkOpener(`${baseURL}auth/twitter`, baseURL));
     $('#google').click(getLinkOpener(`${baseURL}auth/google`, baseURL));
@@ -290,4 +300,27 @@
       isoDateTime.toLocaleString('en-US');
   }
 
+  function licenseClickHandler() {
+    let license = $(this).attr('data-license');
+    switch (license) {
+      case 'cc-by':
+        $('#longLicense').text('Creative Commons CC-BY');
+        $('#licenseInfo').html('The selected license, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC-BY</a>' +
+          ', allows anyone to share and build upon the data below, as long as they give you credit.');
+        break;
+      case 'cc-by-sa':
+        $('#longLicense').text('Creative Commons CC-BY-SA');
+        $('#licenseInfo').html('The selected license, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA</a>' +
+          ', allows anyone to share and build upon the data below, as long as they give you credit and make any changes available ' +
+          'under the same terms ("copyleft").');
+        break;
+      default:
+        $('#longLicense').text('Creative Commons CC-0');
+        $('#licenseInfo').html('The selected license, <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">CC-0</a>, ' +
+          'is equivalent to the <a href="https://en.wikipedia.org/wiki/Public_domain" target="_blank">public domain</a>. ' +
+          'If you click "publish", it will allow anyone to use the data below for any purpose.' +
+          ' (<a href="https://freeyourstuff.cc/faq#cc0" target="_blank">Why this license?</a>)');
+    }
+    $('#publish').val(license);
+  }
 })();

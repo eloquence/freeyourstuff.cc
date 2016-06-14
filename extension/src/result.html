@@ -3,13 +3,13 @@
 
 <head>
   <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="lib/css/bootstrap-theme.min.css">
   <link rel="stylesheet" type="text/css" href="lib/css/dataTables.bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="lib/css/font-awesome.min.css">
 
   <title>Your freeyourstuff.cc results</title>
   <script src="lib/js/jquery-2.1.4.min.js"></script>
   <script src="lib/js/jquery.dataTables.min.js"></script>
+  <script src="lib/js/bootstrap.min.js"></script>
   <script src="lib/js/dataTables.bootstrap.min.js"></script>
   <style>
     body {
@@ -34,7 +34,8 @@
     }
 
     #publish,
-    #signedout {
+    #signedout,
+    #licenseSelector {
       display: none;
     }
 
@@ -116,7 +117,7 @@
       display: none;
     }
 
-    #loginInfo {
+    #loginInfo, #licenseInfo {
       display: none;
     }
   </style>
@@ -125,9 +126,7 @@
 <body>
 
   <div id="preamble">
-    <img src="../assets/icon64.png" id="icon"> This is your data retrieved with <a href="https://freeyourstuff.cc/">freeyourstuff.cc</a>. You can inspect it below and <a href="#" id="download">download a copy</a>. But most importantly, we encourage you to publish your data under Creative Commons
-    <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC-0</a>. This puts your data in the public domain and makes it possible for anyone to build upon it and use it for any purpose. It will also let the Internet community keep backups of your
-    data forever.
+    <img src="../assets/icon64.png" id="icon"> This is your data retrieved with <a href="https://freeyourstuff.cc/" target="_blank">freeyourstuff.cc</a>. You can inspect it below and <a href="#" id="download">download a copy</a>. But most importantly, we encourage you to publish your data under a <a href="http://freedomdefined.org/Definition" target="_blank">free license</a>. This lets others build upon your work and share it freely. It will also let the Internet community keep backups of your data forever. See our <a href="https://freeyourstuff.cc/faq" target="_blank">FAQ</a> for more info.
     <br clear="all">
     <br>
     <div id="nonStandardURLNotice" class="message">
@@ -153,8 +152,22 @@
     </div>
     <div id="messages">
     </div>
-    <button class="btn btn-primary" id="publish">Publish data under Creative Commons CC-0</button>
-    <div id="loginInfo"><span class="fa fa-info-circle" style="color:#265a88;"></span> You are currently logged in as <span id="loginInfoLink"></span>.</div>
+    <button class="btn btn-primary" id="publish" value="cc-0">Publish data under <span id="longLicense">Creative Commons CC-0</a></button>
+    <span class="dropdown"  id="licenseSelector">
+      <button class="btn btn-default dropdown-toggle" id="licenseButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        Change license
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="licenseButton ">
+        <li><a href="#" data-license="cc-0">CC-0 (public domain)</a></li>
+        <li><a href="#" data-license="cc-by">CC-BY (attribution)</a></li>
+        <li><a href="#" data-license="cc-by-sa">CC-BY-SA (attribution and copyleft)</a></li>
+      </ul>
+    </span>
+    <div id="infoArea">
+    <span id="loginInfo"><span class="fa fa-info-circle" style="color:#265a88;"></span> You are currently logged in as <span id="loginInfoLink"></span>.</span>
+    <span id="licenseInfo">The selected license, <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">CC-0</a>, is equivalent to the <a href="https://en.wikipedia.org/wiki/Public_domain" target="_blank">public domain</a>. If you click "publish", it will allow anyone to use the data below for any purpose. (<a href="https://freeyourstuff.cc/faq#cc0" target="_blank">Why this license?</a>)</span>
+    </div>
   </div>
   <div id="results">
   </div>

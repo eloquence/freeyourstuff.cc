@@ -121,10 +121,13 @@ module.exports = {
       if (c.schemaVersion !== undefined)
         siteSet.schemaVersion = c.schemaVersion;
 
+      if (c.license !== undefined)
+        siteSet.license = c.license;
+
       // Loop through datasets in this siteset, add them to our DB collection.
       // Abort if we encounter invalid data.
       for (let d in c) {
-        if (d == 'schemaKey' || d == 'schemaVersion')
+        if (d == 'schemaKey' || d == 'schemaVersion' || d == 'license')
           continue;
         if (!apiValidateDataset(this, c[d]))
           return yield next;

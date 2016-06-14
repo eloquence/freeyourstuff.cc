@@ -21,6 +21,10 @@ var main = {
   mirrors: router.get('/mirrors', function*(next) {
     render.call(this, 'mirrors.ejs');
     return yield next;
+  }),
+  faq: router.get('/faq', function*(next) {
+    render.call(this, 'faq.ejs');
+    return yield next;
   })
 };
 

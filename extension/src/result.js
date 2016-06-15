@@ -30,6 +30,8 @@
         // first slash.
         baseURL = permissions && permissions.origins && permissions.origins[0] ?
           permissions.origins[0].match(/.*\//)[0] : defaultBaseURL;
+        // For debugging / inspection
+        window.siteSet = request.data;
         showData(request.data, request.schema, baseURL);
         chrome.runtime.onMessage.removeListener(displayHandler);
       });
@@ -120,7 +122,9 @@
   function getLinkOpener(url, baseURL) {
     return function() {
       $(this).prop('disabled', true);
-      chrome.tabs.create({ url }, (loginTab) => {
+      chrome.tabs.create({
+        url
+      }, (loginTab) => {
         startPinging(baseURL, loginTab);
       });
     };
@@ -143,7 +147,6 @@
     return function(e) {
       data.license = $('#publish').val();
       let json = JSON.stringify(data, null, 2);
-      console.log(json);
 
       $('#publish').prop('disabled', true); // Prevent repeat submission
       $.ajax({
@@ -183,10 +186,10 @@
 
   function showData(data, schema, baseURL) {
 
-    let json = JSON.stringify(data, null, 2);
-    // We need to URI-encode it so we can stash it into the href attribute
-    let encodedJSON = encodeURIComponent(json);
-    $('#download').attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
+    let blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json'
+    });
+    $('#download').attr('href', window.URL.createObjectURL(blob));
     $('#download').attr('download', 'data.json');
 
     $('#publish').click(getPublishClickHandler(data, baseURL));

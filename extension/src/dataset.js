@@ -69,7 +69,10 @@ Attempted data import with unknown key in section "${section}": "${key}"`);
       case TEXT:
         return escapeHTML(String(value));
       case HTML:
-        return String(value);
+        value = String(value);
+        // Browser will interpret closing script tag as end of script even inside a string
+        value = value.replace('</script>', '<\\/script>');
+        return value;
       case WEBURL:
         value = String(value);
         if (!value)

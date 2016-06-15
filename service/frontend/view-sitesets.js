@@ -268,9 +268,8 @@
     }
 
     function addJSONToLink(ele, data, filename) {
-      // We need to URI-encode it so we can stash it into the href attribute
-      let encodedJSON = encodeURIComponent(data);
-      $(ele).attr('href', `data:application/json;charset=utf-8,${encodedJSON}`);
+      let blob = new Blob([data], {type : 'application/json'});
+      $(ele).attr('href', window.URL.createObjectURL(blob));
       $(ele).attr('download', filename);
     }
   });

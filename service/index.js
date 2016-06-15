@@ -61,6 +61,7 @@ app.use(session({
 app.use(flash());
 app.use(bodyParser({
   strict: false,
+  jsonLimit: '50mb',
   onerror: function(err, ctx) {
     ctx.throw('{"error": "JSON data could not be parsed, invalid syntax."}', 400);
   }

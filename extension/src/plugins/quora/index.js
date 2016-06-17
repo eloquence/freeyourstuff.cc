@@ -95,8 +95,8 @@ function retrieveAnswers(callback) {
       let data = [];
       $('.AnswerListItem').each((index, answer) => {
         let $answer = $(answer);
-        let question = $answer.find('.question_text span').text();
-        let questionLink = $answer.find('.question_link').attr('href');
+        let question = $answer.find('.question_text span').first().text();
+        let questionLink = $answer.find('.question_link').first().attr('href');
         let questionURL = `https://www.quora.com${questionLink}`;
 
         // We create a new jQuery node so we don't unnecessarily

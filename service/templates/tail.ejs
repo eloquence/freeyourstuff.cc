@@ -35,7 +35,7 @@
     <% } %>
     <% if (load.siteSets) { %>
         <script type="text/javascript">
-            window.siteSets = <%- JSON.stringify(siteSets) -%>;
+            window.siteSets = <%- JSON.stringify(siteSets).replace(/<\/script>/g, '<\\/script>') -%>;
         </script>
         <script src="<%- jsFile('datatables') -%>"></script>
         <script src="<%- jsFile('view-sitesets', true) -%>"></script>

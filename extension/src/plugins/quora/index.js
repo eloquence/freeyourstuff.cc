@@ -109,6 +109,11 @@ function retrieveAnswers(callback) {
         });
         $answerText.find('iframe').removeAttr('width').removeAttr('height');
 
+        // Replace MathJax with its original TeX source
+        $answerText.find('span.render_latex').each((ind, ele) => {
+                  $(ele).replaceWith('[math]' + $(ele).find('script[type="math/tex"]').text() + '[/math]');
+         });
+
         // Strip misc. attributes
         $answerText.find('a,img,p').removeAttr('rel target onclick class onmouseover data-tooltip master_w master_h master_src');
 

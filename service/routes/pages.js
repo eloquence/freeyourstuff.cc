@@ -25,6 +25,10 @@ var main = {
   faq: router.get('/faq', function*(next) {
     render.call(this, 'faq.ejs');
     return yield next;
+  }),
+  osb2016: router.get('/osb2016', function*(next) {
+    this.redirect('/static/misc/osb-presentation-2016/index.html');
+    return yield next;
   })
 };
 

@@ -29,12 +29,18 @@ module.exports = function(grunt) {
       dataTablesJS: {
         src: [
           'node_modules/datatables.net/js/jquery.dataTables.js',
-          'node_modules/datatables.net-bs/js/dataTables.bootstrap.js'
+          'node_modules/datatables.net-bs/js/dataTables.bootstrap.js',
+          'node_modules/datatables-buttons/js/dataTables.buttons.js',
+          'node_modules/datatables-buttons/js/buttons.print.js',
+          'node_modules/datatables-buttons/js/buttons.html5.js',
+          'node_modules/datatables.net-buttons-bs/js/buttons.bootstrap.js'
         ],
         dest: 'static/js/datatables.js'
       },
       dataTablesCSS: {
-        src: ['node_modules/datatables.net-bs/css/dataTables.bootstrap.css'],
+        src: ['node_modules/datatables.net-bs/css/dataTables.bootstrap.css',
+        'node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.css'
+        ],
         dest: 'static/css/datatables.css'
       }
     },

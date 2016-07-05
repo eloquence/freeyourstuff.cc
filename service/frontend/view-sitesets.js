@@ -43,7 +43,7 @@
           });
           return false;
         });
-      // Just show trust info if upload is already trusted
+        // Just show trust info if upload is already trusted
       } else if (siteSet._upload && siteSet._upload.isTrusted) {
         let trustedBy = getUploaderLink(siteSet._upload.trustedBy);
         let trustedDate = new Date(siteSet._upload.trustedDate).toLocaleString('en-US');
@@ -160,10 +160,24 @@
             $('#siteSets').append('<div class="technicalNotice">Since this may not be your own dataset, HTML characters have been escaped for security reasons.<br><br></div>');
           }
           $('#siteSets').append(`<table id="siteSet_table_${tableIndex}" class="table table-hover table-responsive">`);
-          $(`#siteSet_table_${tableIndex}`).dataTable({
+          $(`#siteSet_table_${tableIndex}`).DataTable({
             "data": siteSet[setName].data,
+            "dom": 'Bfrtip',
+            "buttons": [ {
+              extend: 'print',
+              exportOptions: {
+                stripHtml: false
+              }
+            }, {
+              extend: 'csv',
+              exportOptions: {
+                stripHtml: false
+              },
+              text: 'Download CSV'
+            }],
             "columns": columns
           });
+
         }
         if (hasHead && !hasData)
           $('#siteSets').append('No data of this type included in the set.');
@@ -268,7 +282,9 @@
     }
 
     function addJSONToLink(ele, data, filename) {
-      let blob = new Blob([data], {type : 'application/json'});
+      let blob = new Blob([data], {
+        type: 'application/json'
+      });
       $(ele).attr('href', window.URL.createObjectURL(blob));
       $(ele).attr('download', filename);
     }

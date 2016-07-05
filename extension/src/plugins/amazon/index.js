@@ -51,7 +51,7 @@ function retrieveReviews(callback) {
     head: {},
     data: []
   };
-  let pages = [1];
+  let currentPage = 0;
   let profileURL = 'https://www.amazon.com/gp/profile/';
 
   plugin.report('Fetching your profile info &hellip;');
@@ -83,6 +83,8 @@ function retrieveReviews(callback) {
 
   function processPage(html) {
     try {
+      currentPage++;
+
       let $dom = $($.parseHTML(html));
       let reviewElements = $dom.find('table[cellpadding="0"][cellspacing="0"] tr').has('div.reviewText');
       reviewElements.each((i, reviewElement) => {
@@ -117,16 +119,23 @@ function retrieveReviews(callback) {
         reviews.data.push(reviewObj);
       });
 
-      // There's no "Next / Prev", so we grab the rightmost link in the page nav
-      // and make sure it's not a page we've seen before
-      let nextPageLink = $dom.find('div[align="right"] b a').last();
-      let nextPage = Number(nextPageLink.text());
+      let nextPage = currentPage + 1;
 
-      if (nextPage && pages.indexOf(nextPage) == -1) {
+      // The pagination is just a set of numbered links, so if we're on page
+      // "4", we try to find one that's labeled "5", or "5-" since the last link
+      // always is labeled with a range (11-20, 21-30, etc.).
+      let regEx = new RegExp('^' + String(nextPage) + '(-\\d*$|$)');
+
+      let $pageMatches = $dom
+        .find('td div[align="right"] b a')
+        .filter(function() {
+          return regEx.test($(this).text());
+        });
+
+      if ($pageMatches.length) {
+        let nextPageURL = $pageMatches.attr('href');
         let progress = `Fetching page ${nextPage} &hellip;`;
         plugin.report(progress);
-        pages.push(nextPage);
-        let nextPageURL = 'https://www.amazon.com' + nextPageLink.attr('href');
         $.get(nextPageURL)
           .done(processPage)
           .fail(plugin.handleConnectionError(nextPageURL));

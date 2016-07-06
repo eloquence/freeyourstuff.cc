@@ -85,7 +85,7 @@ function retrieveReviews(callback) {
     try {
       currentPage++;
 
-      let $dom = $($.parseHTML(html));
+      let $dom = $($.parseHTML(html, null, true));
       let reviewElements = $dom.find('table[cellpadding="0"][cellspacing="0"] tr').has('div.reviewText');
       reviewElements.each((i, reviewElement) => {
         let product, productURL, headline, date, text, starRating;
@@ -97,7 +97,22 @@ function retrieveReviews(callback) {
         productURL = $(productLink).attr('href');
         productURL = normalizeURL(productURL);
         headline = $reviewElement.find('td b').first().text();
-        text = $reviewElement.find('.reviewText').first().html();
+        let $text = $reviewElement.find('.reviewText').first();
+
+        let videoURL;
+        // Extract video URL, if any
+        if ($text.find('[id^=airy-player]').length) {
+          videoURL = ($text
+            .find('div script:not([src])')
+            .text()
+            .match(/"streamingUrls":"(.*?)"/) || [])[1];
+        }
+        // Remove all divs, span, script incl. contents. Since reviews cannot
+        // contain formatting, and images (not yet supported) are underneath the
+        // review text, this seems to only affect the video player.
+        $text.find('div,span,script').remove();
+        text = $text.html();
+
         date = $reviewElement.find('td nobr').first().text();
         date = plugin.getISODate(date);
 
@@ -114,7 +129,8 @@ function retrieveReviews(callback) {
           headline,
           date,
           text,
-          starRating
+          starRating,
+          videoURL
         };
         reviews.data.push(reviewObj);
       });

@@ -21,6 +21,7 @@ function DataSet(dataObj, schemaObj) {
   const TEXT = 'text';
   const HTML = 'html';
   const WEBURL = 'weburl'; // Technically FTP is permitted for legacy reasons
+  const VIDEOURL = 'videourl';
   const NUMBER = 'number';
   const DATE = 'date'; // ISO date string of the format YYYY-MM-DD, no time (where time is stored, it's midnight UTC)
   const DATETIME = 'datetime'; // ISO date string of the format YYYY-MM-DDTHH:mm:ss.sssZ (UTC time)
@@ -74,6 +75,7 @@ Attempted data import with unknown key in section "${section}": "${key}"`);
         value = value.replace(/<\/script>/g, '<\\/script>');
         return value;
       case WEBURL:
+      case VIDEOURL:
         value = String(value);
         if (!value)
           return undefined;

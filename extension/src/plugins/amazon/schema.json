@@ -4,7 +4,7 @@
     "label": {
       "en": "Amazon.com"
     },
-    "version": 1
+    "version": 2
   },
   "reviews": {
     "label": {
@@ -84,6 +84,15 @@
         },
         "description": {
           "en": "The star rating of the review (1-5)"
+        }
+      },
+      "videoURL": {
+        "type": "videourl",
+        "label": {
+          "en": "Video"
+        },
+        "description": {
+          "en": "The video URL for this review"
         }
       }
     }

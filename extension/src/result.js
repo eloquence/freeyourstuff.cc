@@ -259,6 +259,9 @@
                 colDef.render = renderDate;
               if (schema[setName].data[prop].type == 'datetime')
                 colDef.render = renderDateTime;
+              if (schema[setName].data[prop].type == 'videourl')
+                colDef.render = renderVideo;
+
               columns.push(colDef);
               fields.push(prop);
             } else {
@@ -301,6 +304,13 @@
     let isoDateTime = new Date(isoDateTimeString);
     return isoDateTime.toString() === 'Invalid Date' ? undefined :
       isoDateTime.toLocaleString('en-US');
+  }
+
+  function renderVideo(videoURL) {
+    if (videoURL)
+      return `<video src="${videoURL}" width="320" controls></video>`;
+    else
+      return '';
   }
 
   function licenseClickHandler() {

@@ -65,6 +65,7 @@ function getType(schemaType) {
     case 'text':
     case 'html':
     case 'weburl':
+    case 'videourl':
       return String;
     // using a getter means we need to convert objects with {getters: true} to get the desired format
     case 'date': // must be set to midnight UTC

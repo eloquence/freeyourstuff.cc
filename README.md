@@ -34,6 +34,11 @@ It's a fully open JavaScript stack. We've put special emphasis on the plugin sys
 
 # Contributor notice
 
+We'd love your help in making freeyourstuff.cc better. :-)
+
 The extension, plugins and web service are licensed under the CC-0 License (see LICENSE file),
 equivalent to the public domain. By submitting a pull request, you agree to license it
 under the same terms.
+
+This project has adopted a [code of conduct](./CODE_OF_CONDUCT.md) to make
+sure all contributors feel welcome. 

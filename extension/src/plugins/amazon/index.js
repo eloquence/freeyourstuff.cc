@@ -70,6 +70,11 @@ function retrieveReviews(callback) {
 
       // The requests redirects to the full profile URL
       reviews.head.reviewerURL = this.responseURL;
+
+      if (!reviews.head.reviewerName && /signin/.test(reviews.head.reviewerURL)) {
+        plugin.reportError(`<br>Sorry, you are not fully logged in yet. Please <a href="${reviews.head.reviewerURL}" target="_blank">sign in</a>, then start the process again.`);
+        return false;
+      }
       let firstURL = 'https://www.amazon.com/gp/cdp/member-reviews/';
       plugin.report('Fetching page 1 &hellip;');
       $.get(firstURL)

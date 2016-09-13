@@ -2,7 +2,7 @@
   "name": "Yelp",
   "plugin": "yelp",
   "canonicalURL": "https://www.yelp.com/",
-  "regex": "http(s)*://(www.)*yelp.com",
+  "regex": "http(s)*://(www.)*yelp.com/",
   "supported": ["Reviews"],
   "unsupported": ["Comments", "Photographs", "Messages", "Events"]
 }, {
@@ -10,7 +10,7 @@
   "plugin": "imdb",
   "deps": ["papaparse"],
   "canonicalURL": "http://www.imdb.com/",
-  "regex": "http(s)*://(www.)*imdb.com",
+  "regex": "http(s)*://(www.)*imdb.com/",
   "supported": ["Reviews", "Ratings"],
   "unsupported": ["Comments", "Lists"]
 },
@@ -19,7 +19,7 @@
   "plugin": "goodreads",
   "deps": ["papaparse"],
   "canonicalURL": "https://www.goodreads.com/",
-  "regex": "http(s)*://(www.)*goodreads.com",
+  "regex": "http(s)*://(www.)*goodreads.com/",
   "supported": ["Reviews", "Ratings"],
   "unsupported": ["Comments", "Lists", "Quotes"]
 },
@@ -27,7 +27,7 @@
   "name": "TripAdvisor",
   "plugin": "tripadvisor",
   "canonicalURL": "https://www.tripadvisor.com/",
-  "regex": "http(s)*://(www.)*tripadvisor.com",
+  "regex": "http(s)*://(www.)*tripadvisor.com/",
   "supported": ["Reviews"],
   "unsupported": ["Maps", "Comments", "Questions", "Photographs", "Lists"]
 },
@@ -35,7 +35,95 @@
   "name": "Amazon.com",
   "plugin": "amazon",
   "canonicalURL": "https://www.amazon.com/",
-  "regex": "http(s)*://(www.)*amazon.com",
+  "regex": "http(s)*://(www.)*amazon.com/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.com.au",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.com.au/",
+  "regex": "http(s)*://(www.)*amazon.com.au/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.com.br",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.com.br/",
+  "regex": "http(s)*://(www.)*amazon.com.br/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.ca",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.ca/",
+  "regex": "http(s)*://(www.)*amazon.ca/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.de",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.de/",
+  "regex": "http(s)*://(www.)*amazon.de/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.fr",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.fr/",
+  "regex": "http(s)*://(www.)*amazon.fr/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.es",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.es/",
+  "regex": "http(s)*://(www.)*amazon.es/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.in",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.in/",
+  "regex": "http(s)*://(www.)*amazon.in/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.it",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.it/",
+  "regex": "http(s)*://(www.)*amazon.it/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.com.mx",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.com.mx/",
+  "regex": "http(s)*://(www.)*amazon.com.mx/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.nl",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.nl/",
+  "regex": "http(s)*://(www.)*amazon.nl/",
+  "supported": ["Reviews"],
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+},
+{
+  "name": "Amazon.co.uk",
+  "plugin": "amazon",
+  "canonicalURL": "https://www.amazon.co.uk/",
+  "regex": "http(s)*://(www.)*amazon.co.uk/",
   "supported": ["Reviews"],
   "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
 },
@@ -44,7 +132,7 @@
   "plugin": "quora",
   "deps": ["moment"],
   "canonicalURL": "https://www.quora.com/",
-  "regex": "http(s)*://(www.)*quora.com",
+  "regex": "http(s)*://(www.)*quora.com/",
   "supported": ["Answers"],
   "unsupported": ["Questions","Posts"],
   "extraPermissions": true

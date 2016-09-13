@@ -4,6 +4,9 @@ var jsonTests = {
   reviews: retrieveReviews
 };
 
+// By default we assume we're on Amazon.com
+var edition = 'com';
+
 if (typeof init === 'undefined')
   var init = false;
 
@@ -14,6 +17,11 @@ if (typeof chrome !== 'undefined' && !init)
 function setupExtensionEvents() {
   chrome.runtime.onMessage.addListener(request => {
     if (request.action == 'retrieve') {
+      // Set edition based on hostname.
+      let m = window.location.hostname.match(/amazon\.(.*)$/);
+      if (m)
+        edition = m[1];
+
       if (!loggedIn()) {
         chrome.runtime.sendMessage({
           action: 'notice-login'
@@ -21,7 +29,7 @@ function setupExtensionEvents() {
         return false;
       }
       if (window.location.protocol == 'http:') {
-        plugin.reportError('Please visit <a href="https://www.amazon.com/" target="_blank">the HTTPS version</a> of Amazon.com.');
+        plugin.reportError(`Please visit <a href="https://www.amazon.${edition}/" target="_blank">the HTTPS version</a> of Amazon.${edition}.`);
         init = false;
         return false;
       }
@@ -52,7 +60,7 @@ function retrieveReviews(callback) {
     data: []
   };
   let currentPage = 0;
-  let profileURL = 'https://www.amazon.com/gp/profile/';
+  let profileURL = `https://www.amazon.${edition}/gp/profile/`;
 
   plugin.report('Fetching your profile info &hellip;');
   // We use XMLHttpRequest here because jQuery does not expose responseURL,
@@ -75,7 +83,7 @@ function retrieveReviews(callback) {
         plugin.reportError(`<br>Sorry, you are not fully logged in yet. Please <a href="${reviews.head.reviewerURL}" target="_blank">sign in</a>, then start the process again.`);
         return false;
       }
-      let firstURL = 'https://www.amazon.com/gp/cdp/member-reviews/';
+      let firstURL = `https://www.amazon.${edition}/gp/cdp/member-reviews`;
       plugin.report('Fetching page 1 &hellip;');
       $.get(firstURL)
         .done(processPage)

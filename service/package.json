@@ -13,7 +13,7 @@
   "author": "Erik Moeller",
   "license": "CC0-1.0",
   "dependencies": {
-    "auto-sni": "^1.0.2",
+    "auto-sni": "^1.5.1",
     "babel-helper-regex": "^6.9.0",
     "babel-types": "^6.9.0",
     "bcrypt-nodejs": "0.0.3",

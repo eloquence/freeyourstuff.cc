@@ -210,8 +210,13 @@
           }, () => {
             let listener = function() {
               if (tab.status === 'complete') {
-                init(tab, autoRetrieve);
                 chrome.tabs.onUpdated.removeListener(listener);
+                let delay = request.delay || 0;
+                if (delay > 0)
+                  $('#progress').html('Giving page time to finish loading &hellip;');
+                setTimeout(() => {
+                  init(tab, autoRetrieve);
+                }, delay);
               }
             };
             chrome.tabs.onUpdated.addListener(listener);

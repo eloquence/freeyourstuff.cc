@@ -46,7 +46,8 @@ function retrieveAnswers(callback) {
     chrome.runtime.sendMessage({
       action: 'redirect',
       url: answersURL,
-      autoRetrieve: true
+      autoRetrieve: true,
+      delay: 3000
     });
     init = false;
     return false;

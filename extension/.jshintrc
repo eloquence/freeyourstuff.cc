@@ -1,8 +1,0 @@
-{
-    "esnext": true,
-    "globalstrict": true,
-    "node": false,
-    "browser": true,
-    "validthis": true,
-    "predef": [ "chrome", "console", "$", "DataSet", "plugin", "Papa", "moment" ]
-}

@@ -64,9 +64,9 @@ function retrieveReviews(callback) {
 
       // Helper functions common to different review types
       let getRating = $root => (($root
-          .find("[class^='star-img stars_']")
+          .find("[class^='i-stars i-stars']")
           .attr('class') || '')
-        .match(/[0-9]/) || [])[0];
+          .match(/[0-9]/) || [])[0];
 
       let getDate = $root => {
         let qualifiers = $root

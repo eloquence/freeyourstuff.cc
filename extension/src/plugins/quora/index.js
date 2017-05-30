@@ -67,7 +67,9 @@ function retrieveAnswers(callback) {
   getNextPage();
 
   function getNextPage() {
-    $('.pager_next').click();
+    $('.pager_next').each(function() {
+      this.click();
+    });
     var displayedAnswerCount = $('.AnswerListItem').length;
     plugin.report(`Expanded ${displayedAnswerCount} of ${answerCount} answers &hellip;`);
     if (displayedAnswerCount < answerCount) {
@@ -92,7 +94,7 @@ function retrieveAnswers(callback) {
         if (activeModal === undefined)
           return dispatchExtractedAnswers(); // We've opened all modals -- time to go home
 
-        $(activeModal).click();
+        activeModal.click();
         // Check for modal being opened, then proceed to next step
         activeInterval = setInterval(getModalVisibilityCheck(true, extractNextAnswer), 10);
       }
@@ -184,7 +186,7 @@ function retrieveAnswers(callback) {
       function closeActiveModal() {
         // Close modal dialog
         activeInterval = setInterval(getModalVisibilityCheck(false, openNextModal), 10);
-        $('.modal_overlay.feed_desktop_modal:visible').click();
+        $('.modal_fixed_close:visible')[0].click();
       }
 
       // Return an interval handler that checks the visibility of modal content

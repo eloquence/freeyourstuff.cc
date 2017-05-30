@@ -64,42 +64,41 @@ function retrieveAnswers(callback) {
     author,
     profileURL
   };
-  getNext();
+  getNextPage();
 
-  function getNext() {
+  function getNextPage() {
     $('.pager_next').click();
-    $('.more_link:visible').each(function() {
-      this.click();
-    });
     var displayedAnswerCount = $('.AnswerListItem').length;
     plugin.report(`Expanded ${displayedAnswerCount} of ${answerCount} answers &hellip;`);
     if (displayedAnswerCount < answerCount) {
-      setTimeout(getNext, 500);
+      setTimeout(getNextPage, 500);
     } else {
-      plugin.report('Waiting for data &hellip;');
-      let wait = 0;
-      let increments = 100;
-      let maxWait = 6000; // 10 minutes
-      let interval = setInterval(() => {
-        if ($('.ExpandedAnswer').length >= answerCount) {
-          clearInterval(interval);
-          transformAnswers();
-        } else {
-          wait += increments;
-          if (wait >= maxWait) {
-            clearInterval(interval);
-            plugin.reportError('We don\'t seem to be getting all the answers. Sorry! :-(');
-            return;
-          }
-        }
-      }, increments);
+      extractAnswers();
     }
 
-    function transformAnswers() {
-      plugin.report('Transforming data &hellip;');
+    function extractAnswers() {
+      plugin.report('Extracting data &hellip;');
       let data = [];
-      $('.AnswerListItem').each((index, answer) => {
-        let $answer = $(answer);
+      let answerModals = $('.StoryItemToggleModal.toggle_modal_inline').toArray();
+      let activeInterval;
+
+      // Kicks off sequential chain of dialog open actions which is contingent
+      // on polling callbacks that tell us the required DOM elements are ready
+      // to use
+      openNextModal();
+
+      function openNextModal() {
+        let activeModal = answerModals.shift();
+        if (activeModal === undefined)
+          return dispatchExtractedAnswers(); // We've opened all modals -- time to go home
+
+        $(activeModal).click();
+        // Check for modal being opened, then proceed to next step
+        activeInterval = setInterval(getModalVisibilityCheck(true, extractNextAnswer), 10);
+      }
+
+      function extractNextAnswer() {
+        let $answer = $('.modal_content:visible');
         let question = $answer.find('.question_text span').first().text();
         let questionLink = $answer.find('.question_link').first().attr('href');
         let questionURL = `https://www.quora.com${questionLink}`;
@@ -163,7 +162,7 @@ function retrieveAnswers(callback) {
 
           date = date.format('YYYY-MM-DD');
         } else {
-          date = moment(dateText);
+          date = moment(new Date(dateText));
           if (date._d == 'Invalid Date')
             date = undefined;
           else
@@ -176,14 +175,40 @@ function retrieveAnswers(callback) {
           answer: answerText,
           date
         });
-      });
 
+        closeActiveModal();
 
-      let answers = {
-        head,
-        data
-      };
-      callback(answers);
+      }
+
+      // Close the currently opened model and open the next one
+      function closeActiveModal() {
+        // Close modal dialog
+        activeInterval = setInterval(getModalVisibilityCheck(false, openNextModal), 10);
+        $('.modal_overlay.feed_desktop_modal:visible').click();
+      }
+
+      // Return an interval handler that checks the visibility of modal content
+      // according to the first parameter, and calls the callback (second parameter)
+      // when it matches.
+      function getModalVisibilityCheck(expectedModalVisibility, next) {
+        return function() {
+          let actualModalVisibility = $('.modal_content').is(':visible');
+          if (actualModalVisibility == expectedModalVisibility) {
+            clearInterval(activeInterval);
+            next();
+          }
+        };
+      }
+
+      function dispatchExtractedAnswers() {
+        let answers = {
+          head,
+          data
+        };
+        callback(answers);
+      }
+
     }
+
   }
 }

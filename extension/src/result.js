@@ -207,11 +207,11 @@
       $('#nonStandardURLNotice').show();
     }
 
-    checkLoginStatus(false, baseURL);
-
     if (data.schemaKey !== schema.schema.key) {
       throw new Error('Schemas do not match. Cannot process data.');
     }
+
+    let weHaveData = false;
 
     for (let setName in data) {
       // Exclude metadata
@@ -242,7 +242,6 @@
           $(`#result_${setName}_header`).append(row);
         }
       }
-
 
       // Loop through each data object in the set
       for (let dataObj of data[setName].data) {
@@ -286,9 +285,20 @@
           'data': data[setName].data,
           'columns': columns
         });
+        weHaveData = true;
       } else {
         $('#results').append('No data of this type included in the set.');
       }
+    }
+    if (!weHaveData) {
+      // UI to publish will not be shown
+      showMessage({
+        text: `We were not able to find any data of the supported types for your user account. If this is a mistake, please <a target="_blank" href="https://github.com/eloquence/freeyourstuff.cc/issues/new">file a bug report</a>.`,
+        type: 'warning'
+      });
+    } else {
+      // Check if we're ready to publish
+      checkLoginStatus(false, baseURL);
     }
   }
 

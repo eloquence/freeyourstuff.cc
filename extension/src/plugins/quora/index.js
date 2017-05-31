@@ -132,7 +132,7 @@ function retrieveAnswers(callback) {
         // "8h ago" to "May 12, 2012" type formats. We try to parse all of them
         // correctly, but if there is an error-prone area in this code, it's
         // this one.
-        let dateText = ($answer.find('.answer_permalink').text().match(/(Written|Updated) (.*)/) || [])[2];
+        let dateText = ($answer.find('.answer_permalink').text().match(/(Written|Updated|Answered) (.*)/) || [])[2];
         let date;
         if (/^\d{1,2}(h|m|s) ago$/.test(dateText)) {
           let match = dateText.match(/^(\d{1,2})(m|h|s)/);

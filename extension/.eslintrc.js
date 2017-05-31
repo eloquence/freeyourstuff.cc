@@ -10,7 +10,8 @@ module.exports = {
   "rules": {
     "indent": [
       "error",
-      2
+      2,
+      { 'SwitchCase': 1 }
     ],
     "linebreak-style": [
       "error",
@@ -23,6 +24,9 @@ module.exports = {
     "semi": [
       "error",
       "always"
-    ]
+    ],
+    "no-console": "off",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" } ],
+    "quotes": ["warn", "single", { "avoidEscape": true, allowTemplateLiterals: true }]
   }
 };

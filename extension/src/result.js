@@ -1,10 +1,11 @@
+/* global $, exampleData, exampleSchema */
 (function() {
   'use strict';
 
   // Can be overridden by granting different permission in manifest.json
   const defaultBaseURL = 'https://freeyourstuff.cc/';
 
-  if (typeof chrome !== "undefined" && chrome.runtime.onMessage) {
+  if (typeof chrome !== 'undefined' && chrome.runtime.onMessage) {
     chrome.runtime.onMessage.addListener(displayHandler);
   } else {
     console.log('Chrome API not found. Loading outside of extension context with example data.');
@@ -101,9 +102,9 @@
         $('#licenseInfo').hide();
         $('#loginInfo').hide();
       }
-    }).fail(err => {
+    }).fail(_err => {
       showMessage({
-        text: `We can't reach freeyourstuff.cc right now, so you can't publish your data. Sorry! You can still download it or` +
+        text: `We can't reach freeyourstuff.cc right now, so you can\'t publish your data. Sorry! You can still download it or` +
           ` <a id="retry" href="#">retry connecting.</a>`,
         type: 'warning',
         retry
@@ -144,7 +145,7 @@
   }
 
   function getPublishClickHandler(data, baseURL) {
-    return function(e) {
+    return function(_e) {
       data.license = $('#publish').val();
       let json = JSON.stringify(data, null, 2);
 
@@ -155,7 +156,7 @@
         url: `${baseURL}api/siteset`,
         data: json,
         dataType: 'json'
-      }).done(res => {
+      }).done(_res => {
         $('#publish').hide();
         $('#licenseSelector').hide();
         let link = $('#loginInfoLink a').attr('href');
@@ -282,8 +283,8 @@
       if (Array.isArray(data[setName].data) && data[setName].data.length) {
         $('#results').append(`<table id="result_${setName}" class="table table-hover table-responsive">`);
         $(`#result_${setName}`).dataTable({
-          "data": data[setName].data,
-          "columns": columns
+          'data': data[setName].data,
+          'columns': columns
         });
       } else {
         $('#results').append('No data of this type included in the set.');
@@ -330,8 +331,7 @@
       default:
         $('#longLicense').text('Creative Commons CC-0');
         $('#licenseInfo').html('The selected license, <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">CC-0</a>, ' +
-          'is equivalent to the <a href="https://en.wikipedia.org/wiki/Public_domain" target="_blank">public domain</a>. ' +
-          'If you click "publish", it will allow anyone to use the data below for any purpose.' +
+          'is equivalent to the <a href="https://en.wikipedia.org/wiki/Public_domain" target="_blank">public domain</a>. ' + 'If you click "publish", it will allow anyone to use the data below for any purpose.' +
           ' (<a href="https://freeyourstuff.cc/faq#cc0" target="_blank">Why this license?</a>)');
     }
     $('#publish').val(license);

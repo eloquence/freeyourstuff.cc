@@ -1,3 +1,4 @@
+/* global DataSet, $, plugin */
 'use strict';
 
 // Result comparison tests to be run by NodeJS/JSDOM test runner
@@ -39,11 +40,10 @@ function setupExtensionEvents() {
 }
 
 function loggedIn() {
-  return Boolean($('.greeting').length);
+  return Boolean($('.name').length);
 }
 
 function retrieveReviews(callback) {
-  let page = 1;
   let reviews = {
     head: {},
     data: []
@@ -122,7 +122,7 @@ function retrieveReviews(callback) {
             .find('.reviewSelector')
             .first();
           let text = $review
-            .find('[property="reviewBody"]')
+            .find('p[id^="review_"]')
             .html()
             .trim();
           let date = $review
@@ -161,9 +161,9 @@ function retrieveReviews(callback) {
             if (subRatingIndex == -1)
               return;
             let subRating = (($this
-                .find('.rate img')
+                .find('span.ui_bubble_rating')
                 .attr('class') || '')
-              .match(/s([0-9])/) || [])[1];
+              .match(/bubble_([0-9])/) || [])[1];
             reviewObj[subRatingKeys[subRatingIndex]] = subRating;
           });
 
@@ -179,15 +179,15 @@ function retrieveReviews(callback) {
               version: 5,
               authenticator: 'DEFAULT',
               actions: JSON.stringify([{
-                "name": "FETCH",
-                "resource": "modules.membercenter.model.ContentStreamComposite",
-                "params": {
-                  "offset": count,
-                  "limit": 50,
-                  "page": "PROFILE",
-                  "memberId": id
+                'name': 'FETCH',
+                'resource': 'modules.membercenter.model.ContentStreamComposite',
+                'params': {
+                  'offset': count,
+                  'limit': 50,
+                  'page': 'PROFILE',
+                  'memberId': id
                 },
-                "id": "clientaction576"
+                'id': 'clientaction576'
               }])
             };
             let postURL = 'https://www.tripadvisor.com/ModuleAjax?';

@@ -72,11 +72,10 @@ function retrieveAnswers(callback) {
     });
     var displayedAnswerCount = $('.AnswerListItem').length;
     plugin.report(`Expanded ${displayedAnswerCount} of ${answerCount} answers &hellip;`);
-    if (displayedAnswerCount < answerCount) {
+    if (displayedAnswerCount < answerCount)
       setTimeout(getNextPage, 500);
-    } else {
+    else
       extractAnswers();
-    }
 
     function extractAnswers() {
       plugin.report('Extracting data &hellip;');
@@ -84,10 +83,32 @@ function retrieveAnswers(callback) {
       let answerModals = $('.StoryItemToggleModal.toggle_modal_inline').toArray();
       let activeInterval;
 
-      // Kicks off sequential chain of dialog open actions which is contingent
-      // on polling callbacks that tell us the required DOM elements are ready
-      // to use
-      openNextModal();
+
+      // Quora alternates between two UIs for answers (possibly a long-term
+      // UI test): a modal view of the answers, and in-place expansion.
+      // We detect which UI is active.
+      if (answerModals.length) {
+        // Kicks off sequential chain of dialog open actions which is contingent
+        // on polling callbacks that tell us the required DOM elements are ready
+        // to use
+        openNextModal();
+      } else {
+        // In-place expansion.
+        $('a.more_link').each(function() {
+          this.click();
+        });
+        // Wait for content to be fully loaded.
+        activeInterval = setInterval(function() {
+          let remainingLinks = $('a.more_link:visible').length;
+          if (remainingLinks === 0) {
+            clearInterval(activeInterval);
+            $('.AnswerListItem').each(function() {
+              extractAndStoreAnswer($(this));
+            });
+            dispatchExtractedAnswers();
+          }
+        }, 50);
+      }
 
       function openNextModal() {
         let activeModal = answerModals.shift();
@@ -96,11 +117,18 @@ function retrieveAnswers(callback) {
 
         activeModal.click();
         // Check for modal being opened, then proceed to next step
-        activeInterval = setInterval(getModalVisibilityCheck(true, extractNextAnswer), 10);
+        activeInterval = setInterval(getModalVisibilityCheck(true, extractNextModalAnswer), 10);
       }
 
-      function extractNextAnswer() {
+      function extractNextModalAnswer() {
         let $answer = $('.modal_content:visible');
+        extractAndStoreAnswer($answer);
+        closeActiveModal();
+      }
+
+      // Generic function for extracting answer content either from a modal or
+      // within  the feed
+      function extractAndStoreAnswer($answer) {
         let question = $answer.find('.question_text span').first().text();
         let questionLink = $answer.find('.question_link').first().attr('href');
         let questionURL = `https://www.quora.com${questionLink}`;
@@ -177,8 +205,6 @@ function retrieveAnswers(callback) {
           answer: answerText,
           date
         });
-
-        closeActiveModal();
 
       }
 

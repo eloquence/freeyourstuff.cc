@@ -71,7 +71,7 @@ function retrieveAnswers(callback) {
       this.click();
     });
     var displayedAnswerCount = $('.AnswerListItem').length;
-    plugin.report(`Expanded ${displayedAnswerCount} of ${answerCount} answers &hellip;`);
+    plugin.report(`Showing ${displayedAnswerCount} of ${answerCount} answers &hellip;`);
     if (displayedAnswerCount < answerCount)
       setTimeout(getNextPage, 500);
     else
@@ -81,8 +81,10 @@ function retrieveAnswers(callback) {
       plugin.report('Extracting data &hellip;');
       let data = [];
       let answerModals = $('.StoryItemToggleModal.toggle_modal_inline').toArray();
+      let moreLinks;
+      let expandedCollapsed = 0;
+      let totalCollapsed;
       let activeInterval;
-
 
       // Quora alternates between two UIs for answers (possibly a long-term
       // UI test): a modal view of the answers, and in-place expansion.
@@ -93,23 +95,44 @@ function retrieveAnswers(callback) {
         // to use
         openNextModal();
       } else {
-        // In-place expansion.
-        $('a.more_link').each(function() {
-          this.click();
-        });
-        // Wait for content to be fully loaded.
-        activeInterval = setInterval(function() {
-          let remainingLinks = $('a.more_link:visible').length;
-          if (remainingLinks === 0) {
-            clearInterval(activeInterval);
-            $('.AnswerListItem').each(function() {
-              extractAndStoreAnswer($(this));
-            });
-            dispatchExtractedAnswers();
-          }
-        }, 50);
+        // Kicks off sequential chain of in-place expansion (given the potentially
+        // huge number of answers, opening them all in parallel doesn't scale,
+        // though we could potentially batch them up a bit more)
+        moreLinks = $('a.more_link:visible').toArray();
+        totalCollapsed = moreLinks.length;
+        expandNextAnswer();
       }
 
+      // Expand next answer in place
+      function expandNextAnswer() {
+        let moreLink = moreLinks.shift();
+        if (moreLink === undefined) {
+          plugin.report('Extracting content &hellip;');
+          return extractAnswerListItems();
+        }
+        moreLink.click();
+        // Wait for content to be loaded.
+        activeInterval = setInterval(function() {
+          let isVisible = $(moreLink).is(':visible');
+          if (!isVisible) {
+            expandedCollapsed++;
+            plugin.report(`Expanded ${expandedCollapsed} of ${totalCollapsed} collapsed answer(s) &hellip;`);
+            clearInterval(activeInterval);
+            return expandNextAnswer();
+          }
+        }, 50);
+
+      }
+
+      // Actually extract the content from in-place answers
+      function extractAnswerListItems() {
+        $('.AnswerListItem').each(function() {
+          extractAndStoreAnswer($(this));
+        });
+        dispatchExtractedAnswers();
+      }
+
+      // Expand next modal in-place
       function openNextModal() {
         let activeModal = answerModals.shift();
         if (activeModal === undefined)
@@ -127,7 +150,7 @@ function retrieveAnswers(callback) {
       }
 
       // Generic function for extracting answer content either from a modal or
-      // within  the feed
+      // within the feed
       function extractAndStoreAnswer($answer) {
         let question = $answer.find('.question_text span').first().text();
         let questionLink = $answer.find('.question_link').first().attr('href');

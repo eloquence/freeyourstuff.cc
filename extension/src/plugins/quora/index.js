@@ -191,14 +191,14 @@ function retrieveAnswers(callback) {
           let unit = match[2];
           date = moment().subtract(ago, unit).format('YYYY-MM-DD');
         } else if (/^Mon|Tue|Wed|Thu|Fri|Sat|Sun$/.test(dateText)) {
-          // Moment week begins with Sunday. 'Sun' in Quora always refers to most recent Sunday,
-          // 'Sat' to most recent Saturday.
+          // Map Quora's date strings to moment values that return the most
+          // recent day with this name
           let dayToDay = {
-            'Mon': 1,
-            'Tue': 2,
-            'Wed': 3,
-            'Thu': 4,
-            'Fri': 5,
+            'Mon': -6,
+            'Tue': -5,
+            'Wed': -4,
+            'Thu': -3,
+            'Fri': -2,
             'Sat': -1,
             'Sun': 0
           };

@@ -2,6 +2,7 @@
 'use strict';
 
 // Result comparison tests to be run by NodeJS/JSDOM test runner
+
 var jsonTests = {
   reviews: retrieveReviews
 };
@@ -62,7 +63,7 @@ function retrieveReviews(callback) {
   function processDirectory() {
     try {
       let directoryURL = this.responseURL;
-      if (!/\members\//.test(directoryURL)) {
+      if (!/\/members\//.test(directoryURL)) {
         plugin.reportError('We did not find any reviews for this account.',
           'Profile URL was: ' + directoryURL);
         return;
@@ -91,7 +92,7 @@ function retrieveReviews(callback) {
         .text()
         .match(/[0-9,]*/) || [])[0];
       if (total)
-        total = Number(total.replace(/,/g,''));
+        total = Number(total.replace(/,/g, ''));
       processReviewList();
     } catch (error) {
       plugin.reportError('An error occurred processing the list of reviews.', error.stack);
@@ -102,7 +103,14 @@ function retrieveReviews(callback) {
       let url = reviewURLs.shift();
       if (url) {
         plugin.report(`Fetching review ${count} of ${total} &hellip;`);
-        $.get(url)
+        $.ajax({
+          url,
+          // jQuery default header triggers different HTML response that doesn't
+          // include some of the information we want.
+          beforeSend: function( xhr ) {
+            xhr.setRequestHeader('X-Requested-With', 'freeyourstuff.cc');
+          },
+        })
           .done(processReview)
           .fail(plugin.handleConnectionError(url));
       }
@@ -122,15 +130,15 @@ function retrieveReviews(callback) {
             .find('.reviewSelector')
             .first();
           let text = $review
-            .find('p[id^="review_"]')
+            .find('.entry')
             .html()
             .trim();
           let date = $review
             .find('.ratingDate')
-            .attr('content');
+            .attr('title');
           let overallRating = (($review
-              .find('.rating img')
-              .attr('class') || '')
+            .find('.rating img')
+            .attr('class') || '')
             .match(/s([0-9])/) || [])[1];
 
           date = plugin.getISODate(date);
@@ -161,8 +169,8 @@ function retrieveReviews(callback) {
             if (subRatingIndex == -1)
               return;
             let subRating = (($this
-                .find('span.ui_bubble_rating')
-                .attr('class') || '')
+              .find('div.ui_bubble_rating')
+              .attr('class') || '')
               .match(/bubble_([0-9])/) || [])[1];
             reviewObj[subRatingKeys[subRatingIndex]] = subRating;
           });

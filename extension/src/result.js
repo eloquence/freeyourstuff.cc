@@ -104,7 +104,7 @@
       }
     }).fail(_err => {
       showMessage({
-        text: `We can't reach freeyourstuff.cc right now, so you can\'t publish your data. Sorry! You can still download it or` +
+        text: `We can't reach freeyourstuff.cc right now, so you can't publish your data. Sorry! You can still download it or` +
           ` <a id="retry" href="#">retry connecting.</a>`,
         type: 'warning',
         retry

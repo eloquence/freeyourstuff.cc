@@ -1,3 +1,4 @@
+/* global $ */
 (function() {
 
   // This script needs to be loaded at the bottom of popup.html as it performs

@@ -1,8 +1,9 @@
 {
   "manifest_version": 2,
+  "minimum_chrome_version": "55",
   "name": "Free Your Stuff",
   "description": "Lets you download your contributions to sites you contribute to",
-  "version": "0.3.21",
+  "version": "0.3.22",
   "background": {
     "scripts": ["src/init.js", "src/background.js"],
     "persistent": false

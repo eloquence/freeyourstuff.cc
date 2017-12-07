@@ -126,10 +126,16 @@ function retrieveAnswers(callback) {
 
       // Actually extract the content from in-place answers
       function extractAnswerListItems() {
+        const extractAnswers = [];
         $('.AnswerListItem').each(function() {
-          extractAndStoreAnswer($(this));
+          extractAnswers.push(extractAndStoreAnswer($(this)));
         });
-        dispatchExtractedAnswers();
+        Promise
+          .all(extractAnswers)
+          .then(dispatchExtractedAnswers)
+          .catch(error =>
+            plugin.reportError('A problem occurred while extracting your answers.', error.stack)
+          );
       }
 
       // Expand next modal in-place
@@ -145,20 +151,37 @@ function retrieveAnswers(callback) {
 
       function extractNextModalAnswer() {
         let $answer = $('.modal_content:visible');
-        extractAndStoreAnswer($answer);
-        closeActiveModal();
+        extractAndStoreAnswer($answer)
+          .then(closeActiveModal);
       }
 
       // Generic function for extracting answer content either from a modal or
       // within the feed
-      function extractAndStoreAnswer($answer) {
+      async function extractAndStoreAnswer($answer) {
+
+        // Before anything else, attempt to get the long-form answer and re-try
+        // if it's not rendered yet. Given Quora's asynchronous loading
+        // strategies, this is necessary to avoid "undefined" answers.
+        let getAnswerHTML = () => $answer.find('.ExpandedAnswer span').html(),
+          answerHTML,
+          elapsedTime = 0,
+          waitIncrement = 250,
+          maxTime = 30000;
+
+        while ((answerHTML = getAnswerHTML()) === undefined) {
+          if (elapsedTime >= maxTime)
+            throw new Error(`Attempt to obtain answer timed out after ${maxTime / 1000} seconds`);
+          await waitFor(waitIncrement);
+          elapsedTime += waitIncrement;
+        }
+
         let question = $answer.find('.question_text span').first().text();
         let questionLink = $answer.find('.question_link').first().attr('href');
         let questionURL = `https://www.quora.com${questionLink}`;
 
         // We create a new jQuery node so we don't unnecessarily
         // change the visible page content
-        let $answerText = $('<div>' + $answer.find('.ExpandedAnswer span').html() + '</div>');
+        let $answerText = $('<div>' + answerHTML + '</div>');
 
         // Strip Quora-specific embed code
         $answerText.find('div.qtext_embed').each((ind, ele) => {
@@ -257,6 +280,10 @@ function retrieveAnswers(callback) {
           data
         };
         callback(answers);
+      }
+
+      function waitFor(delay) {
+        return new Promise(resolve => setTimeout(resolve, delay));
       }
 
     }

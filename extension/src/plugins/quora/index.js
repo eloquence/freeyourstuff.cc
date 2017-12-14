@@ -78,7 +78,6 @@ function retrieveAnswers(callback) {
       extractAnswers();
 
     function extractAnswers() {
-      plugin.report('Extracting data &hellip;');
       let data = [];
       let answerModals = $('.StoryItemToggleModal.toggle_modal_inline').toArray();
       let moreLinks;
@@ -98,7 +97,7 @@ function retrieveAnswers(callback) {
         // Kicks off sequential chain of in-place expansion (given the potentially
         // huge number of answers, opening them all in parallel doesn't scale,
         // though we could potentially batch them up a bit more)
-        moreLinks = $('a.more_link:visible').toArray();
+        moreLinks = $('a.ui_qtext_more_link:visible').toArray();
         totalCollapsed = moreLinks.length;
         expandNextAnswer();
       }
@@ -107,8 +106,24 @@ function retrieveAnswers(callback) {
       function expandNextAnswer() {
         let moreLink = moreLinks.shift();
         if (moreLink === undefined) {
+
+          // Quora's answer count is not always reliable; sometimes new answers
+          // are loaded while we expand. If our new count differs from our old
+          // count, we expand the remaining answers
+          let newDisplayedAnswerCount = $('.AnswerListItem').length;
+          if (newDisplayedAnswerCount > displayedAnswerCount) {
+            displayedAnswerCount = newDisplayedAnswerCount;
+            extractAnswers();
+            return;
+          }
+
           plugin.report('Extracting content &hellip;');
-          return extractAnswerListItems();
+          extractAnswerListItems()
+            .then(dispatchExtractedAnswers)
+            .catch(error =>
+              plugin.reportError('A problem occurred while extracting your answers.', error.stack)
+            );
+          return;
         }
         moreLink.click();
         // Wait for content to be loaded.
@@ -125,17 +140,10 @@ function retrieveAnswers(callback) {
       }
 
       // Actually extract the content from in-place answers
-      function extractAnswerListItems() {
-        const extractAnswers = [];
-        $('.AnswerListItem').each(function() {
-          extractAnswers.push(extractAndStoreAnswer($(this)));
-        });
-        Promise
-          .all(extractAnswers)
-          .then(dispatchExtractedAnswers)
-          .catch(error =>
-            plugin.reportError('A problem occurred while extracting your answers.', error.stack)
-          );
+      async function extractAnswerListItems() {
+        const answers = $('.AnswerListItem').toArray();
+        for (let answer of answers)
+          await extractAndStoreAnswer($(answer));
       }
 
       // Expand next modal in-place
@@ -162,7 +170,7 @@ function retrieveAnswers(callback) {
         // Before anything else, attempt to get the long-form answer and re-try
         // if it's not rendered yet. Given Quora's asynchronous loading
         // strategies, this is necessary to avoid "undefined" answers.
-        let getAnswerHTML = () => $answer.find('.ExpandedAnswer span').html(),
+        let getAnswerHTML = () => $answer.find('.ui_qtext_expanded span').html(),
           answerHTML,
           elapsedTime = 0,
           waitIncrement = 250,

@@ -34,7 +34,8 @@ function setupExtensionEvents() {
 }
 
 function loggedIn() {
-  return $('.hover_menu_item').length > 0;
+  return $('.hover_menu_item').length > 0 ||
+    $('.SiteHeaderNavItem.HoverMenu.MoreNavItem').length > 0;
 }
 
 function retrieveAnswers(callback) {

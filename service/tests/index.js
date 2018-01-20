@@ -12,7 +12,10 @@
 // trigger captchas under certain circumstances.)
 //
 // Right now we support loading Chrome's cookies, though support for various
-// cookie exports would be fairly easy to add.
+// cookie exports would be fairly easy to add. Set password authentication to
+// basic on Linux to avoid decryption issues:
+//
+// $ google-chrome --password-store=basic
 //
 // We use icdiff by default, which you can find here: https://www.jefftk.com/icdiff
 //
@@ -25,6 +28,7 @@
 const chromeCookies = require('chrome-cookies-secure');
 const colors = require('colors/safe');
 const jsdom = require('jsdom');
+const { JSDOM } = jsdom;
 const CookieJar = require('tough-cookie').CookieJar;
 const cookieJar = new CookieJar();
 const fs = require('fs');
@@ -32,21 +36,24 @@ const execSync = require('child_process').execSync;
 
 // Internal dependencies
 const DataSet = require('../../extension/src/dataset.js');
-const plugin = require('../../extension/src/plugin.js');
 const schemas = require('../load-schemas');
 const pluginDir = `${__dirname}/../../extension/src/plugins`;
 const libDir = `${__dirname}/../../extension/src/lib/js`;
 const resultsDir = `${__dirname}/results`;
 const diffCommand = `icdiff --cols=${process.stdout.columns} --show-all-spaces --line-numbers --no-headers %file1 %file2`;
+
+// Config
+const userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
+
+
 let schemaKeys = Object.keys(schemas);
+
 if (process.argv.length > 2) {
-  let myTests = process.argv;
+  const myTests = process.argv;
   myTests.splice(0, 2);
-  schemaKeys = schemaKeys.filter(key => {
-    return (myTests.indexOf(key) !== -1);
-  });
+  schemaKeys = schemaKeys.filter(key => myTests.indexOf(key) !== -1);
   if (!schemaKeys.length) {
-    console.log(colors.red('None of the specified plugin(s) could be found: ' + myTests.join(', ')));
+    console.error(colors.red('None of the specified plugin(s) could be found: ' + myTests.join(', ')));
     process.exit(1);
   } else
     console.log(colors.gray('The following specified plugin(s) have been found in sites.json and will be tested: ' + schemaKeys.join(', ')));
@@ -55,134 +62,112 @@ if (process.argv.length > 2) {
   console.log(colors.gray('To test only some plugins, specify them as command line arguments, separated with spaces.'));
 }
 
-processTestQueue();
+runTests()
+  .then(() => {
+    console.log('Tests completed.');
+  })
+  .catch(error => {
+    console.error(colors.red(error.message));
+    console.error(error.stack);
+  });
 
-// Since we have a lot of async code that could throw errors, we'll make sure
-// tests keep running when that happens.
-process.on('uncaughtException', function(e) {
-  console.log(colors.red(e.stack));
-  processTestQueue();
-});
+function getCookies(url) {
+  return new Promise((resolve, reject) => {
+      chromeCookies.getCookies(url, 'set-cookie', (err, cookies) => {
+        if (err)
+          return reject(err);
+        else
+          return resolve(cookies);
+      });
+  });
+}
 
-function processTestQueue() {
-  if (schemaKeys.length) {
-    let schemaKey = schemaKeys.shift();
+async function runTests() {
+  for (let schemaKey of schemaKeys) {
     console.log('-'.repeat(process.stdout.columns));
     console.log(`Testing plugin "${schemaKey}"...`);
-    chromeCookies.getCookies(schemas[schemaKey].schema.site.canonicalURL, 'set-cookie', (err, cookies) => {
-      for (let cookie of cookies) {
-        cookieJar.setCookieSync(cookie, schemas[schemaKey].schema.site.canonicalURL);
-      }
-      let userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
-      let virtualConsole = jsdom.createVirtualConsole().sendTo(console);
-      const document = jsdom.jsdom(undefined, {
-        userAgent,
-        cookieJar,
-        virtualConsole,
-        url: schemas[schemaKey].schema.site.canonicalURL // needed for setting document origin
-      });
-      let window = document.defaultView;
-      window.plugin = plugin;
+    const cookies = await getCookies(schemas[schemaKey].schema.site.canonicalURL);
+    for (let cookie of cookies)
+      cookieJar.setCookieSync(cookie, schemas[schemaKey].schema.site.canonicalURL);
 
-      injectDependency('jquery')() // immediately fire first promise
-        .then(injectDependency('papaparse'))
-        .then(injectScript(require.resolve(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`),
-          runJSONTests))
-        .catch((error) => {
-          console.error(colors.red(error.stack));
-        });
 
-      function injectScript(path, callback) {
-        return () => {
-          let p = new Promise((resolve, reject) => {
-            let pluginJS = fs.readFileSync(path).toString();
-            let scriptEl = document.createElement('script');
-            scriptEl.textContent = pluginJS;
-            scriptEl.addEventListener('load', () => {
-              resolve();
-              if (callback)
-                callback();
-            });
-            document.body.appendChild(scriptEl);
-          });
-          return p;
-        };
-      }
-
-      function injectDependency(dep) {
-        switch (dep) {
-          case 'jquery':
-            return injectScript(`${libDir}/jquery-2.1.4.min.js`);
-          case 'papaparse':
-            if (Array.isArray(schemas[schemaKey].schema.site.deps) &&
-              schemas[schemaKey].schema.site.deps.indexOf(dep) !== -1) {
-              console.log('Loading plugin dependency ' + dep);
-              return injectScript(`${libDir}/papaparse.min.js`);
-            }
-            /* falls through */
-          default:
-            return () => {
-              return new Promise((resolve) => {
-                resolve();
-              });
-            };
-        }
-      }
-
-      function runJSONTests() {
-        if (typeof window.jsonTests !== 'object') {
-          console.log(`No JSON tests defined for plugin ${schemaKey}.`);
-          console.log(`Tests must be defined in the plugin itself in its jsonTests variable.`);
-          processTestQueue();
-        } else {
-          let jsonTests = [];
-          for (let jsonTest in window.jsonTests) {
-            jsonTests.push(getTestPromise(window.jsonTests[jsonTest], jsonTest));
-          }
-          Promise.all(jsonTests)
-            .then(validateResults)
-            .catch((error) => {
-              console.error(colors.red('There was a problem validating this test.'));
-              console.error(colors.red(error.stack));
-            })
-            .then(processTestQueue);
-        }
-      }
-
-      function getTestPromise(testFunction, setName) {
-        if (typeof testFunction === 'function')
-          return new Promise(resolve => {
-            testFunction(result => {
-              resolve({
-                schemaKey,
-                setName,
-                result
-              });
-            });
-          });
-        else
-          return;
-      }
-
+    const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {
+      userAgent,
+      cookieJar,
+      runScripts: 'dangerously',
+      // needed for setting document origin
+      url: schemas[schemaKey].schema.site.canonicalURL
     });
+
+    const window = dom.window,
+      document = window.document;
+
+    const injectScript = path => {
+      return new Promise((resolve, reject) => {
+        const pluginJS = fs.readFileSync(path).toString();
+        const scriptEl = document.createElement('script');
+        scriptEl.textContent = pluginJS;
+        scriptEl.addEventListener('load', () => {
+          resolve();
+        });
+        document.body.appendChild(scriptEl);
+      });
+    };
+
+    const injectDependency = dep => {
+      switch (dep) {
+        case 'jquery':
+          return injectScript(`${libDir}/jquery-2.1.4.min.js`);
+        case 'papaparse':
+        case 'numeral':
+        case 'moment':
+          if (Array.isArray(schemas[schemaKey].schema.site.deps) &&
+            schemas[schemaKey].schema.site.deps.indexOf(dep) !== -1) {
+            console.log('Loading plugin dependency ' + dep);
+            return injectScript(`${libDir}/${dep}.min.js`);
+          }
+          /* falls through */
+        default:
+          return Promise.resolve();
+      }
+    };
+
+    await injectDependency('jquery');
+    await injectDependency('papaparse');
+    await injectDependency('numeral');
+    await injectScript(require.resolve('../../extension/src/plugin.js'));
+    await injectScript(require.resolve(`${pluginDir}/${schemas[schemaKey].schema.site.plugin}`));
+    if (typeof window.jsonTests !== 'object') {
+      console.log(`No JSON tests defined for plugin ${schemaKey}.`);
+      console.log(`Tests must be defined in the plugin itself in its jsonTests variable.`);
+      continue;
+    }
+    for (let testName in window.jsonTests) {
+      try {
+       const result = await window.jsonTests[testName]();
+       validateResult({
+         schemaKey,
+         datasetName: testName,
+         result,
+         schema: schemas[schemaKey][testName]
+       });
+      } catch (error) {
+        console.error(colors.red(`There was a problem validating this test: ${testName}.`));
+        console.error(colors.red(error.stack));
+      }
+    }
+
   }
 }
 
-function validateResults(resultArray) {
-  for (let resultObj of resultArray) {
-    validateResult(resultObj);
-  }
-}
-
-function validateResult(resultObj) {
-  console.log(`Parsing ${resultObj.testID} against schema ...`);
-  let testID = `${resultObj.schemaKey}.${resultObj.setName}`;
-  let dataSet = new DataSet(resultObj.result, schemas[resultObj.schemaKey][resultObj.setName]);
-
-  let jsonData = JSON.stringify(dataSet.set, null, 2);
-  console.log(`Running diff for ${testID} ...`);
-  let filename = `${resultsDir}/${testID}.json`;
-  let tmpFilename = `${resultsDir}/tmp.json`;
+function validateResult({ schemaKey, datasetName, result, schema }) {
+  const testID = `${schemaKey}.${datasetName}`;
+  console.log(`Parsing result for ${testID}`);
+  const dataSet = new DataSet(result, schema);
+  const jsonData = JSON.stringify(dataSet.set, null, 2);
+  console.log('Running diff')
+  const filename = `${resultsDir}/${testID}.json`;
+  const tmpFilename = `${resultsDir}/tmp.json`;
   try {
     fs.statSync(filename);
   } catch (e) {
@@ -196,9 +181,9 @@ function validateResult(resultObj) {
     }
     return;
   }
-  let oldResult = fs.readFileSync(filename).toString();
+  const oldResult = fs.readFileSync(filename).toString();
   fs.writeFileSync(tmpFilename, jsonData);
-  let command = diffCommand
+  const command = diffCommand
     .replace(/%file1/, filename)
     .replace(/%file2/, tmpFilename);
   let diff;

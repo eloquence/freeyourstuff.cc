@@ -41,6 +41,11 @@
       font-style: italic;
     }
 
+    #busy {
+      display: none;
+      padding: 0 0.5em 0 0.5em;
+    }
+
     #error {
       color: red;
     }
@@ -58,9 +63,10 @@
   Hooray! freeyourstuff.cc lets you download or publish the following content contributions you have made to <span id="siteName">this site</span>:
   <ul id="availableContent"></ul>
   <button id="retrieve" class="btn btn-primary">Retrieve my contributions</button>
+  <span id="busy"><img src="/assets/dots.svg" width="20"></span>
   <span id="progress"></span>
-  <span id="error"></span>
-  <br><br>
+  <div id="error"></div>
+  <br>
   The download will be done by your browser. Nothing will be published unless you say so in the next step.
   <br><br>
   We don't know yet how to download the following contribution types:

@@ -4,7 +4,7 @@
     "label": {
       "en": "Amazon.com"
     },
-    "version": 2
+    "version": 3
   },
   "reviews": {
     "label": {
@@ -60,7 +60,7 @@
         }
       },
       "headline": {
-        "type": "text",
+        "type": "html",
         "label": {
           "en": "Headline"
         },

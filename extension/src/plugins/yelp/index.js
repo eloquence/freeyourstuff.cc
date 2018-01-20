@@ -1,61 +1,55 @@
-'use strict';
+/* global DataSet, $, plugin */
+(function() {
+  'use strict';
 
-// JSON result comparison tests to be run by NodeJS/JSDOM test runner
-var jsonTests = {
-  reviews: retrieveReviews
-};
+  // JSON result comparison tests to be run by NodeJS/JSDOM test runner
+  // eslint-disable-next-line no-unused-vars
+  window.jsonTests = {
+    reviews: retrieveReviews
+  };
 
-if (typeof init === 'undefined')
-  var init = false;
+  plugin.setup([handleRetrieval]);
 
-// For execution in browser
-if (typeof chrome !== 'undefined' && !init)
-  setupExtensionEvents();
-
-function setupExtensionEvents() {
-  chrome.runtime.onMessage.addListener(request => {
+  function handleRetrieval(request) {
     if (request.action == 'retrieve') {
-      if (!loggedIn()) {
-        chrome.runtime.sendMessage({
-          action: 'notice-login'
-        });
-        return false;
-      }
+      if (!loggedIn())
+        return plugin.loggedOut();
+      plugin.busy();
+
       let datasets = {};
       datasets.schemaKey = request.schema.schema.key;
       datasets.schemaVersion = request.schema.schema.version;
-      retrieveReviews(reviews => {
-        datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
-        chrome.runtime.sendMessage({
-          action: 'dispatch',
-          data: datasets,
-          schema: request.schema
-        });
-      });
+      retrieveReviews()
+        .then(reviews => {
+          datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
+          chrome.runtime.sendMessage({
+            action: 'dispatch',
+            data: datasets,
+            schema: request.schema
+          });
+          plugin.done();
+        })
+        .catch(plugin.reportError);
     }
-  });
-  // Prevent repeated initialization
-  init = true;
-}
+  }
 
-function loggedIn() {
-  return Boolean($('.user-account .user-display-name').html());
-}
+  function loggedIn() {
+    return Boolean($('.user-account .user-display-name').html());
+  }
 
-function retrieveReviews(callback) {
-  let page = 1;
-  let reviews = {
-    head: {},
-    data: []
-  };
-  let firstURL = 'https://www.yelp.com/user_details_reviews_self';
-  $.get(firstURL)
-    .done(processPage)
-    .fail(plugin.handleConnectionError(firstURL));
+  async function retrieveReviews() {
+    let page = 1;
+    const reviews = {
+      head: {},
+      data: []
+    };
+    let url = 'https://www.yelp.com/user_details_reviews_self';
 
-  function processPage(html) {
-    try {
-      let $dom = $($.parseHTML(html));
+    do {
+
+      const html = await plugin.getURL(url),
+        $dom = $($.parseHTML(html));
+
       if (page === 1) {
         let idLink = $dom.find('.user-display-name');
         reviews.head.reviewerName = idLink.text();
@@ -63,12 +57,12 @@ function retrieveReviews(callback) {
       }
 
       // Helper functions common to different review types
-      let getRating = $root => (($root
+      const getRating = $root => (($root
           .find("[class^='i-stars i-stars']")
           .attr('class') || '')
-          .match(/[0-9]/) || [])[0];
+        .match(/[0-9]/) || [])[0];
 
-      let getDate = $root => {
+      const getDate = $root => {
         let qualifiers = $root
           .find('.rating-qualifier')
           .text(); // TODO: other qualifiers
@@ -81,71 +75,63 @@ function retrieveReviews(callback) {
 
         let $e = $(e);
 
-        let text = $e
+        const text = $e
           .find('.review-content p')
           .first()
-          .html();
-        let subject = $e
+          .html(),
+
+          subject = $e
           .find('.biz-name')
           .text();
+
         let subjectYelpURL;
-        let base = 'https://yelp.com';
-        let path = $e
+        const base = 'https://yelp.com';
+        const path = $e
           .find('.biz-name')
           .attr('href');
+
         if (path)
           subjectYelpURL = base + path;
 
-        let checkins = $e
+        const checkins = $e
           .find("[class$='checkin_c-common_sprite-wrap review-tag']")
           .text()
           .match(/\d+/) || undefined;
 
-        let reviewObj = {
+        reviews.data.push({
           subject,
           subjectYelpURL,
           date: getDate($e),
           text,
           starRating: getRating($e),
           checkins
-        };
-
-        reviews.data.push(reviewObj);
+        });
 
         // Process older reviews
         $e.find('.previous-review').each((j, p) => {
-          let $p = $(p);
-          let text = $p.find('.hidden').html();
-          let reviewObj = {
+          const $p = $(p),
+            text = $p.find('.hidden').html();
+          reviews.data.push({
             subject,
             subjectYelpURL,
             date: getDate($p),
             text,
             starRating: getRating($p)
-          };
-          reviews.data.push(reviewObj);
+          });
         });
-
       });
 
-      let nextURL = $dom.find('.pagination-links .next').attr('href');
-      if (nextURL) {
+      url = $dom.find('.pagination-links .next').attr('href');
+      if (url) {
         page++;
         // Obtain and relay progress info
         let totalPages = ($dom
           .find('.page-of-pages')
           .text()
           .match(/\d+.*?(\d+)/) || [])[1];
-        plugin.report(`Fetching page ${page} of ${totalPages} &hellip;`);
-        // Fetch next page
-        $.get(nextURL)
-          .done(processPage)
-          .fail(plugin.handleConnectionError(nextURL));
-      } else {
-        callback(reviews);
+        plugin.report(`Fetching page ${page} of ${totalPages}`);
       }
-    } catch (error) {
-      plugin.reportError(`An error occurred processing your reviews.`, error.stack);
-    }
+    } while (url);
+    return reviews;
   }
-}
+})();

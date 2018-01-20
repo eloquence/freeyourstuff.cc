@@ -26,6 +26,7 @@
 {
   "name": "TripAdvisor",
   "plugin": "tripadvisor",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.tripadvisor.com/",
   "regex": "http(s)*://(www.)*tripadvisor.com/",
   "supported": ["Reviews"],
@@ -34,103 +35,127 @@
 {
   "name": "Amazon.com",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.com/",
   "regex": "http(s)*://(www.)*amazon.com/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.com.au",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.com.au/",
   "regex": "http(s)*://(www.)*amazon.com.au/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.com.br",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.com.br/",
   "regex": "http(s)*://(www.)*amazon.com.br/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.ca",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.ca/",
   "regex": "http(s)*://(www.)*amazon.ca/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.de",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.de/",
   "regex": "http(s)*://(www.)*amazon.de/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.fr",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.fr/",
   "regex": "http(s)*://(www.)*amazon.fr/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.es",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.es/",
   "regex": "http(s)*://(www.)*amazon.es/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.in",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.in/",
   "regex": "http(s)*://(www.)*amazon.in/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.it",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.it/",
   "regex": "http(s)*://(www.)*amazon.it/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.com.mx",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.com.mx/",
   "regex": "http(s)*://(www.)*amazon.com.mx/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.nl",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.nl/",
   "regex": "http(s)*://(www.)*amazon.nl/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Amazon.co.uk",
   "plugin": "amazon",
+  "deps": ["numeral"],
   "canonicalURL": "https://www.amazon.co.uk/",
   "regex": "http(s)*://(www.)*amazon.co.uk/",
   "supported": ["Reviews"],
-  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"]
+  "unsupported": ["Ratings", "Comments", "Multimedia", "Lists"],
+  "extraPermissions": true
 },
 {
   "name": "Quora",
   "plugin": "quora",
-  "deps": ["moment"],
+  "deps": ["moment", "numeral"],
   "canonicalURL": "https://www.quora.com/",
   "regex": "http(s)*://(www.)*quora.com/",
   "supported": ["Answers"],

@@ -215,8 +215,8 @@
 
   // We normalize URLs by stripping the referral string
   function normalizeURL(url) {
-    if (/\/ref=.*/.test(url))
-      url = url.match(/(.*\/)(ref=.*)?/)[1];
+    if (/\/\?ref_=.*/.test(url))
+      url = url.match(/(.*\/)(\?ref_=.*)?/)[1];
     return url;
   }
 })();

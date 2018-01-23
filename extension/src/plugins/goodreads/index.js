@@ -170,12 +170,11 @@
 
   function pollCompletion(url) {
     return new Promise((resolve, reject) => {
-      let tries = 0,
-        maxTries = 50,
+      let elapsedTime = 0,
+        timeout = 30000,
         interval = 250;
 
       const i = setInterval(() => {
-        tries++;
         $.ajax({
             type: 'HEAD',
             url
@@ -185,9 +184,9 @@
             resolve();
           })
           .fail(event => {
-            tries++;
-            if (tries >= maxTries)
-              reject(plugin.getConnectionError(url, event, 'Export never completed.'));
+            elapsedTime += interval;
+            if (elapsedTime >= timeout)
+              reject(plugin.getConnectionError(url, event, `Export did not complete in ${timeout} milliseconds.`));
           });
       }, interval);
     });

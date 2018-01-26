@@ -1,9 +1,13 @@
+/* global $, Papa */
 (function() {
   'use strict';
-  /* global $, DataSet, plugin, Papa */
-  // Result comparison tests to be run by NodeJS/JSDOM test runner
-  // eslint-disable-next-line no-unused-vars
-  window.jsonTests = {
+
+  const freeyourstuff = window.freeyourstuff,
+    plugin = freeyourstuff.plugin,
+    DataSet = freeyourstuff.DataSet;
+
+  // Puppeteer tests
+  freeyourstuff.tests = {
     reviews: retrieveReviews
   };
 
@@ -93,7 +97,13 @@
       };
   }
 
-  async function retrieveReviews() {
+  async function retrieveReviews({ url } =  {}) {
+    if (url) {
+      console.log(`URL option not supported. ` +
+        `Goodreads can only export the ratings CSV for the user's own session.`);
+      return null;
+    }
+
     const reviews = {
       head: {},
       data: []

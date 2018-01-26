@@ -20,10 +20,14 @@ The extension shows a little icon in the address bar on supported sites, and let
 
 # Development
 
-There are two components:
+There are three components:
 
 - a Chrome/Chromium extension (directory `extension/`) for downloading content
 - a web service (directory `service/`) for publishing content.
+- a command line suite (directory `cli/`) for interacting with your content
+  on the command line, by scripting Chromium via
+  [Puppeteer](https://github.com/GoogleChrome/puppeteer) (experimental,
+  currently just used for tests).
 
 It's a fully open JavaScript stack. We've put special emphasis on the plugin system to make it easy for anyone to add support for their favorite site. See the [plugin developer documentation](http://freeyourstuff.cc/plugins) for details.
 
@@ -41,4 +45,4 @@ equivalent to the public domain. By submitting a pull request, you agree to lice
 under the same terms.
 
 This project has adopted a [code of conduct](./CODE_OF_CONDUCT.md) to make
-sure all contributors feel welcome. 
+sure all contributors feel welcome.

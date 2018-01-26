@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 
 // Internal dependencies
 const config = require('../load-config');
-const schemas = require('../load-schemas');
+const { schemas } = require('../load-schemas');
 const SiteSet = require('../models/siteset.js');
 const Upload = require('../models/upload.js');
 

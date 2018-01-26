@@ -1,6 +1,15 @@
-/* global DataSet, $, plugin, moment, numeral */
+/* global $, moment, numeral */
 (function() {
   'use strict';
+
+  const freeyourstuff = window.freeyourstuff,
+    plugin = freeyourstuff.plugin,
+    DataSet = freeyourstuff.DataSet;
+
+  // Puppeteer tests
+  freeyourstuff.tests = {
+    answers: retrieveAnswers
+  };
 
   plugin.setup([handleRetrieval]);
 
@@ -48,18 +57,14 @@
   }
 
   // The main coordinating function. Refactor potential in the execution loop.
-  async function retrieveAnswers() {
+  async function retrieveAnswers({ url } = {}) {
     const profileLink = $('.hover_menu_item').first().attr('href'),
-      profileURL = `https://www.quora.com${profileLink}`,
+      profileURL = url || `https://www.quora.com${profileLink}`,
       answersURL = `${profileURL}/answers`;
 
     if (decodeURI(window.location.href) != answersURL || $('#freeyourstuff-status').length) {
       plugin.report('Redirecting to answers list');
-      chrome.runtime.sendMessage({
-        action: 'redirect',
-        url: answersURL,
-        autoRetrieve: true
-      });
+      plugin.redirect(answersURL);
       return false;
     }
 

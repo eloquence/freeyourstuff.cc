@@ -41,7 +41,7 @@
   // redirected from another page
   function init(autoRetrieve) {
     // Ensure we have jQuery available before loading anything else
-    injectScript('src/lib/js/jquery-2.1.4.min.js')()
+    injectScript('src/lib/js/jquery.min.js')()
       .then(injectScript('src/dataset.js'))
       .then(getTab)
       .then(tab => loadPlugin(tab, autoRetrieve))

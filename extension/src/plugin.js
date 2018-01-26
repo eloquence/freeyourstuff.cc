@@ -3,33 +3,44 @@
 (function() {
 
   'use strict';
-  // The pluginState and pluginListeners variables are persistent across multiple
-  // injections of the plugin.
-  if (typeof window.pluginState != 'object') {
-    window.pluginState = {
-      loaded: false,
-      busy: false
-    };
 
-    // We don't have to reset this listener for multiple injections, since it only
-    // returns the persistent state object
-    if (typeof chrome !== 'undefined')
-      chrome.runtime.onMessage.addListener(request => {
-        if (request.action == 'get-plugin-state')
-          window.plugin.sendState();
-      });
+  initGlobals();
+
+
+  function initGlobals() {
+
+    // Namespace to ensure safe injection even via Puppeteer
+    if (window.freeyourstuff === undefined)
+      window.freeyourstuff = {};
+
+    // For variables that are persistent across multiple injections of the plugin
+    if (window.freeyourstuff.plugin === undefined) {
+
+      window.freeyourstuff.pluginState = {
+        loaded: false,
+        busy: false
+      };
+
+      window.freeyourstuff.pluginListeners = [];
+
+      // Set only once to access the persistent state
+      if (useExtensionAPI())
+        chrome.runtime.onMessage.addListener(request => {
+          if (request.action == 'get-plugin-state')
+            window.freeyourstuff.plugin.sendState();
+        });
+    }
   }
 
-  if (typeof window.pluginListeners != 'object')
-    window.pluginListeners = [];
+  const freeyourstuff = window.freeyourstuff;
 
   // Will get overwritten each time the popup is opened. This is
   // by design and makes it easier to test development changes.
-  window.plugin = {
+  const plugin = freeyourstuff.plugin = {
     // Pass a message back to the popup, or to the console if running in Node.js
     // mode.
     report: function(html) {
-      if (typeof chrome !== 'undefined')
+      if (useExtensionAPI())
         chrome.runtime.sendMessage({
           action: 'notice',
           html
@@ -40,7 +51,7 @@
 
     // Clear notices and errors
     clearMessages: function() {
-      if (typeof chrome !== 'undefined')
+      if (useExtensionAPI())
         chrome.runtime.sendMessage({ action: 'clear' });
     },
 
@@ -55,7 +66,7 @@
           details += '<br>Additional details: ' + error.details;
       }
 
-      if (typeof chrome !== 'undefined')
+      if (useExtensionAPI())
         chrome.runtime.sendMessage({
           action: 'error',
           errorMessage,
@@ -63,7 +74,7 @@
         });
       else
         console.error(errorMessage, details);
-      window.plugin.done();
+      plugin.done();
     },
 
     // Returns an error handler for XMLHttpRequest callbacks (native or jQuery)
@@ -73,7 +84,7 @@
     //   .fail(plugin.handleConnectionError(someURL));
     handleConnectionError: function(url) {
       const handler = event =>
-        window.plugin.reportError(window.plugin.getConnectionError(url, event));
+        plugin.reportError(plugin.getConnectionError(url, event));
       return handler;
     },
 
@@ -136,46 +147,66 @@
     // specifically failed to load. selectors is an array of jQuery selector
     // strings.
     awaitSelectors: async function(selectors, interval, timeout) {
-      selectors = selectors.map(selector => window.plugin.awaitSelector(selector, interval, timeout));
+      selectors = selectors.map(selector => plugin.awaitSelector(selector, interval, timeout));
       await Promise.all(selectors);
     },
 
     // Tell the popup to say that the user has to log in (the popup also shows
     // the site name)
     loggedOut: function() {
-      chrome.runtime.sendMessage({
-        action: 'notice-login'
-      });
-      window.plugin.done();
+      if (useExtensionAPI())
+        chrome.runtime.sendMessage({
+          action: 'notice-login'
+        });
+      else
+        console.log('User does not appear to be logged in.');
+
+      plugin.done();
+    },
+
+    // Move to a new page and (by default) re-start the plugin
+    redirect: function(url, autoRetrieve = true) {
+      if (useExtensionAPI()) {
+        chrome.runtime.sendMessage({
+          action: 'redirect',
+          url,
+          autoRetrieve
+        });
+      }
+      else if (usePuppeteer()) {
+        window.puppeteerRedirect(url);
+      }
+      else
+        console.log('Redirection not implemented.');
     },
 
     // State functions. Loading: waiting for page to be ready. Loaded: page is
     // ready. Busy: Plugin is doing stuff. Done: Plugin is done doing stuff.
     loading() {
-      window.pluginState.loaded = false;
-      window.plugin.sendState();
+      freeyourstuff.pluginState.loaded = false;
+      plugin.sendState();
     },
 
     loaded() {
-      window.pluginState.loaded = true;
-      window.plugin.sendState();
+      freeyourstuff.pluginState.loaded = true;
+      plugin.sendState();
     },
 
     busy() {
-      window.pluginState.busy = true;
-      window.plugin.sendState();
+      freeyourstuff.pluginState.busy = true;
+      plugin.sendState();
     },
 
     done() {
-      window.pluginState.busy = false;
-      window.plugin.sendState();
+      freeyourstuff.pluginState.busy = false;
+      plugin.sendState();
     },
 
     sendState() {
-      if (typeof chrome !== 'undefined')
+      if (useExtensionAPI())
         chrome.runtime.sendMessage({
           action: 'send-plugin-state',
-          pluginState: window.pluginState
+          pluginState: freeyourstuff.pluginState
         });
     },
 
@@ -187,19 +218,19 @@
     // Remove message listeners from previous injection, then setup listeners
     // for this plugin
     setup(listeners) {
-      if (typeof chrome === 'undefined')
+      if (!useExtensionAPI())
         return false;
 
-      window.plugin.loading();
+      plugin.loading();
       $(document).ready(() => {
-        for (let listener of window.pluginListeners)
+        for (let listener of freeyourstuff.pluginListeners)
           chrome.runtime.onMessage.removeListener(listener);
 
         for (let listener of listeners)
           chrome.runtime.onMessage.addListener(listener);
 
-        window.plugin.loaded();
-        window.pluginListeners = listeners;
+        plugin.loaded();
+        freeyourstuff.pluginListeners = listeners;
       });
     },
 
@@ -208,14 +239,22 @@
       return new Promise((resolve, reject) =>
         $.get(url, params)
         .done(resolve)
-        .fail(event => reject(window.plugin.getConnectionError(url, event))));
+        .fail(event => reject(plugin.getConnectionError(url, event))));
     },
 
     getConnectionError(url, event, message = 'Connection error.') {
       const error = new Error(message);
-      error.details = window.plugin.getConnectionErrorDetails(url, event);
+      error.details = plugin.getConnectionErrorDetails(url, event);
       return error;
     }
 
   };
+
+  function useExtensionAPI() {
+    return typeof chrome !== 'undefined' && !window.freeyourstuff.puppeteer;
+  }
+
+  function usePuppeteer() {
+    return window.freeyourstuff.puppeteer === true;
+  }
 })();

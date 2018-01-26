@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 // Internal dependencies
-const schemas = require('../load-schemas.js');
+const { schemas } = require('../load-schemas.js');
 const Upload = require('./upload.js');
 
 let models = {};

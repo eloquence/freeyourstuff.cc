@@ -7,13 +7,19 @@
 // service in order to use this module.
 'use strict';
 const jsonfile = require('jsonfile');
-let sitesDir = `${__dirname}/../extension`;
-let pluginDir = `${__dirname}/../extension/src/plugins`;
-let sites = jsonfile.readFileSync(`${sitesDir}/sites.json`);
-let schemas = {};
+const path = require('path');
+
+const sitesDir = path.join(__dirname, '..', 'extension'),
+  pluginDir = path.join(sitesDir, 'src', 'plugins'),
+  sitesFile = path.join(sitesDir, 'sites.json'),
+  sites = jsonfile.readFileSync(sitesFile);
+
+const schemas = {};
 for (let site of sites) {
     try {
-      let schema = jsonfile.readFileSync(`${pluginDir}/${site.plugin}/schema.json`);
+      const schemaFile = path.join(pluginDir, site.plugin, 'schema.json'),
+        schema = jsonfile.readFileSync(schemaFile);
+
       if (schema.hasOwnProperty('schema') && schema.schema.hasOwnProperty('key')) {
         schemas[schema.schema.key] = schema;
         schema.schema.site = site;
@@ -24,4 +30,9 @@ for (let site of sites) {
       console.log(`Problem reading schema.json for plugin "${site.plugin}". Skipping. Error was: ${e}`);
     }
 }
-module.exports = schemas;
+
+// For convenience, we also export the loaded site data
+module.exports = {
+  schemas,
+  sites
+};

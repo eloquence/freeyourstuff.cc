@@ -15,7 +15,7 @@ const fs = require('fs');
 const exec = require('child-process-promise').exec;
 
 // Internal dependencies
-const schemas = require('../load-schemas.js');
+const { schemas } = require('../load-schemas.js');
 const config = require('../load-config.js');
 const colors = require('colors/safe');
 

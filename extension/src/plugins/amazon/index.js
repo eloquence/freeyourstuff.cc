@@ -1,29 +1,30 @@
-/* global $, plugin, DataSet, numeral */
+/* global $, numeral */
 (function() {
   'use strict';
 
+  const freeyourstuff = window.freeyourstuff,
+    plugin = freeyourstuff.plugin,
+    DataSet = freeyourstuff.DataSet;
+
   // By default we assume we're on Amazon.com
   let edition = 'com';
+
+  // Puppeteer tests
+  freeyourstuff.tests = {
+    reviews: retrieveReviews
+  };
 
   plugin.setup([handleRetrieval]);
 
   function handleRetrieval(request) {
     if (request.action == 'retrieve') {
-      // Set edition based on hostname.
-      let m = window.location.hostname.match(/amazon\.(.*)$/);
-      if (m)
-        edition = m[1];
 
       if (!loggedIn())
         return plugin.loggedOut();
 
       plugin.busy();
 
-      if (window.location.protocol == 'http:') {
-        plugin.reportError(null, `Please visit <a href="https://www.amazon.${edition}/" target="_blank">the HTTPS version</a> of Amazon.${edition}.`);
-        return false;
-      }
-      let datasets = {};
+      const datasets = {};
       datasets.schemaKey = request.schema.schema.key;
       datasets.schemaVersion = request.schema.schema.version;
       retrieveReviews()
@@ -49,15 +50,20 @@
     return !($('#nav-flyout-ya-signin').length);
   }
 
-  async function retrieveReviews() {
+  async function retrieveReviews({ url } = {}) {
     const reviews = {
       head: {}
     };
 
+    // Set edition based on hostname.
+    const m = window.location.hostname.match(/amazon\.(.*)$/);
+    if (m)
+      edition = m[1];
+
     // Amazon has two profile variants in the wild which behave very differently.
     // Depending which edition we're on, we need to branch accordingly below.
     const newProfile = edition === 'com' ? true : false,
-      profileURL = `https://www.amazon.${edition}/gp/profile/`,
+      profileURL = url || `https://www.amazon.${edition}/gp/profile/`,
       profileRegex = new RegExp(`^https://www\\.amazon\\.${edition}/gp/profile/`),
       actualURL = decodeURI(window.location.href);
 
@@ -73,11 +79,7 @@
     // Navigate to profile if needed
     if (!profileRegex.test(actualURL)) {
       plugin.report('Redirecting to profile page');
-      chrome.runtime.sendMessage({
-        action: 'redirect',
-        url: profileURL,
-        autoRetrieve: true
-      });
+      plugin.redirect(profileURL);
       return false;
     }
 

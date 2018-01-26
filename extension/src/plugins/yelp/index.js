@@ -1,10 +1,13 @@
-/* global DataSet, $, plugin */
+/* global $ */
 (function() {
   'use strict';
 
-  // JSON result comparison tests to be run by NodeJS/JSDOM test runner
-  // eslint-disable-next-line no-unused-vars
-  window.jsonTests = {
+  const freeyourstuff = window.freeyourstuff,
+    plugin = freeyourstuff.plugin,
+    DataSet = freeyourstuff.DataSet;
+
+  // Puppeteer tests
+  freeyourstuff.tests = {
     reviews: retrieveReviews
   };
 
@@ -37,13 +40,14 @@
     return Boolean($('.user-account .user-display-name').html());
   }
 
-  async function retrieveReviews() {
+  async function retrieveReviews({ url } = {}) {
     let page = 1;
     const reviews = {
       head: {},
       data: []
     };
-    let url = 'https://www.yelp.com/user_details_reviews_self';
+    if (!url)
+      url = 'https://www.yelp.com/user_details_reviews_self';
 
     do {
 
@@ -121,14 +125,17 @@
         });
       });
 
-      url = $dom.find('.pagination-links .next').attr('href');
+      // The second check is for logged out profile views
+      url = $dom.find('.pagination-links .next').attr('href') ||
+        $dom.find('.pagination-block > a').attr('href');
+
       if (url) {
         page++;
         // Obtain and relay progress info
         let totalPages = ($dom
           .find('.page-of-pages')
           .text()
-          .match(/\d+.*?(\d+)/) || [])[1];
+          .match(/\d+.*?(\d+)/) || [])[1] || 'unknown number of pages';
         plugin.report(`Fetching page ${page} of ${totalPages}`);
       }
     } while (url);

@@ -1,17 +1,18 @@
-/* global DataSet, $, plugin, numeral */
+/* global $, numeral */
 (function() {
   'use strict';
 
-  const baseURL = 'https://www.tripadvisor.com',
+  const freeyourstuff = window.freeyourstuff,
+    plugin = freeyourstuff.plugin,
+    DataSet = freeyourstuff.DataSet,
+    baseURL = 'https://www.tripadvisor.com',
     counter = {
       total: undefined,
       progress: 0
     };
 
-  // Result comparison tests to be run by NodeJS/JSDOM test runner
-  // eslint-disable-next-line no-unused-vars
-  // Needs to be refactored to async
-  window.jsonTests = {
+  // Puppeteer tests
+  freeyourstuff.tests = {
     reviews: retrieveReviews
   };
 
@@ -50,14 +51,14 @@
   }
 
   // The main retrieval loop
-  async function retrieveReviews() {
+  async function retrieveReviews({ url } = {}) {
     const reviews = {
       head: {},
       data: []
     };
 
     // Will be overwritten with member ID in URL, after redirect
-    let directoryURL = `${baseURL}/MemberProfile`;
+    let directoryURL = url ? url : `${baseURL}/MemberProfile`;
 
     const directoryResponse = await getDirectory(directoryURL);
     directoryURL = directoryResponse.responseURL;

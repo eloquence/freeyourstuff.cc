@@ -1,9 +1,13 @@
-/* global $, DataSet, plugin, Papa, */
+/* global $, Papa, */
 (function() {
   'use strict';
-  // Result comparison tests to be run by NodeJS/JSDOM test runner
-  // eslint-disable-next-line no-unused-vars
-  window.jsonTests = {
+
+  const freeyourstuff = window.freeyourstuff,
+    plugin = freeyourstuff.plugin,
+    DataSet = freeyourstuff.DataSet;
+
+  // Puppeteer tests
+  freeyourstuff.tests = {
     reviews: retrieveReviews,
     ratings: retrieveRatings
   };
@@ -85,16 +89,16 @@
     return reviewerID ? head : null;
   }
 
-  async function retrieveReviews() {
+  async function retrieveReviews({ url } = {}) {
     const reviews = {
       head: {},
       data: []
     };
 
-    reviews.head = await getHead();
-
-    const path = `/user/${reviews.head.reviewerID}/reviews`,
-      url = `${mainURL}${path}`;
+    if (!url) {
+      reviews.head = await getHead();
+      url = `/user/${reviews.head.reviewerID}/reviews`;
+    }
 
     const reviewIndex = await plugin.getURL(url);
 
@@ -171,9 +175,15 @@
     return reviews;
   }
 
-  async function retrieveRatings(head) {
+  async function retrieveRatings(options = {}, head) {
     if (head === undefined)
       head = await getHead();
+
+    if (options.url) {
+      console.log(`URL option not supported. ` +
+        `IMDB can only export the ratings CSV for the user's own session.`);
+      return null;
+    }
 
     plugin.report('Fetching ratings');
     const ratings = {

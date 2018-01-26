@@ -12,10 +12,12 @@ const colors = require('colors/safe');
 const wordwrap = require('wordwrap');
 const program = require('commander');
 const md5 = require('md5');
+const isURL = require('is-url-superb');
 
 // Internal dependencies
 const DataSet = require('../extension/src/dataset.js');
 const { schemas, sites } = require('../service/load-schemas');
+const { logSiteList } = require('./lib');
 
 const srcDir = path.join(__dirname, '..', 'extension', 'src'),
   pluginDir = path.join(srcDir, 'plugins'),
@@ -62,11 +64,17 @@ let failedTests = 0,
 
 module.exports.exec = () => {
 
-  setupCommandLineOptions(siteNames);
-  // Specify which site(s) to test
-  const siteIDs = applyArgs(siteNames);
+  setupCommandLineOptions();
 
-  runTests(siteIDs)
+  if (program.list) {
+    logNotice('The following site names are recognized (names are not case-sensitive):\n');
+    logSiteList();
+    process.exit();
+  }
+  // Specify which site(s) to test
+  const { siteIDs, optionalURLs } = applyArgs(siteNames);
+
+  runTests(siteIDs, optionalURLs)
     .then(() => {
       const msg = `Testing completed. ${failedTests || 'No'} failed test(s), ` +
         `${skippedTests || 'no'} skipped tests.`;
@@ -85,7 +93,7 @@ module.exports.exec = () => {
     });
 };
 
-async function runTests(siteIDs) {
+async function runTests(siteIDs, optionalURLs) {
 
   const browser = await puppeteer.launch({
     userDataDir,
@@ -103,7 +111,7 @@ async function runTests(siteIDs) {
     const schema = schemas[sites[siteID].plugin];
     const { canonicalURL, deps, plugin, name: siteName } = sites[siteID];
     // URL to use instead of canonical URL for this site from command line arg
-    const optionalURL = program[siteName.toLowerCase()];
+    const optionalURL = optionalURLs[siteName.toLowerCase()];
     const testState = {};
     const page = await browser.newPage();
 
@@ -224,34 +232,50 @@ async function prepareTests({ url, page, deps = [], plugin } = {}) {
 
 
 function applyArgs(siteNames) {
+  const optionalURLs = {};
 
   if (!program.args.length) {
     logNotice('All sites registered in sites.json will be ' +
       'tested: ' + siteNames.join(', '));
     logNotice('\nTo test only some sites, specify them as ' +
-      'command line arguments, separated with spaces. See --help for more ' +
-      'information.');
-    return siteNames.map((_siteName, id) => id);
+      'command line arguments, separated with spaces.');
+    logNotice('\nSee --help for more information.');
+    return {
+      optionalURLs,
+      siteIDs: siteNames.map((_siteName, id) => id)
+    };
   }
 
   const siteIDs = [],
-    args = program.args.map(arg => arg.toLowerCase());
+    badArgs = [];
 
-  siteNames.forEach((siteName, id) => {
-    if (args.indexOf(siteName) !== -1)
-      siteIDs.push(id);
+  let lastSite;
+  program.args.forEach(arg => {
+    const index = siteNames.indexOf(arg.toLowerCase());
+    if (index !== -1) {
+      siteIDs.push(index);
+      lastSite = siteNames[index];
+    } else if (isURL(arg) && lastSite) {
+      logNotice(`Will attempt to use ${arg} as profile URL for ${lastSite}.`);
+      optionalURLs[lastSite] = arg;
+      lastSite = undefined;
+    } else
+      badArgs.push(arg);
   });
 
   const selectedNames = siteIDs.map(id => siteNames[id]);
 
-  if (!siteIDs.length) {
-    logError('None of the specified site(s) could be ' +
-      'found: ' + args.join(', '));
+  if (badArgs.length) {
+    logError('The following arguments were not recognized as valid plugins or URLs: ' +
+      badArgs.join(', '));
     process.exit(1);
   } else {
     logNotice('The following specified site(s) have been ' +
       'found in sites.json and will be tested: ' + selectedNames.join(', '));
-    return siteIDs;
+    return {
+      siteIDs,
+      optionalURLs
+    };
   }
 }
 
@@ -328,19 +352,23 @@ function validateResult({ siteName, dataSetName, result, schema, optionalURL }) 
   }
 }
 
-function setupCommandLineOptions(siteNames) {
-  program.version('0.1.0');
-  program.usage('[site ...] [options]');
-
-  program.option('-b, --browser', `Show browser while performing tests`);
-
-  for (let siteName of siteNames)
-    program.option(`--${siteName} <url>`, `[EXPERIMENTAL] Profile URL for ${siteName} ` +
-      `(will be used instead of session data)`);
+function setupCommandLineOptions() {
 
   program
+    .version('0.1.0')
+    .description('run all freeyourstuff.cc tests, or only the ones specified')
+    .usage('[site [profile url] ...] [options]')
+    .option('-b, --browser', `show the browser while performing tests`)
+    .option('-l, --list', `display the list of supported sites`)
+    .on('--help', () => {
+      logNotice('');
+      logNotice('  Examples:\n');
+      logNotice('      $ ./run-tests imdb quora amazon.de');
+      logNotice('      Runs the specified tests\n');
+      logNotice('      $ ./run-tests imdb http://www.imdb.com/user/ur1289896/reviews yelp');
+      logNotice('      Uses the specified profile URL for the IMDB test, but uses session data for Yelp test.');
+    })
     .parse(process.argv);
-
 }
 
 module.exports.runTests = runTests;

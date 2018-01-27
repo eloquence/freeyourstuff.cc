@@ -11,6 +11,7 @@
   "dependencies": {
     "colors": "^1.1.2",
     "commander": "^2.13.0",
+    "config": "^1.29.2",
     "is-url-superb": "^2.0.0",
     "md5": "^2.2.1",
     "puppeteer": "^1.0.0",

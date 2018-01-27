@@ -1,0 +1,20 @@
+// TO CHANGE THE CONFIG, MAKE A COPY OF THIS FILE CALLED "local.json5" -- 
+// IT WILL TAKE PRECEDENCE OVER THE SETTINGS BELOW.
+
+{
+  // if set to false, the Puppeteer version of Chromium will run with a new
+  // profile on each run, rendering each session anonymous - useful only
+  // for testing purposes
+  "useUserDataDir": true,
+
+  // Relative to your home directory. Do NOT change this to point to your
+  // live profile, or you risk corruption from the more recent Chromium version
+  // bundled with Puppeteer. Instead, make a copy of your profile directory
+  // (typically ~/.config/chromium or ~/.config/google-chrome on Linux) and
+  // place it in the directory below.
+  "userDataDir": ".chromium-testing-profile",
+
+  // Command to obtain diffs for testing purposes. %width will be replaced
+  // with terminal width; %file1 and %file2 with old and new file, respectively.
+  "diffCommand": "icdiff --cols=%width --show-all-spaces --line-numbers --no-headers %file1 %file2"
+}

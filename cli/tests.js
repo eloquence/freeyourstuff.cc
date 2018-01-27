@@ -13,6 +13,7 @@ const wordwrap = require('wordwrap');
 const program = require('commander');
 const md5 = require('md5');
 const isURL = require('is-url-superb');
+const config = require('config');
 
 // Internal dependencies
 const DataSet = require('../extension/src/dataset.js');
@@ -38,7 +39,7 @@ const logPlugin = txt => console.log(wrap(colors.gray(
 // necessary to use a copy if you want Puppeteer to work alongside a different
 // version of Chromium that is locally installed, otherwise you will get profile
 // corruption.
-const userDataDir = path.join(os.homedir(), '.chromium-testing-profile');
+const userDataDir = path.join(os.homedir(), config.get('userDataDir'));
 
 // We want to use the cookies/local storage associated with the account that
 // is actively in use. By default Puppeteer switches to basic auth instead.
@@ -53,9 +54,6 @@ const waitOptions = {
   quora: ['load', 'networkidle2']
 };
 const getWaitOptions = plugin => waitOptions[plugin] || ['load'];
-
-const diffCommand = `icdiff --cols=${process.stdout.columns}` +
-  ` --show-all-spaces --line-numbers --no-headers %file1 %file2`;
 
 const siteNames = sites.map(site => site.name.toLowerCase());
 
@@ -96,7 +94,7 @@ module.exports.exec = () => {
 async function runTests(siteIDs, optionalURLs) {
 
   const browser = await puppeteer.launch({
-    userDataDir,
+    userDataDir: config.get('useUserDataDir') ? userDataDir : undefined,
     ignoreDefaultArgs: true,
     headless: program.browser ? false : true,
     args: puppeteerArgs
@@ -325,7 +323,8 @@ function validateResult({ siteName, dataSetName, result, schema, optionalURL }) 
     }
   }
   fs.writeFileSync(tmpFilename, jsonData);
-  const command = diffCommand
+  const command = config.get('diffCommand')
+    .replace(/%width/, process.stdout.columns)
     .replace(/%file1/, filename)
     .replace(/%file2/, tmpFilename);
   let diff;

@@ -95,7 +95,14 @@
       data: []
     };
 
-    if (!url) {
+    if (url) {
+      try {
+        url = normalizeProfileURL(url);
+      } catch (error) {
+        console.error(`URL ${url} does not appear to be a valid IMDB profile.`);
+        return null;
+      }
+    } else {
       reviews.head = await getHead();
       url = `/user/${reviews.head.reviewerID}/reviews`;
     }
@@ -227,6 +234,22 @@
   function normalizeURL(url) {
     if (/\/\?ref_=.*/.test(url))
       url = url.match(/(.*\/)(\?ref_=.*)?/)[1];
+    return url;
+  }
+
+  // For command line usage, normalize a provided URL to add the "reviews"
+  // suffix if needed
+  function normalizeProfileURL(url) {
+    url = normalizeURL(url);
+    // Profile URL without reviews path
+    if (/imdb\.com\/user\/ur\d*\/?$/.test(url)) {
+      if (!/\/$/.test(url))
+        url += '/';
+      url += 'reviews';
+    }
+    if (!/^https?:\/\/(www\.)?imdb.com\//.test(url))
+      throw new Error('Does not appear to be an IMDB url');
+
     return url;
   }
 })();

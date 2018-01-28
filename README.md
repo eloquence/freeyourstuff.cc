@@ -26,8 +26,7 @@ There are three components:
 - a web service (directory `service/`) for publishing content.
 - a command line suite (directory `cli/`) for interacting with your content
   on the command line, by scripting Chromium via
-  [Puppeteer](https://github.com/GoogleChrome/puppeteer) (experimental,
-  currently just used for tests).
+  [Puppeteer](https://github.com/GoogleChrome/puppeteer) (experimental!).
 
 It's a fully open JavaScript stack. We've put special emphasis on the plugin system to make it easy for anyone to add support for their favorite site. See the [plugin developer documentation](http://freeyourstuff.cc/plugins) for details.
 

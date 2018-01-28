@@ -3,13 +3,10 @@
 // Must be run via cli/run-tests or imported as a module
 
 // External dependencies
-const os = require('os');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const execSync = require('child_process').execSync;
-const colors = require('colors/safe');
-const wordwrap = require('wordwrap');
 const program = require('commander');
 const md5 = require('md5');
 const isURL = require('is-url-superb');
@@ -18,43 +15,13 @@ const config = require('config');
 // Internal dependencies
 const DataSet = require('../extension/src/dataset.js');
 const { schemas, sites } = require('../service/load-schemas');
-const { logSiteList } = require('./lib');
-
-const srcDir = path.join(__dirname, '..', 'extension', 'src'),
-  pluginDir = path.join(srcDir, 'plugins'),
-  libDir = path.join(srcDir, 'lib', 'js'),
-  resultsDir = `${__dirname}/results`;
-
-// For formatting results
-const width = process.stdout.columns;
-const wrap = wordwrap(width);
-const logNotice = txt => console.log(wrap(txt));
-const logError = txt => console.error(wrap(colors.red(txt)));
-const logPlugin = txt => console.log(wrap(colors.gray(
-  `Message from plugin or site: ${txt}`)));
-
-// Test config
-
-// By default, we look for a copy of the running Chromium profile here. It is
-// necessary to use a copy if you want Puppeteer to work alongside a different
-// version of Chromium that is locally installed, otherwise you will get profile
-// corruption.
-const userDataDir = path.join(os.homedir(), config.get('userDataDir'));
-
-// We want to use the cookies/local storage associated with the account that
-// is actively in use. By default Puppeteer switches to basic auth instead.
-const disabledPuppeteerArgs = ['--use-mock-keychain', '--password-store=basic'];
-const puppeteerArgs = puppeteer
-  .defaultArgs()
-  .filter(arg => !disabledPuppeteerArgs.includes(arg));
-
-// Different plugins may require a different Puppeteer load state before
-// execution of the tested function.
-const waitOptions = {
-  quora: ['load', 'networkidle2']
-};
-const getWaitOptions = plugin => waitOptions[plugin] || ['load'];
-
+const {
+  userDataDir,
+  logSiteList, logNotice, logError,
+  puppeteerArgs,
+  preparePlugin, getRedirectHandler
+} = require('./lib');
+const resultsDir = path.join(__dirname, config.get('testResultDir'));
 const siteNames = sites.map(site => site.name.toLowerCase());
 
 let failedTests = 0,
@@ -75,7 +42,7 @@ module.exports.exec = () => {
   runTests(siteIDs, optionalURLs)
     .then(() => {
       const msg = `Testing completed. ${failedTests || 'No'} failed test(s), ` +
-        `${skippedTests || 'no'} skipped tests.`;
+        `${skippedTests || 'no'} skipped test(s).`;
       if (failedTests) {
         logError(msg);
         process.exit(1);
@@ -94,7 +61,7 @@ module.exports.exec = () => {
 async function runTests(siteIDs, optionalURLs) {
 
   const browser = await puppeteer.launch({
-    userDataDir: config.get('useUserDataDir') ? userDataDir : undefined,
+    userDataDir,
     ignoreDefaultArgs: true,
     headless: program.browser ? false : true,
     args: puppeteerArgs
@@ -118,14 +85,14 @@ async function runTests(siteIDs, optionalURLs) {
 
     oldPages.push(page);
 
-    logNotice('-'.repeat(width));
+    logNotice('-'.repeat(process.stdout.columns));
     logNotice(`Running tests for ${siteName}`);
 
     // Note that we may be running multiple tests per plugin without navigating.
     // We only navigate during the test if a plugin performs a redirect.
-    await prepareTests({ url: optionalURL || canonicalURL, page, deps, plugin });
+    await preparePlugin({ url: optionalURL || canonicalURL, page, deps, plugin });
 
-    const tests = await page.evaluate('window.freeyourstuff.tests') || [];
+    const tests = await page.evaluate('window.freeyourstuff.jsonData || {}');
     for (let testID in tests) {
       logNotice(`Running test for dataset ${testID}.`);
 
@@ -147,7 +114,7 @@ async function runTests(siteIDs, optionalURLs) {
         // Execute the actual test
         result = await testPage.evaluate(
           async (testName, url) =>
-          await window.freeyourstuff.tests[testName]({ url }),
+          await window.freeyourstuff.jsonData[testName]({ url }),
           testID, optionalURL);
 
         let passed;
@@ -176,7 +143,7 @@ async function runTests(siteIDs, optionalURLs) {
           const newPage = await browser.newPage();
           oldPages.push(newPage);
           testPage = newPage;
-          await prepareTests({ url: testState.url, page: newPage, deps, plugin });
+          await preparePlugin({ url: testState.url, page: newPage, deps, plugin });
         }
       } while (testState.redirect);
 
@@ -185,49 +152,6 @@ async function runTests(siteIDs, optionalURLs) {
 
   await browser.close();
 }
-
-async function prepareTests({ url, page, deps = [], plugin } = {}) {
-  await page.setViewport({ width: 1280, height: 1024 });
-
-  const addDep = async file =>
-    await page.addScriptTag({ path: path.join(libDir, `${file}.min.js`) });
-
-  await page.goto(url, { waitUntil: getWaitOptions(plugin) });
-
-  page.on('console', msg => logPlugin(msg._text));
-
-  // Some sites have the `define` function from RequireJS loaded, which may
-  // interfere with a dependency's own check for the presence of RequireJS
-  // in its module loading code (numeral is an example that otherwise fails
-  // to load on some sites).
-  await page.evaluate(() => {
-    window.define = undefined;
-  });
-
-  // Used by all plugins
-  await addDep('jquery');
-
-  // Inject optional plugin-specific dependencies like Papaparse, Numeral
-  if (deps)
-    for (let dep of deps)
-      await addDep(dep);
-
-  // For handling schemas
-  await page.addScriptTag({ path: path.join(srcDir, 'dataset.js') });
-
-  // For telling extension code not to send messages using the Chrome API
-  await page.evaluate(() => {
-    window.freeyourstuff.puppeteer = true;
-  });
-
-  // Shared helper code
-  await page.addScriptTag({ path: path.join(srcDir, 'plugin.js') });
-
-  // The actual plugin
-  const pluginPath = path.join(pluginDir, plugin, 'index.js');
-  await page.addScriptTag({ path: pluginPath });
-}
-
 
 function applyArgs(siteNames) {
   const optionalURLs = {};
@@ -275,15 +199,6 @@ function applyArgs(siteNames) {
       optionalURLs
     };
   }
-}
-
-// Exposed to plugins so they can let us know that we need to navigate
-function getRedirectHandler(testState) {
-  return url => {
-    testState.redirect = true;
-    testState.url = url;
-    logNotice(`Redirecting to ${testState.url} and restarting test.`);
-  };
 }
 
 function validateResult({ siteName, dataSetName, result, schema, optionalURL }) {

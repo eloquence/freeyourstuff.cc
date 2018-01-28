@@ -1,3 +1,2 @@
 #!/usr/bin/env node
-const { exec } = require('../tests');
-exec();
+require('../tests').exec();

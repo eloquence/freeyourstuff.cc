@@ -1,4 +1,4 @@
-// TO CHANGE THE CONFIG, MAKE A COPY OF THIS FILE CALLED "local.json5" -- 
+// TO CHANGE THE CONFIG, MAKE A COPY OF THIS FILE CALLED "local.json5" --
 // IT WILL TAKE PRECEDENCE OVER THE SETTINGS BELOW.
 
 {
@@ -13,6 +13,12 @@
   // (typically ~/.config/chromium or ~/.config/google-chrome on Linux) and
   // place it in the directory below.
   "userDataDir": ".chromium-testing-profile",
+
+  // Relative to program directory, where to store test results
+  testResultDir: "test-results",
+
+  // Relative to program directory, where to store downloaded data
+  downloadDir: "downloads",
 
   // Command to obtain diffs for testing purposes. %width will be replaced
   // with terminal width; %file1 and %file2 with old and new file, respectively.

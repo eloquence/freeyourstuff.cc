@@ -9,8 +9,8 @@
   // By default we assume we're on Amazon.com
   let edition = 'com';
 
-  // Puppeteer tests
-  freeyourstuff.tests = {
+  // Dataset IDs and the functions to retrieve that data in raw, uncoerced JSON
+  freeyourstuff.jsonData = {
     reviews: retrieveReviews
   };
 

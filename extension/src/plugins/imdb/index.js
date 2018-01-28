@@ -6,8 +6,8 @@
     plugin = freeyourstuff.plugin,
     DataSet = freeyourstuff.DataSet;
 
-  // Puppeteer tests
-  freeyourstuff.tests = {
+  // Dataset IDs and the functions to retrieve that data in raw, uncoerced JSON
+  freeyourstuff.jsonData = {
     reviews: retrieveReviews,
     ratings: retrieveRatings
   };

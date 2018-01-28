@@ -6,8 +6,8 @@
     plugin = freeyourstuff.plugin,
     DataSet = freeyourstuff.DataSet;
 
-  // Puppeteer tests
-  freeyourstuff.tests = {
+  // Dataset IDs and the function to retrieve that data in raw, uncoerced JSON
+  freeyourstuff.jsonData = {
     answers: retrieveAnswers
   };
 
@@ -25,7 +25,6 @@
       let datasets = {};
       datasets.schemaKey = request.schema.schema.key;
       datasets.schemaVersion = request.schema.schema.version;
-
 
       awaitInitialAJAXRequests()
         .then(retrieveAnswers)

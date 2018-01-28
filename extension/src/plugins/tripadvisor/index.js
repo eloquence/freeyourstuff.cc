@@ -11,8 +11,8 @@
       progress: 0
     };
 
-  // Puppeteer tests
-  freeyourstuff.tests = {
+  // Dataset IDs and the functions to retrieve that data in raw, uncoerced JSON
+  freeyourstuff.jsonData = {
     reviews: retrieveReviews
   };
 

@@ -7,9 +7,7 @@ const puppeteer = require('puppeteer');
 const config = require('config');
 const os = require('os');
 const wrap = wordwrap(process.stdout.columns); // For formatting console output
-
-// Internal deps
-const { sites } = require('../service/load-schemas');
+const jsonfile = require('jsonfile');
 
 // Static config
 
@@ -36,8 +34,13 @@ const lib = {
   },
 
   // Get standard paths in OS-independent way
+
+  get extensionDir() {
+    return path.join(__dirname, '..', 'extension');
+  },
+
   get srcDir() {
-    return path.join(__dirname, '..', 'extension', 'src');
+    return path.join(lib.extensionDir, 'src');
   },
 
   get pluginDir() {
@@ -46,6 +49,15 @@ const lib = {
 
   get libDir() {
     return path.join(lib.srcDir, 'lib', 'js');
+  },
+
+  // Loaded synchronously below
+  get sites() {
+    return sites;
+  },
+
+  get schemas() {
+    return schemas;
   },
 
   // See config/default.json5 for explanation. Returns undefined if not in use.
@@ -120,7 +132,30 @@ const lib = {
     };
   }
 
-
 };
+
+// Internal deps
+const { sites, schemas } = loadSitesAndSchemas();
+
+function loadSitesAndSchemas() {
+  const sites = jsonfile.readFileSync(path.join(lib.extensionDir, 'sites.json'));
+  const schemas = {};
+  for (let site of sites) {
+      try {
+        const schemaFile = path.join(lib.pluginDir, site.plugin, 'schema.json'),
+          schema = jsonfile.readFileSync(schemaFile);
+
+        if (schema.hasOwnProperty('schema') && schema.schema.hasOwnProperty('key')) {
+          schemas[schema.schema.key] = schema;
+          schema.schema.site = site;
+        } else {
+          lib.logNotice(`schema.json for plugin "${site.plugin}" does not have a valid schema header. Skipping.`);
+        }
+      } catch (e) {
+        lib.logError(`Problem reading schema.json for plugin "${site.plugin}". Skipping. Error was: ${e}`);
+      }
+  }
+  return { sites, schemas };
+}
 
 module.exports = lib;

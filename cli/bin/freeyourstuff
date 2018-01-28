@@ -1,2 +1,5 @@
 #!/usr/bin/env node
-require('../download').exec();
+const path = require('path');
+// config module looks in current working directory unless this is set
+process.env.NODE_CONFIG_DIR = path.join(__dirname, '..', 'config');
+require('../download.js').exec();

@@ -13,6 +13,7 @@
     "commander": "^2.13.0",
     "config": "^1.29.2",
     "is-url-superb": "^2.0.0",
+    "jsonfile": "^4.0.0",
     "md5": "^2.2.1",
     "puppeteer": "^1.0.0",
     "wordwrap": "^1.0.0"

@@ -222,8 +222,8 @@ function validateResult({ siteName, dataSetName, result, schema, optionalURL }) 
   }
   const jsonData = JSON.stringify(dataSet.set, null, 2);
   logNotice('Running diff');
-  const filename = `${resultsDir}/${testID}${md5Suffix}.json`;
-  const tmpFilename = `${resultsDir}/tmp.json`;
+  const filename = path.join(resultsDir, `${testID}${md5Suffix}.json`);
+  const tmpFilename = path.join(resultsDir, 'tmp.json');
   try {
     fs.statSync(filename);
   } catch (e) {

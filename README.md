@@ -30,6 +30,10 @@ There are three components:
 
 It's a fully open JavaScript stack. We've put special emphasis on the plugin system to make it easy for anyone to add support for their favorite site. See the [plugin developer documentation](http://freeyourstuff.cc/plugins) for details.
 
+Yes, you read that correctly -- you can run freeyourstuff on the command line:
+
+![command line animation](https://raw.githubusercontent.com/eloquence/freeyourstuff.cc/master/cli/cli.gif)
+
 # Mailing list and chat
 
 * [Mailing list for developers and users](http://www.freelists.org/list/freeyourstuff)

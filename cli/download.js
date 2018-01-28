@@ -9,7 +9,7 @@ const program = require('commander');
 
 
 const DataSet = require('../extension/src/dataset.js');
-const { schemas, sites } = require('../service/load-schemas');
+const { schemas, sites } = require('./lib');
 const {
   logNotice, logError, logSiteList,
   getRedirectHandler, preparePlugin,

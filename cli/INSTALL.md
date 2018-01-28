@@ -26,7 +26,7 @@ and should look like this:
 
 # Location of your Chrome/Chromium profile
 
-The first directory to copy may vary, e.g., depending on whether you're using Chrome or Chromium. You can find the directory in chrome://version , under "Profile directory", **minus** the part at the end (typically "Default").
+The directory to copy may vary, e.g., depending on whether you're using Chrome or Chromium. You can find the directory in chrome://version , under "Profile directory", **minus** the part at the end (typically "Default").
 
 This copy lets the CLI find your session data. You need to work with a copy, because the version of Chromium used by the CLI is likely more recent than yours, which can result in profile corruption.
 

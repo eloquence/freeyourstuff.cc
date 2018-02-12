@@ -220,7 +220,7 @@
               starRating: ele['Your Rating'],
               subject: ele.Title,
               subjectIMDBURL: ele.URL,
-              datePosted: plugin.getISODate(ele['Date Added']) || undefined
+              datePosted: plugin.getISODate(ele['Date Rated']) || undefined
             };
           });
           resolve(ratings);

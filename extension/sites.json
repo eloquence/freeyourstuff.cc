@@ -9,7 +9,7 @@
   "name": "IMDB",
   "plugin": "imdb",
   "deps": ["papaparse"],
-  "canonicalURL": "http://www.imdb.com/",
+  "canonicalURL": "https://www.imdb.com/",
   "regex": "http(s)*://(www.)*imdb.com/",
   "supported": ["Reviews", "Ratings"],
   "unsupported": ["Comments", "Lists"]

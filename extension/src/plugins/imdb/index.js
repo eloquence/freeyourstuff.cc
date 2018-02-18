@@ -14,7 +14,8 @@
 
   plugin.setup([handleRetrieval]);
 
-  var mainURL = 'http://www.imdb.com';
+  const protocol = window.location.protocol,
+    mainURL = `${protocol}//www.imdb.com`;
 
   function handleRetrieval(request) {
     if (request.action == 'retrieve') {
@@ -197,7 +198,7 @@
       head,
       data: []
     };
-    const csvURL = `http://www.imdb.com/list/export?list_id=ratings`;
+    const csvURL = `${protocol}//www.imdb.com/list/export?list_id=ratings`;
     const ratingData = await retrieveAndParseCSV(csvURL);
     ratings.data.push(...ratingData);
     return ratings;

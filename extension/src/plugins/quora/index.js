@@ -26,8 +26,7 @@
       datasets.schemaKey = request.schema.schema.key;
       datasets.schemaVersion = request.schema.schema.version;
 
-      awaitInitialAJAXRequests()
-        .then(retrieveAnswers)
+      retrieveAnswers()
         .then(answers => {
           if (answers) {
             datasets.answers = new DataSet(answers, request.schema.answers).set;
@@ -43,11 +42,6 @@
     }
   }
 
-  async function awaitInitialAJAXRequests() {
-    plugin.report('Waiting for page to finish loading');
-    await plugin.awaitSelector('.hover_menu_item');
-  }
-
   // The second check should succeed for a logged in user even if AJAX requests
   // haven't completed yet.
   function loggedIn() {
@@ -57,6 +51,9 @@
 
   // The main coordinating function. Refactor potential in the execution loop.
   async function retrieveAnswers({ url } = {}) {
+    // Open menu to get user ID and wait for page to finish loading
+    await awaitInitialAJAXRequests();
+
     const profileLink = $('.hover_menu_item').first().attr('href'),
       profileURL = url || `https://www.quora.com${profileLink}`,
       answersURL = `${profileURL}/answers`;
@@ -112,6 +109,13 @@
       'Reload this page</a></h3>');
 
     return answers;
+  }
+
+  async function awaitInitialAJAXRequests() {
+    // We can't get the profile URL without opening the menu.
+    $('.MoreNavItem a').first()[0].click();
+    plugin.report('Waiting for page to finish loading');
+    await plugin.awaitSelector('.main_menu');
   }
 
   // Some long answers are collapsed by default and need AJAX requests to get the

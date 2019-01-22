@@ -95,9 +95,10 @@
       // next page
       do {
         tries++;
-        $('.pager_next').each(function() {
-          this.click();
-        });
+        // Quora uses an infinite scroll paradigm, which we can reliably trigger
+        // by scrolling first to the top and then to the bottom
+        window.scrollTo(0,0);
+        window.scrollTo(0,document.body.scrollHeight);
         // Returns 0 if it times out
         displayedAnswerCount = await pollForDisplayedAnswers(counter, tries, maxTries);
       } while (counter.progress < counter.total && !displayedAnswerCount && tries < maxTries);
@@ -250,6 +251,7 @@
     $answerText.find('span,div').contents().unwrap();
 
     const answerText = $answerText.html();
+    $answerText.remove();
 
     // Quora displays dates in a pretty inconsistent way, ranging from
     // "8h ago" to "May 12, 2012" type formats. We try to parse all of them

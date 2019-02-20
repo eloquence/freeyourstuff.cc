@@ -27,15 +27,7 @@
         }
       });
     $('#installButton').click(() => {
-      chrome.webstore.install(undefined, // no URL needed, specified in HTML head
-        () => {
-          $('#installButton').attr('disabled', 'disabled');
-          $('#extensionMessage').html('<span class="fa fa-check-circle-o"></span> Successfully installed!');
-          $('#extensionMessage').fadeIn();
-        },
-        (error) => {
-          window.location = 'https://chrome.google.com/webstore/detail/free-your-stuff/hlkhpekhgcaigleojiocoeockhcaglia';
-        });
+      window.location = 'https://chrome.google.com/webstore/detail/free-your-stuff/hlkhpekhgcaigleojiocoeockhcaglia';
     });
   } else {
     $('#installButton').click(() => {

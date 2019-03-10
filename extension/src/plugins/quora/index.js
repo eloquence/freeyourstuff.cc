@@ -226,7 +226,7 @@
       elapsedTime += waitIncrement;
     }
 
-    const question = $answer.find('.ui_story_title span').first().text(),
+    const question = $answer.find('.story_title_container').first().text(),
       questionLink = $answer.find('.question_link').first().attr('href'),
       questionURL = `https://www.quora.com${questionLink}`,
       // We create a new jQuery node so we don't unnecessarily

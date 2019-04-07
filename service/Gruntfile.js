@@ -39,7 +39,7 @@ module.exports = function(grunt) {
       },
       dataTablesCSS: {
         src: ['node_modules/datatables.net-bs/css/dataTables.bootstrap.css',
-        'node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.css'
+          'node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.css'
         ],
         dest: 'static/css/datatables.css'
       }
@@ -57,17 +57,19 @@ module.exports = function(grunt) {
         }
       }
     },
-    fontawesome: {
-      'cwd': 'node_modules/font-awesome/fonts/',
-      'src': ['*'],
-      expand: true,
-      'dest': 'static/fonts/',
-    },
-    glyphicons: {
-      'cwd': 'node_modules/bootstrap/fonts/',
-      'src': ['*'],
-      expand: true,
-      'dest': 'static/fonts/',
+    copy: {
+      fontawesome: {
+        'cwd': 'node_modules/font-awesome/fonts/',
+        'src': ['*'],
+        expand: true,
+        'dest': 'static/fonts/',
+      },
+      glyphicons: {
+        'cwd': 'node_modules/bootstrap/fonts/',
+        'src': ['*'],
+        expand: true,
+        'dest': 'static/fonts/',
+      },
     },
     uglify: {
       options: {
@@ -105,6 +107,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-babel');
 
-  grunt.registerTask('default', ['babel', 'concat', 'uglify', 'cssmin']);
+  grunt.registerTask('default', ['babel', 'concat', 'uglify', 'cssmin', 'copy']);
 
 };

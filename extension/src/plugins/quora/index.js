@@ -45,8 +45,7 @@
   // The second check should succeed for a logged in user even if AJAX requests
   // haven't completed yet.
   function loggedIn() {
-    return $('.hover_menu_item').length > 0 ||
-      $('.SiteHeaderNavItem.HoverMenu.MoreNavItem').length > 0;
+    return $('.MoreNavItem.SidebarNavItem.SiteHeaderNavItem.HoverMenu').length > 0;
   }
 
   // The main coordinating function. Refactor potential in the execution loop.
@@ -54,7 +53,7 @@
     // Open menu to get user ID and wait for page to finish loading
     await awaitInitialAJAXRequests();
 
-    const profileLink = $('.hover_menu_item').first().attr('href'),
+    const profileLink = $('.MoreNavItem.SidebarNavItem.SiteHeaderNavItem.HoverMenu').find('a').first().attr('href'),
       profileURL = url || `https://www.quora.com${profileLink}`,
       answersURL = `${profileURL}/answers`;
 
@@ -116,7 +115,7 @@
     // We can't get the profile URL without opening the menu.
     $('.MoreNavItem a').first()[0].click();
     plugin.report('Waiting for page to finish loading');
-    await plugin.awaitSelector('.main_menu');
+    await plugin.awaitSelector('.MoreNavItem.SidebarNavItem.SiteHeaderNavItem.HoverMenu svg');
   }
 
   // Some long answers are collapsed by default and need AJAX requests to get the

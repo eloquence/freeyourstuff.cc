@@ -95,9 +95,13 @@
       do {
         tries++;
         // Quora uses an infinite scroll paradigm, which we can reliably trigger
-        // by scrolling first to the top and then to the bottom
-        window.scrollTo(0,0);
-        window.scrollTo(0,document.body.scrollHeight);
+        // by adding a large element to the bottom and scrolling to its top edge
+        let $visible = $('<div id="scroll-position" style="height:2160px;"></div>');
+        $(document.body).append($visible);
+        let scrollTo = $('#scroll-position').position().top;
+        window.scrollTo(0, 0);
+        window.scrollTo(0, scrollTo);
+        $visible.remove();
         // Returns 0 if it times out
         displayedAnswerCount = await pollForDisplayedAnswers(counter, tries, maxTries);
       } while (counter.progress < counter.total && !displayedAnswerCount && tries < maxTries);

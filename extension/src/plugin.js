@@ -151,6 +151,29 @@
       await Promise.all(selectors);
     },
 
+    awaitCondition: function(conditionFn, interval = 50, timeout = 10000) {
+      return new Promise((resolve, reject) => {
+
+        let i, elapsed = 0;
+
+        const checkCondition = () => {
+            if (conditionFn()) {
+              clearInterval(i);
+              return resolve();
+            }
+            elapsed += interval;
+            if (elapsed > timeout) {
+              clearInterval(i);
+              return reject(new Error(`Specified page layout condition was not reached within ${timeout} milliseconds.`));
+            }
+
+        };
+        i= setInterval(checkCondition, interval);
+
+      });
+
+    },
+
     // Tell the popup to say that the user has to log in (the popup also shows
     // the site name)
     loggedOut: function() {

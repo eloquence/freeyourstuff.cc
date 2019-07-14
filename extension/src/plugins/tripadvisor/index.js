@@ -47,11 +47,12 @@
   }
 
   function loggedIn() {
-    return Boolean($('.global-nav-profile-menu').length);
+    return !($('[class*=brand-global-nav-action-profile-Profile__loginButton]').length);
   }
 
   // The main retrieval loop
   async function retrieveReviews({ url } = {}) {
+
     const reviews = {
       head: {},
       data: []
@@ -62,97 +63,60 @@
 
     const directoryResponse = await getDirectory(directoryURL);
     directoryURL = directoryResponse.responseURL;
-    if (!/\/members\//.test(directoryURL)) {
-      plugin.reportError(new Error(`Profile URL ${directoryURL} has no reviews.`), 'We did not find any reviews for this account.');
-      return;
+    if (new URL(directoryURL).pathname != window.location.pathname) {
+      plugin.report('Redirecting to profile');
+      plugin.redirect(directoryURL);
+      return false;
     }
-    const reviewerID = (directoryURL.match('/members/(.*)') || [])[1],
-      directoryHTML = directoryResponse.responseText,
-      $directoryDOM = $($.parseHTML(directoryHTML)),
-      reviewList = $directoryDOM.find('li.cs-review').toArray();
+
+    const decodedURI = decodeURI(window.location.href);
+    const reviewerID = (decodedURI.match('/Profile/(.*)') || [])[1];
 
     reviews.head.reviewerID = reviewerID;
-    reviews.head.reviewerName = $directoryDOM.find('.name .nameText').text();
+    reviews.head.reviewerName = $('span[class*=social-member-MemberBlock__display_name]').text();
+    // Approximate count, other contributions combined into one total
+    counter.total = getReviewCountFromDOM($(document));
 
-    // Will be overwritten during pagination
-    let reviewURLs = reviewList.map(ele =>
-      baseURL + $(ele).find('a.cs-review-title').attr('href')
-    );
+    const reviewLinkSelector = "div[class^=social-sections-ReviewSection] a[href^='/ShowUserReviews']",
+      getReviewCount = () => $(reviewLinkSelector).length;
+
+    let displayedReviews = getReviewCount(),
+      failedTries = 0,
+      maxTries = 5;
+
+    while (displayedReviews < counter.total && failedTries <= maxTries) {
+      if (failedTries > 0)
+        plugin.report(`Waiting for more review summaries to load, attempt ${failedTries} of ${maxTries}`);
+      else
+        plugin.report(`Loaded ${displayedReviews} review summaries`);
+
+      window.scrollTo(0, 0);
+      window.scrollTo(0, document.body.scrollHeight);
+      $('[class^=social-show-more-ShowMore__show_more] button').click();
+      try {
+        await plugin.awaitCondition(() => getReviewCount() > displayedReviews, 50, 2000);
+        failedTries = 0;
+      } catch (error) {
+        failedTries++;
+      }
+      displayedReviews = getReviewCount();
+    }
+    // Update with actual result
+    counter.total = displayedReviews;
+
+    let reviewURLs = $(reviewLinkSelector).map(function() {
+      return baseURL + $(this).attr('href');
+    });
+
     if (!reviewURLs.length) {
       plugin.reportError(null, 'No reviews found.');
       return null;
     }
 
-    counter.total = getReviewCountFromDOM($directoryDOM);
-
-    do {
-      for (let url of reviewURLs)
-        reviews.data.push(await getReview(url));
-
-      plugin.report('Attempting to get more data');
-      reviewURLs = await getMoreReviewURLs(directoryHTML, $directoryDOM);
-    } while (reviewURLs);
+    for (let url of reviewURLs)
+      reviews.data.push(await getReview(url));
 
     return reviews;
-  }
-
-  function getDirectory(directoryURL) {
-    return new Promise((resolve, reject) => {
-      // We use XMLHttpRequest here because jQuery does not expose responseURL,
-      // due to limited support for it; see https://bugs.jquery.com/ticket/15173
-      const req = new XMLHttpRequest();
-      req.addEventListener('load', function() {
-        const response = this;
-        resolve(response);
-      });
-      req.addEventListener('error', function(event) {
-        const error = plugin.getConnectionError(directoryURL, event);
-        reject(error);
-      });
-      req.open('GET', directoryURL);
-      req.send();
-    });
-  }
-
-  function getMoreReviewURLs(directoryHTML, $directoryDOM) {
-    return new Promise((resolve, reject) => {
-      const id = (directoryHTML.match(/\{"memberId":"(.*?)"\}/ || []))[1];
-      const token = $directoryDOM.find('input[name="token"]').val();
-      const data = {
-        token,
-        version: 5,
-        authenticator: 'DEFAULT',
-        actions: JSON.stringify([{
-          'name': 'FETCH',
-          'resource': 'modules.membercenter.model.ContentStreamComposite',
-          'params': {
-            'offset': counter.progress,
-            'limit': 50,
-            'page': 'PROFILE',
-            'memberId': id
-          },
-          'id': 'clientaction576'
-        }])
-      };
-      const postURL = 'https://www.tripadvisor.com/ModuleAjax?';
-      $.post(postURL, data, null, 'json')
-        .done(function(response) {
-          const rv = [];
-          let dir = response.store['modules.unimplemented.entity.AnnotatedItem'];
-          for (let itemKey in dir) {
-            if (dir[itemKey].url)
-              rv.push(baseURL + dir[itemKey].url);
-          }
-          if (rv.length)
-            resolve(rv);
-          else
-            resolve(null);
-        })
-        .fail(event => {
-          const error = plugin.getConnectionError(postURL, event);
-          reject(error);
-        });
-    });
   }
 
   async function getReview(url) {
@@ -160,33 +124,41 @@
     plugin.report(`Fetching review ${counter.progress} of ${counter.total}`);
     const reviewHTML = await getReviewData(url);
     const $dom = $($.parseHTML(reviewHTML));
-    const subject = $dom
-      .find('.altHeadInline a')
-      .first()
-      .text(),
+
+    const
+      subject = $dom
+        .find('.altHeadInline a')
+        .first()
+        .text(),
       subjectTripAdvisorURL = baseURL + $dom
-      .find('.altHeadInline a')
-      .first()
-      .attr('href'),
+        .find('.altHeadInline a')
+        .first()
+        .attr('href'),
+      // #PAGEHEADING is used for the title on some review pages. It's in
+      // quotation marks, hence the slicing.
+      title = $dom.find('#PAGEHEADING').length ?
+         $dom.find('#PAGEHEADING').text().trim().slice(1, -1) :
+         $dom.find('#HEADING').text(),
       $review = $dom
-      .find('.reviewSelector')
-      .first(),
+        .find('.reviewSelector')
+        .first(),
       text = $review
-      .find('.entry p')
-      .html()
-      .trim(),
+        .find('.entry p')
+        .html()
+        .trim(),
       date = $review
-      .find('.ratingDate')
-      .attr('title'),
+        .find('.ratingDate')
+        .attr('title'),
       isoDate = plugin.getISODate(date),
-      overallRating = (($review
-          .find('.rating span')
-          .attr('class') || '')
-        .match(/bubble_([0-9])/) || [])[1];
+      ratingClassStr = $review
+        .find('.ui_bubble_rating')
+        .attr('class') || '',
+      overallRating = (ratingClassStr.match(/bubble_([0-9])/) || [])[1];
 
     const reviewObj = {
       subject,
       subjectTripAdvisorURL,
+      title,
       text,
       date: isoDate,
       overallRating
@@ -241,11 +213,31 @@
   }
 
   function getReviewCountFromDOM($dom) {
-    const asText = ($dom
-      .find('a[name="reviews"]')
-      .text()
-      .match(/[0-9,]*/) || [])[0];
+    const asText =
+      ($dom
+        .find('[class^=social-member-MemberStats__link]')
+        .first()
+        .text()
+        .match(/[0-9,]*/) || [])[0];
     return numeral(asText).value();
+  }
+
+  function getDirectory(directoryURL) {
+    return new Promise((resolve, reject) => {
+      // We use XMLHttpRequest here because jQuery does not expose responseURL,
+      // due to limited support for it; see https://bugs.jquery.com/ticket/15173
+      const req = new XMLHttpRequest();
+      req.addEventListener('load', function() {
+        const response = this;
+        resolve(response);
+      });
+      req.addEventListener('error', function(event) {
+        const error = plugin.getConnectionError(directoryURL, event);
+        reject(error);
+      });
+      req.open('GET', directoryURL);
+      req.send();
+    });
   }
 
 })();

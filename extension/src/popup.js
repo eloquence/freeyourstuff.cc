@@ -92,7 +92,8 @@
         $('#ui').append(`<div id="footer">${footer}</div>`);
 
         for (let site of sites) {
-          $('#directory').append(`<li><a href="${site.canonicalURL}" target="_blank">${site.name}</a></li>`);
+          if (!site.temporarilyDisabled)
+            $('#directory').append(`<li><a href="${site.canonicalURL}" target="_blank">${site.name}</a></li>`);
         }
         $('#ui').show();
         $('#loading').hide();
@@ -101,6 +102,20 @@
 
       for (let site of sites) {
         if (tab.url.match(site.regex)) {
+
+          if (site.temporarilyDisabled) {
+            $('#ui').replaceWith(`<p><b>We're sorry!</b></p>
+            <p>
+            Support for this site is temporarily disabled. Downloading content
+            from specific sites sometimes stops working when the site's layout
+            changes. We then have to update the code to get things working again.
+            </p>
+            <p>
+            If you want to help, please check out our <a href="https://freeyourstuff.cc/plugins" target="_blank">
+            developer documentation</a> and our
+            <a href="https://github.com/eloquence/freeyourstuff.cc" target="_blank">GitHub repository</a>.</p>`);
+            break;
+          }
 
           if (!site.deps)
             site.deps = []; // for convenient access later

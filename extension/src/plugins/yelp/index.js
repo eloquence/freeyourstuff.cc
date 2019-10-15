@@ -55,9 +55,9 @@
         $dom = $($.parseHTML(html));
 
       if (page === 1) {
-        let idLink = $dom.find('.user-display-name');
-        reviews.head.reviewerName = idLink.text();
-        reviews.head.reviewerID = (idLink.attr('href').match(/userid=(.*)/) || [])[1];
+        reviews.head.reviewerName = $dom.find('.user-profile_info h1').text();
+        let idLink = $dom.filter('meta[property="og:url"]').attr('content');
+        reviews.head.reviewerID = (idLink.match(/userid=(.*)/) || [])[1];
       }
 
       // Helper functions common to different review types

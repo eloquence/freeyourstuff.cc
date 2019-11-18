@@ -231,7 +231,7 @@
 
     const question = $answer.find('.story_title_container').first().text(),
       questionLink = $answer.find('.question_link').first().attr('href'),
-      questionURL = `https://www.quora.com${questionLink}`,
+      questionURL = /^https:\/\//.test(questionLink) ? questionLink : `https://www.quora.com${questionLink}`,
       // We create a new jQuery node so we don't unnecessarily
       // change the visible page content
       $answerText = $('<div>' + answerHTML + '</div>');

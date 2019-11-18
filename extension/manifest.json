@@ -3,7 +3,7 @@
   "minimum_chrome_version": "55",
   "name": "Free Your Stuff",
   "description": "Lets you download your contributions to sites you contribute to",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "background": {
     "scripts": ["src/init.js", "src/background.js"],
     "persistent": false

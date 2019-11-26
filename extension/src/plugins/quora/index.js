@@ -229,8 +229,9 @@
       elapsedTime += waitIncrement;
     }
 
-    const question = $answer.find('.story_title_container').first().text(),
-      questionLink = $answer.find('.question_link').first().attr('href'),
+    const $firstQuestionLink = $answer.find('.question_link').first(),
+      question = $firstQuestionLink.text(),
+      questionLink = $firstQuestionLink.attr('href'),
       questionURL = /^https:\/\//.test(questionLink) ? questionLink : `https://www.quora.com${questionLink}`,
       // We create a new jQuery node so we don't unnecessarily
       // change the visible page content
@@ -261,7 +262,8 @@
     // correctly, but if there is an error-prone area in this code, it's
     // this one.
     const answerPermalinkText = $answer.find('.answer_permalink').first().text(),
-      dateText = (answerPermalinkText.match(/(Written|Updated|Answered) (.*)/) || [])[2];
+      // This matches both dates with and without an author (author is shown on spaces)
+      dateText = (answerPermalinkText.match(/(Written|Updated|Answered) (.*?)( by |$)/) || [])[2];
 
     let date;
     if (/^\d{1,2}(h|m|s) ago$/.test(dateText)) {

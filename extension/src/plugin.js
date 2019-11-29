@@ -265,6 +265,24 @@
         .fail(event => reject(plugin.getConnectionError(url, event))));
     },
 
+    getResponseURL(url) {
+      return new Promise((resolve, reject) => {
+        // We use XMLHttpRequest here because jQuery does not expose responseURL,
+        // due to limited support for it; see https://bugs.jquery.com/ticket/15173
+        const req = new XMLHttpRequest();
+        req.addEventListener('load', function() {
+          const response = this;
+          resolve(response.responseURL);
+        });
+        req.addEventListener('error', function(event) {
+          const error = plugin.getConnectionError(url, event);
+          reject(error);
+        });
+        req.open('GET', url);
+        req.send();
+      });
+    },
+
     getConnectionError(url, event, message = 'Connection error.') {
       const error = new Error(message);
       error.details = plugin.getConnectionErrorDetails(url, event);

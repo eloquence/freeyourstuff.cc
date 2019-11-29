@@ -17,7 +17,7 @@
   const protocol = window.location.protocol,
     mainURL = `${protocol}//www.imdb.com`;
 
-  function handleRetrieval(request) {
+  async function handleRetrieval(request) {
     if (request.action == 'retrieve') {
       if (!loggedIn())
         return plugin.loggedOut();
@@ -26,31 +26,41 @@
       const datasets = {};
       datasets.schemaKey = request.schema.schema.key;
       datasets.schemaVersion = request.schema.schema.version;
-      retrieveReviews()
-        .then(reviews => {
-          if (reviews)
-            datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
-          return reviews.head;
-        })
-        .then(retrieveRatings)
-        .then(ratings => {
-          if (ratings)
-            datasets.ratings = new DataSet(ratings, request.schema.ratings).set;
-        })
-        .then(() => {
-          chrome.runtime.sendMessage({
-            action: 'dispatch',
-            data: datasets,
-            schema: request.schema
-          });
-          plugin.done();
-        })
-        .catch(plugin.reportError);
+
+      let reviews;
+      try {
+        reviews = await retrieveReviews();
+      } catch (error) {
+        plugin.reportError(error);
+        return;
+      }
+
+      if (reviews)
+          datasets.reviews = new DataSet(reviews, request.schema.reviews).set;
+
+      let ratings;
+      try {
+        ratings = await retrieveRatings({}, reviews && reviews.head ? reviews.head : undefined);
+      } catch (error) {
+        plugin.reportError(error);
+        return;
+      }
+
+      if (ratings)
+        datasets.ratings = new DataSet(ratings, request.schema.ratings).set;
+
+      chrome.runtime.sendMessage({
+        action: 'dispatch',
+        data: datasets,
+        schema: request.schema
+      });
+
+      plugin.done();
     }
   }
 
   function loggedIn() {
-    return !($('#nblogin').text());
+    return $('.navbar__user-menu-toggle__name').length > 0;
   }
 
   // When running in an extension context, we can usually just look at the page
@@ -58,36 +68,22 @@
   // least one IMDB page first to extract it. This is also a nice fallback for
   // pages which don't have the profile link on them (e.g., error pages).
   async function getHead() {
-    let head = extractHeadInfo();
-    if (head)
-      return head;
 
     plugin.report('Getting profile data');
-    const html = await plugin.getURL(mainURL);
-    const $dom = $($.parseHTML(html));
-    head = extractHeadInfo($dom);
-    if (!head)
-      throw new Error('Could not find IMDB profile.');
+    const url = await plugin.getResponseURL('https://www.imdb.com/profile');
+    if (!url)
+      throw new Error('Failed to load IMDB profile.');
 
-    return head;
-  }
-
-  // Extract a link to the user's profile from an IMDB page.
-  function extractHeadInfo($dom) {
-    if (!$dom)
-      $dom = $(document);
-
-    // Strips off query string
-    const profileLink = $dom.find('#nb_personal a').first().attr('href') || '';
-    const reviewerID = (profileLink.match(/\/user\/(ur[0-9]+)/) || [])[1];
-    const reviewerName = $dom.find('#consumer_user_nav a').first().text().trim();
+    const path = new URL(url).pathname;
+    if (!/^\/user\//.test(path))
+      throw new Error('Failed to locate IMDB profile. Please check if you are logged in.');
 
     const head = {
-      reviewerID,
-      reviewerName
+      reviewerName: $('.navbar__user-menu-toggle__name').text(),
+      reviewerID: path.match(/^\/user\/(.*)\//)[1]
     };
-    // Reviewer name is optional; reviewer ID is required for successful operation
-    return reviewerID ? head : null;
+
+    return head;
   }
 
   async function retrieveReviews({ url } = {}) {
@@ -108,6 +104,7 @@
       url = `/user/${reviews.head.reviewerID}/reviews`;
     }
 
+    plugin.report('Fetching reviews');
     const reviewIndex = await plugin.getURL(url);
 
     let $dom = $($.parseHTML(reviewIndex)),
@@ -137,7 +134,6 @@
     } while (hasMore);
 
 
-    plugin.report('Fetching reviews');
     return reviews;
   }
 
@@ -253,4 +249,5 @@
 
     return url;
   }
+
 })();

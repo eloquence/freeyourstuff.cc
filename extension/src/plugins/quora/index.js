@@ -42,20 +42,48 @@
     }
   }
 
-  // The second check should succeed for a logged in user even if AJAX requests
-  // haven't completed yet.
   function loggedIn() {
-    return $('.MoreNavItem.SidebarNavItem.SiteHeaderNavItem.HoverMenu').length > 0;
+    return getUserMenu() !== null;
+  }
+
+  // Quora serves different CSS to different audiences.
+  //
+  // Returns an object containing
+  // - the jQuery object for the user menu
+  // - a menu version, so we can potentially modify behavior throughout the code
+  //
+  // Returns null if no user menu can be found.
+  //
+  // IMPORTANT: Verify that these classes are present with JavaScript disabled,
+  // as this check may run before all AJAX requests are completed.
+  function getUserMenu() {
+    const $classicMenu = $('.MoreNavItem.SidebarNavItem.SiteHeaderNavItem.HoverMenu');
+    if ($classicMenu.length)
+      return {
+        $userMenu: $classicMenu,
+        menuVersion: 1
+      };
+    // This seems like the least fragile selector, but it necessitates
+    // using parent() to find the actual menu.
+    const $newMenuSelector = $('div.Box-sc-9env3-0 img').first();
+    if ($newMenuSelector.length)
+      return {
+        $userMenu: $newMenuSelector.parent(),
+        menuVersion: 2
+      };
+    return null;
   }
 
   // The main coordinating function. Refactor potential in the execution loop.
   async function retrieveAnswers({ url } = {}) {
+
     // Open menu to get user ID and wait for page to finish loading
     await awaitInitialAJAXRequests();
 
-    const profileLink = $('.MoreNavItem.SidebarNavItem.SiteHeaderNavItem.HoverMenu').find('a').first().attr('href'),
-      profileURL = url || `https://www.quora.com${profileLink}`,
-      answersURL = `${profileURL}/answers`;
+    // Hackish, but seems to work across both menu versions once they are expanded.
+    const profileLink= $('a[href="/content"]').parent().parent().parent().find('a').first().attr('href'),
+        profileURL = url || `https://www.quora.com${profileLink}`,
+        answersURL = `${profileURL}/answers`;
 
     if (decodeURI(window.location.href) != answersURL || $('#freeyourstuff-status').length) {
       plugin.report('Redirecting to answers list');
@@ -117,9 +145,15 @@
 
   async function awaitInitialAJAXRequests() {
     // We can't get the profile URL without opening the menu.
-    $('.MoreNavItem a').first()[0].click();
-    plugin.report('Waiting for page to finish loading');
-    await plugin.awaitSelector('.MoreNavItem.SidebarNavItem.SiteHeaderNavItem.HoverMenu svg');
+    const { $userMenu, menuVersion } = getUserMenu();
+
+    // The classic menu is accessible via an anchor, the new one is not.
+    if (menuVersion == 1)
+      $userMenu.find('a')[0].click();
+    else
+      $userMenu[0].click();
+
+    await plugin.awaitSelector('a[href="/content"]');
   }
 
   // Some long answers are collapsed by default and need AJAX requests to get the

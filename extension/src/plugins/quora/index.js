@@ -127,8 +127,8 @@
         let $visible = $('<div id="scroll-position" style="height:2160px;"></div>');
         $(document.body).append($visible);
         let scrollTo = $('#scroll-position').position().top;
-        window.scrollTo(0, 0);
         window.scrollTo(0, scrollTo);
+        window.scrollTo(0, 0);
         $visible.remove();
         // Returns 0 if it times out
         displayedAnswerCount = await pollForDisplayedAnswers(counter, tries, maxTries);
@@ -195,10 +195,10 @@
   async function pollForDisplayedAnswers(counter, attemptNumber, maxAttempts) {
     let wait, message;
     if (counter.progress == counter.total) {
-      wait = 2500;
+      wait = 5000;
       message = `Final check for missing answers`;
     } else {
-      wait = 5000;
+      wait = 10000;
       message = `Loading more answers ` +
         `(${counter.progress} of ${counter.total} downloaded)`;
       if (attemptNumber > 1)

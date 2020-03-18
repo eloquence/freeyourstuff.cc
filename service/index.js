@@ -85,6 +85,7 @@ app.use(routes.pages.root);
 app.use(routes.pages.plugins);
 app.use(routes.pages.mirrors);
 app.use(routes.pages.faq);
+app.use(routes.pages.privacy);
 app.use(routes.pages.osb2016);
 app.use(routes.content.view);
 app.use(routes.content.browse);

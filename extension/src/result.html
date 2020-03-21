@@ -113,11 +113,7 @@
       cursor: help;
     }
 
-    #nonStandardURLNotice {
-      display: none;
-    }
-
-    #loginInfo, #licenseInfo {
+    #nonStandardURLNotice, #loginInfo, #licenseInfo, #needPermission {
       display: none;
     }
 
@@ -137,6 +133,9 @@
     <div id="nonStandardURLNotice" class="message">
       Instead of freeyourstuff.cc, the extension is currently configured to publish to
       <code><span id="nonStandardURL"></span></code>.
+    </div>
+    <div id="needPermission" class="message success">
+    Want to publish your data under an open license? <a href="#" id="grantPermission"><b>Grant permission</b></a> to the extension to publish your data on freeyourstuff.cc.
     </div>
     <div id="signedout">
       You need to be logged into freeyourstuff.cc to publish your content:

@@ -3,7 +3,7 @@
   "minimum_chrome_version": "55",
   "name": "Free Your Stuff",
   "description": "Lets you download your contributions to sites you contribute to",
-  "version": "0.5.9",
+  "version": "0.6.0",
   "background": {
     "scripts": ["src/init.js", "src/background.js"],
     "persistent": false
@@ -29,8 +29,7 @@
     "declarativeContent",
     "activeTab",
     "storage",
-    "unlimitedStorage",
-    "https://freeyourstuff.cc/"
+    "unlimitedStorage"
   ],
-  "optional_permissions": [ "https://*/" ]
+  "optional_permissions": [ "https://freeyourstuff.cc/", "https://www.quora.com/" ]
 }

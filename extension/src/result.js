@@ -12,30 +12,15 @@
     loadExample('yelp');
   }
 
-  function getPermissions() {
-    return new Promise(function(resolve) {
-      chrome.permissions.getAll(permissions => {
-        resolve(permissions);
-      });
-    });
-  }
-
   function displayHandler(request) {
     if (request.action === 'display' && request.data && request.schema) {
-      getPermissions().then(permissions => {
+      // TODO: Support overriding
+      let baseURL = defaultBaseURL;
 
-        let baseURL;
-
-        // If we have a cross-origin permission defined in manifest.json,
-        // we use it for the base URL, matching up to (and including) the
-        // first slash.
-        baseURL = permissions && permissions.origins && permissions.origins[0] ?
-          permissions.origins[0].match(/.*\//)[0] : defaultBaseURL;
-        // For debugging / inspection
-        window.siteSet = request.data;
-        showData(request.data, request.schema, baseURL);
-        chrome.runtime.onMessage.removeListener(displayHandler);
-      });
+      // For debugging / inspection
+      window.siteSet = request.data;
+      showData(request.data, request.schema, baseURL);
+      chrome.runtime.onMessage.removeListener(displayHandler);
     }
   }
 
@@ -75,7 +60,18 @@
   }
 
   // retry: Whether this was user-triggered.
-  function checkLoginStatus(retry, baseURL, loginTab) {
+  async function checkLoginStatus(retry, baseURL, loginTab) {
+
+    if (!await hasPermission(baseURL)) {
+      $('#signedout').hide();
+      $('#publish').hide();
+      $('#licenseSelector').hide();
+      $('#licenseInfo').hide();
+      $('#loginInfo').hide();
+      $('#needPermission').show();
+      return false;
+    }
+    $('#needPermission').hide();
     $.get(`${baseURL}api/loginstatus`).done(res => {
 
       // Hide previous warning messages
@@ -144,11 +140,19 @@
     $('#pinging').fadeOut();
   }
 
+  function getPermissionClickHandler(url) {
+    return async function(e) {
+      if (await requestPermission(url))
+        // Will hide permission div and show login divs as needed
+        checkLoginStatus(false, url);
+      e.preventDefault();
+    };
+  }
+
   function getPublishClickHandler(data, baseURL) {
     return function(_e) {
       data.license = $('#publish').val();
       let json = JSON.stringify(data, null, 2);
-
       $('#publish').prop('disabled', true); // Prevent repeat submission
       $.ajax({
         type: 'POST',
@@ -193,6 +197,7 @@
     $('#download').attr('href', window.URL.createObjectURL(blob));
     $('#download').attr('download', 'data.json');
 
+    $('#grantPermission').click(getPermissionClickHandler(baseURL));
     $('#publish').click(getPublishClickHandler(data, baseURL));
     $('#licenseSelector a').click(licenseClickHandler);
     $('#facebook').click(getLinkOpener(`${baseURL}auth/facebook`, baseURL));
@@ -322,6 +327,34 @@
       return `<video src="${videoURL}" width="320" controls></video>`;
     else
       return '';
+  }
+
+  function hasPermission(url) {
+    return new Promise(resolve => {
+      chrome.permissions.contains({
+        origins: [url]
+      }, result => {
+        console.log(url);
+        console.log(result);
+        if (result)
+          resolve(true);
+        else
+          resolve(false);
+      });
+    });
+  }
+
+  function requestPermission(url) {
+    return new Promise(resolve => {
+      chrome.permissions.request({
+        origins: [url]
+      }, granted => {
+        if (granted)
+          resolve(true);
+        else
+          resolve(false);
+      });
+    });
   }
 
   function licenseClickHandler() {

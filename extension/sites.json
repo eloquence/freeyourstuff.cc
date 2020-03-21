@@ -30,7 +30,8 @@
   "canonicalURL": "https://www.tripadvisor.com/",
   "regex": "http(s)*://(www.)*tripadvisor.com/",
   "supported": ["Reviews"],
-  "unsupported": ["Maps", "Comments", "Questions", "Photographs", "Lists"]
+  "unsupported": ["Maps", "Comments", "Questions", "Photographs", "Lists"],
+  "temporarilyDisabled": true
 },
 {
   "name": "Amazon.com",

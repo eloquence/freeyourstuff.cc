@@ -4,7 +4,13 @@
 
   const freeyourstuff = window.freeyourstuff,
     plugin = freeyourstuff.plugin,
-    DataSet = freeyourstuff.DataSet;
+    DataSet = freeyourstuff.DataSet,
+    selectors = {
+      menu: '.q-fixed.qu-fullX .q-inlineFlex.qu-overflow--hidden.qu-borderRadius--circle',
+      answerCount: '.q-box.qu-overflowX--hidden.qu-whiteSpace--nowrap div.qu-borderColor--red',
+      answerContent: '.spacing_log_answer_content',
+      feedDiv: '.q-box.qu-borderBottom.qu-pt--small.qu-pb--small~div:not([class])'
+    };
 
   // Dataset IDs and the function to retrieve that data in raw, uncoerced JSON
   freeyourstuff.jsonData = {
@@ -43,35 +49,7 @@
   }
 
   function loggedIn() {
-    return getUserMenu() !== null;
-  }
-
-  // Quora serves different CSS to different audiences.
-  //
-  // Returns an object containing
-  // - the jQuery object for the user menu
-  // - a menu version, so we can potentially modify behavior throughout the code
-  //
-  // Returns null if no user menu can be found.
-  //
-  // IMPORTANT: Verify that these classes are present with JavaScript disabled,
-  // as this check may run before all AJAX requests are completed.
-  function getUserMenu() {
-    const $classicMenu = $('.MoreNavItem.SidebarNavItem.SiteHeaderNavItem.HoverMenu');
-    if ($classicMenu.length)
-      return {
-        $userMenu: $classicMenu,
-        menuVersion: 1
-      };
-    // This seems like the least fragile selector, but it necessitates
-    // using parent() to find the actual menu.
-    const $newMenuSelector = $('div.Box-sc-9env3-0 img').first();
-    if ($newMenuSelector.length)
-      return {
-        $userMenu: $newMenuSelector.parent(),
-        menuVersion: 2
-      };
-    return null;
+    return $(selectors.menu).length > 0;
   }
 
   // The main coordinating function. Refactor potential in the execution loop.
@@ -91,7 +69,7 @@
       return false;
     }
 
-    const author = $('meta[name="twitter:title"]').attr('content'),
+    const author = $('title').text().split(' - Quora')[0],
       answerCount = extractAnswerCount(),
       answers = {
         head: {
@@ -104,7 +82,7 @@
         progress: 0,
         total: answerCount
       };
-    let displayedAnswerCount = $('.AnswerListItem').length;
+    let displayedAnswerCount = $(selectors.answerContent).parent().length;
 
     if (answerCount) {
       plugin.report(`Preparing download of ${answerCount} answers`);
@@ -132,6 +110,8 @@
         $visible.remove();
         // Returns 0 if it times out
         displayedAnswerCount = await pollForDisplayedAnswers(counter, tries, maxTries);
+        // Throttle requests to avoid getting "Too many requests" errors
+        await plugin.sleep(1000);
       } while (counter.progress < counter.total && !displayedAnswerCount && tries < maxTries);
     } while (displayedAnswerCount);
 
@@ -145,21 +125,14 @@
 
   async function awaitInitialAJAXRequests() {
     // We can't get the profile URL without opening the menu.
-    const { $userMenu, menuVersion } = getUserMenu();
-
-    // The classic menu is accessible via an anchor, the new one is not.
-    if (menuVersion == 1)
-      $userMenu.find('a')[0].click();
-    else
-      $userMenu[0].click();
-
+    $(selectors.menu).click();
     await plugin.awaitSelector('a[href="/content"]');
   }
 
   // Some long answers are collapsed by default and need AJAX requests to get the
   // whole thing.
   async function expandVisibleMoreLinks() {
-    const moreLinks = $('a.ui_qtext_more_link:visible').toArray();
+    const moreLinks = $('.qt_read_more').toArray();
     for (let moreLink of moreLinks) {
       moreLink.click();
       await waitForElementToBeHidden(moreLink);
@@ -206,11 +179,11 @@
     }
     plugin.report(message);
     try {
-      await plugin.awaitSelector('.AnswerListItem', 50, wait);
+      await plugin.awaitSelector(selectors.answerContent, 50, wait);
     } catch (_error) {
       return 0;
     }
-    return $('.AnswerListItem').length;
+    return $(selectors.answerContent).length;
   }
 
   // When you have a lot of answers, loading them all on one page will quickly
@@ -218,7 +191,7 @@
   // DOM and show a nice status message.
   async function extractAndHideVisibleAnswers(counter) {
     const data = [],
-      answers = $('.AnswerListItem').toArray();
+      answers = $(selectors.answerContent).parent().toArray();
     for (let answer of answers) {
       const extractedAnswer = await extractAnswer($(answer));
       if (extractedAnswer) {
@@ -228,42 +201,17 @@
       }
     }
     if (!$('#freeyourstuff-status').length)
-      $('.AnswerListItem').first().before('<div id="freeyourstuff-status">' +
+      $(selectors.feedDiv).before('<div id="freeyourstuff-status">' +
         '<h3>Answers will appear and disappear here while freeyourstuff.cc ' +
         'is downloading.</h3>');
-    $('.AnswerListItem').remove();
+    $(selectors.answerContent).parent().parent().parent().parent().parent().parent().remove();
     return data;
   }
 
-  // Okay, this probably wants to be refactored :-). Much of the complexity
-  // is in a) anticipating AJAX requests, b) dealing with dates.
   async function extractAnswer($answer) {
 
-    // Before anything else, attempt to get the long-form answer and re-try
-    // if it's not rendered yet. Given Quora's asynchronous loading
-    // strategies, this is necessary to avoid "undefined" answers.
-    const getAnswerHTML = () => $answer.find('.ui_qtext_expanded span').html();
-    let answerHTML,
-      elapsedTime = 0,
-      waitIncrement = 50, // 500 must be divisible by this number, see below
-      maxTime = 30000;
-
-    while ((answerHTML = getAnswerHTML()) === undefined) {
-      const $moreLink = $answer.find('a.ui_qtext_more_link').first();
-      // Sometimes the first request times out, so we try again every .5 seconds
-      if (elapsedTime > 500 && elapsedTime % 500 === 0 && $moreLink.length) {
-        $moreLink[0].click();
-      }
-
-      if (elapsedTime >= maxTime) {
-        plugin.report('Could not obtain answer, skipping');
-        return;
-      }
-      await plugin.waitFor(waitIncrement);
-      elapsedTime += waitIncrement;
-    }
-
-    const $firstQuestionLink = $answer.find('.question_link').first(),
+    const answerHTML= $answer.find(selectors.answerContent).find('div span').html(),
+      $firstQuestionLink = $answer.find('div.q-flex.qu-mb--tiny a').first(),
       question = $firstQuestionLink.text(),
       questionLink = $firstQuestionLink.attr('href'),
       questionURL = /^https:\/\//.test(questionLink) ? questionLink : `https://www.quora.com${questionLink}`,
@@ -288,6 +236,9 @@
     // Remove divs and spans completely, but keep their contents
     $answerText.find('span,div').contents().unwrap();
 
+    // Strip external link indicators
+    $answerText.find('a~svg').remove();
+
     const answerText = $answerText.html();
     $answerText.remove();
 
@@ -295,9 +246,7 @@
     // "8h ago" to "May 12, 2012" type formats. We try to parse all of them
     // correctly, but if there is an error-prone area in this code, it's
     // this one.
-    const answerPermalinkText = $answer.find('.answer_permalink').first().text(),
-      // This matches both dates with and without an author (author is shown on spaces)
-      dateText = (answerPermalinkText.match(/(Written|Updated|Answered) (.*?)( by |$)/) || [])[2];
+    const dateText = $answer.parent().find('.qu-color--gray a').first().text();
 
     let date;
     if (/^\d{1,2}(h|m|s) ago$/.test(dateText)) {
@@ -349,7 +298,7 @@
   // The answer count may have a thousands separator. This function uses the
   // numeral library to deal with it.
   function extractAnswerCount() {
-    const asText = $('.AnswersNavItem .list_count').text();
+    const asText = $(selectors.answerCount).text().split(' ')[0];
     return numeral(asText).value();
   }
 })();

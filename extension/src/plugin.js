@@ -287,6 +287,10 @@
       const error = new Error(message);
       error.details = plugin.getConnectionErrorDetails(url, event);
       return error;
+    },
+
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
   };
@@ -298,4 +302,5 @@
   function usePuppeteer() {
     return window.freeyourstuff.puppeteer === true;
   }
+
 })();

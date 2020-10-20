@@ -204,7 +204,7 @@
       $(selectors.feedDiv).before('<div id="freeyourstuff-status">' +
         '<h3>Answers will appear and disappear here while freeyourstuff.cc ' +
         'is downloading.</h3>');
-    $(selectors.answerContent).parent().parent().parent().parent().parent().parent().remove();
+    $(selectors.answerContent).parent().parent().parent().parent().parent().remove();
     return data;
   }
 

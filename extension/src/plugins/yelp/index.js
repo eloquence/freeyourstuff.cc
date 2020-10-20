@@ -37,7 +37,7 @@
   }
 
   function loggedIn() {
-    return Boolean($('.user-account .user-display-name').html());
+    return $('a[href^="/login"]').length == 0;
   }
 
   async function retrieveReviews({ url } = {}) {

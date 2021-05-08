@@ -3,7 +3,6 @@
 const app = require('koa')(); // extremely lightweight framework for web apps
 const gzip = require('koa-gzip');
 const fs = require('fs');
-const ejs = require('ejs'); // simple templates with embedded JS
 const mongoose = require('mongoose'); // MongoDB ODB
 const session = require('koa-generic-session');
 const MongoStore = require('koa-generic-session-mongo');
@@ -13,7 +12,7 @@ const morgan = require('koa-morgan');
 const chokidar = require('chokidar'); // monitor file changes
 const path = require('path');
 const url = require('url');
-const createServer = require('auto-sni');
+const greenlock = require('greenlock-express');
 
 // Internal dependencies
 const loadTemplate = require('./templates');
@@ -108,19 +107,27 @@ app.use(routes.api.loginStatus);
 app.use(routes.api.trust_POST);
 app.use(routes.api.siteSet_POST);
 app.use(gzip());
+
 /* ----- End middleware section ------ */
 
-createServer({
-  email: app.config.adminEmail,
-  agreeTos: true,
-  debug: process.env.NODE_ENV == 'production' ? false : true,
-  domains: [ app.config.httpsDomains ],
-  forceSSL: process.env.NODE_ENV == 'production' ? true : false,
-  ports: {
-    http: app.config.httpPort,
-    https: app.config.httpsPort
-  }
-}, app.callback());
 let siteMode = process.env.NODE_ENV === 'production' ? 'PRODUCTION' : 'DEVELOPMENT';
+
+if (siteMode == 'PRODUCTION') {
+  greenlock.init({
+    packageRoot: path.join(__dirname, '..'),
+
+    // contact for security and critical bug notices
+    maintainerEmail: app.config.adminEmail,
+
+    // where to look for configuration
+    configDir: path.join(__dirname, './greenlock'),
+
+    // whether or not to run at cloudscale
+    cluster: false
+  }).serve(app);
+} else {
+  app.listen(app.config.httpPort, '127.0.0.1');
+}
+
 console.log(`${app.config.siteName} service loaded. Running in ${siteMode} mode.`);
 module.exports = app; // For testability

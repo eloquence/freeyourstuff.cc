@@ -7,7 +7,7 @@
     DataSet = freeyourstuff.DataSet,
     selectors = {
       menu: '.q-fixed.qu-fullX .q-inlineFlex.qu-overflow--hidden.qu-borderRadius--circle',
-      answerCount: '.q-box.qu-overflowX--hidden.qu-whiteSpace--nowrap div.qu-borderColor--red',
+      answerCount: '.q-text.qu-fontSize--small.qu-medium.qu-color--red',
       answerContent: '.spacing_log_answer_content',
       feedDiv: '.q-box.qu-borderBottom.qu-pt--small.qu-pb--small~div:not([class])'
     };
@@ -59,8 +59,8 @@
     await awaitInitialAJAXRequests();
 
     // Hackish, but seems to work across both menu versions once they are expanded.
-    const profileLink= $('a[href="/content"]').parent().parent().parent().find('a').first().attr('href'),
-        profileURL = url || `https://www.quora.com${profileLink}`,
+    const profileLink= $('a[href$="/content"]').parent().parent().parent().find('a').first().attr('href'),
+        profileURL = url || profileLink,
         answersURL = `${profileURL}/answers`;
 
     if (decodeURI(window.location.href) != answersURL || $('#freeyourstuff-status').length) {
@@ -126,7 +126,7 @@
   async function awaitInitialAJAXRequests() {
     // We can't get the profile URL without opening the menu.
     $(selectors.menu).click();
-    await plugin.awaitSelector('a[href="/content"]');
+    await plugin.awaitSelector('a[href$="/content"]');
   }
 
   // Some long answers are collapsed by default and need AJAX requests to get the

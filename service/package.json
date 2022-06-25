@@ -59,7 +59,7 @@
     "chrome-cookies-secure": "^1.1.7",
     "colors": "^1.1.2",
     "grunt-babel": "^6.0.0",
-    "jsdom": "^11.5.1",
+    "jsdom": "^16.5.0",
     "tough-cookie": "^2.2.2"
   }
 }

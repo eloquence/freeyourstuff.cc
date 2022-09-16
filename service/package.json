@@ -16,7 +16,7 @@
     "babel-helper-regex": "^6.9.0",
     "babel-types": "^6.9.0",
     "bcrypt-nodejs": "0.0.3",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "bootstrap-show-password": "^1.0.2",
     "chokidar": "^1.4.1",
     "datatables-buttons": "^1.0.3",

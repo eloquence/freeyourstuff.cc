@@ -36,7 +36,7 @@
     "jquery.cookie": "^1.4.1",
     "jsonfile": "^2.2.3",
     "koa": "^1.1.2",
-    "koa-bodyparser": "^2.0.1",
+    "koa-bodyparser": "^2.5.0",
     "koa-connect-flash": "^0.1.2",
     "koa-generic-session": "^1.10.2",
     "koa-generic-session-mongo": "^0.2.5",

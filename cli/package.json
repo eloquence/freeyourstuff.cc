@@ -11,7 +11,7 @@
   "dependencies": {
     "colors": "^1.1.2",
     "commander": "^2.13.0",
-    "config": "^1.29.2",
+    "config": "^3.3.8",
     "is-url-superb": "^2.0.0",
     "jsonfile": "^4.0.0",
     "md5": "^2.2.1",
